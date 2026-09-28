@@ -36,13 +36,13 @@ MODEL_RE = re.compile(r'^[a-z][a-z0-9]*$')
 VERSION_RE = re.compile(r'^v\d{3}$')
 
 DEFAULT_YAML = """schema_version: 1
-identity: {model: {model}, version: {version}, parent: {parent}, status: planned}
+identity: {model: __M__, version: __V__, parent: __P__, status: planned}
 description: >
-  {description}
+  __D__
 hypothesis: >
-  {hypothesis}
+  __H__
 change_vs_parent: >
-  {change}
+  __C__
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -113,8 +113,9 @@ results:
   train_hours: null
   finished_utc: null
 artifacts:
-  log: exploration/logs/log_{model}_{version}.log
-  checkpoint_dir: exploration/checkpoints/checkpoint_{model}_{version}
+  # log and checkpoint_dir are always derived from the key in code, never templated
+  log: null
+  checkpoint_dir: null
   submission_dir: null
 """
 
@@ -219,11 +220,20 @@ def main():
             raise SystemExit(f'missing {TEMPLATE}')
         script.write_text(TEMPLATE.read_text())
         parent = None
-        cfg = yaml.safe_load(DEFAULT_YAML.format(
-            model=args.model, version=args.version, parent=parent,
-            description=args.description or 'TODO: what this model IS, in plain words',
-            hypothesis=args.hypothesis or 'TODO: what we expect to learn, and why',
-            change=args.change or 'TODO: the exact delta vs the parent'))
+        text = (DEFAULT_YAML
+                .replace('__M__', args.model)
+                .replace('__V__', args.version)
+                .replace('__P__', str(parent))
+                .replace('__D__', args.description or 'TODO: what this model IS, in plain words')
+                .replace('__H__', args.hypothesis or 'TODO: what we expect to learn, and why')
+                .replace('__C__', args.change or 'TODO: the exact delta vs the parent'))
+        cfg = yaml.safe_load(text)
+
+    # artifact paths are derived from the experiment key (AGENTS.md §4) so that a
+    # templating slip can never point a run at another version's files
+    cfg.setdefault('artifacts', {})['log'] = f'exploration/logs/log_{args.model}_{args.version}.log'
+    cfg['artifacts']['checkpoint_dir'] = \
+        f'exploration/checkpoints/checkpoint_{args.model}_{args.version}'
 
     for kv in args.set:
         if '=' not in kv:
