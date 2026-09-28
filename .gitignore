@@ -3,3 +3,15 @@ __pycache__/
 
 # Datasets are too large for GitHub (100MB per-file limit); fetch them separately.
 datasets/
+
+# Regenerable memmap shard cache (built by tools/make_shards.py).
+cache/
+
+# Training artifacts: large and regenerable from the yaml + seed.
+exploration/checkpoints/
+exploration/logs/
+
+# Packaged submission archives (the unzipped bundles are kept for inspection).
+submissions/*/*.zip
+
+.DS_Store
