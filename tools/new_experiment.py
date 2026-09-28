@@ -194,6 +194,9 @@ def main():
         if not p_script.exists() or not p_config.exists():
             raise SystemExit(f'parent {args.parent} not found '
                              f'({p_script.name} / {p_config.name} missing)')
+        # --description/--hypothesis/--change must still win when cloning a parent,
+        # otherwise every child inherits the parent's prose and the version is
+        # mislabelled in the yaml (measured 2026-09-29 on gru_v004).
         src = p_script.read_text()
         # rewrite the identity constants so the solution section names the new version
         src, n1 = _re.subn(r"(?m)^MODEL_NAME = '[^']*'$", f"MODEL_NAME = '{args.model}'", src)
@@ -215,6 +218,12 @@ def main():
             f'exploration/checkpoints/checkpoint_{args.model}_{args.version}'
         if 'param_count' in cfg.get('model', {}):
             cfg['model']['param_count'] = None
+        if args.description:
+            cfg['description'] = args.description
+        if args.hypothesis:
+            cfg['hypothesis'] = args.hypothesis
+        if args.change:
+            cfg['change_vs_parent'] = args.change
     else:
         if not TEMPLATE.exists():
             raise SystemExit(f'missing {TEMPLATE}')
