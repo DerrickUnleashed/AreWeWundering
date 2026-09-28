@@ -1,8 +1,9 @@
 venv/
 __pycache__/
 
-# Datasets are too large for GitHub (100MB per-file limit); fetch them separately.
-datasets/
+# datasets/ is NOT ignored: the parquet files are tracked with git-lfs
+# (.gitattributes, committed 2026-09-29), which supersedes the original
+# "too large for GitHub" workaround.  Do not re-add the line.
 
 # Regenerable memmap shard cache (built by tools/make_shards.py).
 cache/
