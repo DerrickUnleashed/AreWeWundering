@@ -1,9 +1,15 @@
 venv/
 __pycache__/
 
-# datasets/ is NOT ignored: the parquet files are tracked with git-lfs
-# (.gitattributes, committed 2026-09-29), which supersedes the original
-# "too large for GitHub" workaround.  Do not re-add the line.
+# datasets/valid_mask.parquet IS tracked with git-lfs (92 MB, under the 2 GiB
+# per-LFS-object limit).  train.parquet (29.2 GB) and valid.parquet (5.6 GB)
+# cannot be: GitHub rejects any single LFS object over 2 GiB, and the 33 GB
+# total would exceed the free 10 GiB storage tier anyway.  Both are organiser
+# files that arrive with the starter pack and are byte-identical to it; their
+# sha256 sums and the cache-regeneration command are in
+# datasets/MANIFEST.md.  Do not re-add these two lines.
+datasets/train.parquet
+datasets/valid.parquet
 
 # Regenerable memmap shard cache (built by tools/make_shards.py).
 cache/
