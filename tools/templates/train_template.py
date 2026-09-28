@@ -123,8 +123,15 @@ def reproducibility_header(cfg, command):
     print('=' * 78, flush=True)
 
 
-def write_yaml_results(path, cfg, status=None, model_updates=None, results=None, artifacts=None):
-    """Only identity.status / model.param_count / results.* / artifacts.* are written back."""
+def write_yaml_results(path, cfg, status=None, model_updates=None, results=None, artifacts=None,
+                       clear_results=()):
+    """Only identity.status / model.param_count / results.* / artifacts.* are written back.
+
+    `results` entries whose value is None are IGNORED, so a value written by an
+    earlier run survives -- that is deliberate for a resumed run, but it means a
+    field can only be *revoked* through `clear_results`, which is why a subset
+    rescore explicitly clears `full_valid_wp` (AGENTS.md §6).
+    """
     data = yaml.safe_load(Path(path).read_text())
     if status is not None:
         data['identity']['status'] = status
@@ -132,6 +139,8 @@ def write_yaml_results(path, cfg, status=None, model_updates=None, results=None,
         data['model'].update(model_updates)
     if results:
         data.setdefault('results', {}).update({k: v for k, v in results.items() if v is not None})
+    for k in clear_results:
+        data.setdefault('results', {})[k] = None
     if artifacts:
         data.setdefault('artifacts', {}).update({k: v for k, v in artifacts.items() if v is not None})
     Path(path).write_text(yaml.safe_dump(data, sort_keys=False))
@@ -956,6 +965,7 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
                                     'full_valid_wp': full_wp,
                                     'train_hours': round((time.time() - t_start) / 3600, 4),
                                     'finished_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())},
+                           clear_results=() if full_wp is not None else ('full_valid_wp',),
                            artifacts={'submission_dir': None})
     return {'best_wp': best_wp, 'full_wp': full_wp, 'params': nparams}
 

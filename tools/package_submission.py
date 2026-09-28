@@ -236,10 +236,10 @@ def main():
             r = run([args.python, ROOT / 'tools' / 'bench_latency.py',
                      '--solution', bundle / 'solution.py', '--rows', args.latency_rows,
                      '--breakdown', '--json'])
-            if r.returncode is None:
-                m = re.search(r'^\{', r.stdout, re.M)
-                if m:
-                    gate['latency'] = json.loads(r.stdout[m.start():])
+            # bench_latency exits 0 on PASS and 1 on FAIL; the report is on stdout either way
+            m = re.search(r'^\{', r.stdout, re.M)
+            if m:
+                gate['latency'] = json.loads(r.stdout[m.start():])
             ok = r.returncode == 0
             gate['latency_pass'] = ok
             if not ok:

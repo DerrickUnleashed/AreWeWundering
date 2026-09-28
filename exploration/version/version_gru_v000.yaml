@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v000
   parent: None
-  status: running
+  status: smoke
 description: 'Framework smoke test. Not a real result.
 
   '
@@ -76,11 +76,11 @@ results:
   best_val_wp: 0.5703406597960128
   best_val_t0: 0.5570966478934152
   best_val_t1: 0.5835846716986103
-  full_valid_wp: 0.5703406597960128
+  full_valid_wp: null
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0117
-  finished_utc: '2026-09-28T18:36:44Z'
+  train_hours: 0.0006
+  finished_utc: '2026-09-28T18:41:55Z'
 artifacts:
   log: exploration/logs/log_gru_v000.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v000
