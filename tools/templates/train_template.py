@@ -88,8 +88,14 @@ class Tee:
         self.stdout.flush()
 
     def close(self):
+        # restore the hooks BEFORE closing the file, otherwise the interpreter's
+        # final traceback print hits a closed stream ("I/O operation on closed file")
+        sys.excepthook = sys.__excepthook__
         sys.stdout, sys.stderr = self.stdout, self.stderr
-        self.stream.close()
+        try:
+            self.stream.close()
+        except Exception:
+            pass
 
 
 def reproducibility_header(cfg, command):
@@ -207,6 +213,13 @@ class FeatureTransform:
         self._diff_idx = self.diff.astype(_np.int32) if self.n_diff else self.diff
         self._step_i = 0
         self._have_prev = False
+        # If every optional block is off and there is no normalisation, the
+        # transform is the identity.  The organiser already ships standardised
+        # features (AGENTS.md §14), so this is the common case and it lets
+        # predict() skip two copies per row -- ~1.5 us of a 30 us budget.
+        self.identity = (self.norm == 'none' and not self.signed_log
+                         and self.n_cross == 0 and self.n_diff == 0
+                         and self.step_feature == 0)
 
     # ------------------------------------------------------------------ helpers
     def reset(self):
@@ -273,6 +286,8 @@ class FeatureTransform:
         The returned array is REUSED on the next call; copy it if you need to keep
         it.  `PredictionModel.predict` feeds it straight into the ONNX session.
         """
+        if self.identity:
+            return _np.asarray(x_row, dtype=_np.float32).reshape(-1)
         x = _np.asarray(x_row, dtype=_np.float32).reshape(-1)
         base = self._base
         _np.copyto(base[:self.n_in], x)
@@ -322,10 +337,14 @@ class PredictionModel:
         self.session = _ort.InferenceSession(
             _os.path.join(ARTIFACT_DIR, 'model.onnx'), sess_options=options,
             providers=['CPUExecutionProvider'])
+        # input signature is features[1, 1, F] / hidden_0[1, 1, H] (the baseline's
+        # shape); the feature dimension is therefore the LAST axis, not index 1.
         meta = self.session.get_inputs()[0].shape
-        self.hidden = int(meta[2])
-        self.feat_dim = int(meta[1])
+        self.feat_dim = int(meta[-1])
+        hmeta = self.session.get_inputs()[1].shape
+        self.hidden = int(hmeta[-1])
         self._x = _np.zeros((1, 1, self.feat_dim), dtype=_np.float32)
+        self._p = _np.zeros(2, dtype=_np.float32)
         self._h0 = _np.zeros((1, 1, self.hidden), dtype=_np.float32)
         self._h1 = _np.zeros((1, 1, self.hidden), dtype=_np.float32)
         self.current_seq_ix = None
@@ -348,25 +367,40 @@ class PredictionModel:
         if self.previous_step is not None and step != self.previous_step + 1:
             raise ValueError('rows must arrive in sequence order')
         self.previous_step = step
-        x = self.transform.step(data_point.state)
-        _np.copyto(self._x[0, 0], x)
+        if self.transform.identity:
+            _np.copyto(self._x[0, 0], data_point.state)
+        else:
+            _np.copyto(self._x[0, 0], self.transform.step(data_point.state))
         pred, self._h0, self._h1 = self.session.run(
             None, {'features': self._x, 'hidden_0': self._h0, 'hidden_1': self._h1})
         if not data_point.need_prediction:
             return None
-        p = _np.clip(pred[0, 0], -METRIC_CLIP, METRIC_CLIP).astype(_np.float32)
-        if not _np.isfinite(p).all():
+        # _np.isfinite(...).all() allocates a bool array per call (~1 us); scalar
+        # comparisons are exact (NaN and inf both fail `abs(v) < 1e30`) and ~10x cheaper.
+        p0 = pred[0, 0, 0]
+        p1 = pred[0, 0, 1]
+        if not (abs(p0) < 1e30 and abs(p1) < 1e30):
             raise ValueError('non-finite prediction')
-        return p
+        _np.clip(pred[0, 0], -METRIC_CLIP, METRIC_CLIP, out=self._p)
+        return self._p
 # ===== END SOLUTION SECTION =====
 
 
 # ===== SECTION: MODEL (PyTorch) =====
 class GRUModel(nn.Module):
-    """input_proj (optional) -> GRU stack -> linear head(2).
+    """input_proj (optional) -> stack of single-layer GRUs -> linear head(2).
 
-    The feature transform is applied OUTSIDE the model (in numpy, in the solution
-    section) so that the same code runs at train and at serve time and so that a
+    WHY A STACK OF `nn.GRU(num_layers=1)` INSTEAD OF ONE `nn.GRU(num_layers=L)`:
+    at inference the graph must carry one ONNX `GRU` op per layer whose initial
+    state is passed straight through, which is exactly what the organiser's
+    `baseline.onnx` does (10 nodes total, hidden_0/hidden_1 in, next_hidden_0/1
+    out).  Handing `nn.GRU(num_layers=2)` a packed (2, 1, H) state makes the
+    exporter emit Split/Concat/Slice/Gather plumbing (50 nodes) and cost ~8 us/row
+    more per call at batch 1 -- 30 % of this model's entire budget.  Measured, not
+    assumed (AGENTS.md §10.4).
+
+    The feature transform is applied OUTSIDE the model (in numpy, inside the
+    solution section) so the same code runs at train and at serve time and so a
     linear part of the transform could later be folded into `input_proj` at export
     time.  `forward_chunk` returns a prediction for every step of the chunk.
     """
@@ -377,20 +411,30 @@ class GRUModel(nn.Module):
         self.hidden = hidden
         self.layers = layers
         self.input_proj = input_proj
+        width = input_proj or in_dim
         self.proj = nn.Linear(in_dim, input_proj) if input_proj else nn.Identity()
-        self.gru = nn.GRU(input_proj or in_dim, hidden, layers,
-                          batch_first=True, dropout=dropout if layers > 1 else 0.0)
+        self.grus = nn.ModuleList([nn.GRU(width if i == 0 else hidden, hidden, 1,
+                                         batch_first=True) for i in range(layers)])
+        self.drop = nn.Dropout(dropout) if (dropout and layers > 1) else None
         self.head = nn.Linear(hidden, 2)
-        self._h0 = [torch.zeros(1, 1, hidden) for _ in range(layers)]
+
+    def _run(self, z, h):
+        """z (1, T, width); h = list of (1, B, hidden). Returns (1, T, width), h."""
+        h = list(h)
+        for i, gru in enumerate(self.grus):
+            z, h[i] = gru(z, h[i])
+            if self.drop is not None:
+                z = self.drop(z)
+        return z, h
 
     def forward_chunk(self, x, h):
         """x (B, T, in_dim) already transformed; h = list of (1, B, hidden)."""
-        y, hn = self.gru(self.proj(x), h)
+        y, hn = self._run(self.proj(x), h)
         return self.head(y), hn
 
     def forward_step(self, x, h):
-        """x (1, in_dim) single row; h = list of (1, 1, hidden)."""
-        y, hn = self.gru(self.proj(x.view(1, 1, -1)), h)
+        """x (in_dim,) single row; h = list of (1, 1, hidden)."""
+        y, hn = self._run(self.proj(x).view(1, 1, -1), h)
         return self.head(y[:, -1]), hn
 
 
@@ -406,8 +450,10 @@ class StepGraph(nn.Module):
         self.model = model
 
     def forward(self, features, hidden_0, hidden_1):
-        p, hn = self.model.forward_step(features[0, 0], [hidden_0[0, 0], hidden_1[0, 0]])
-        return (p.reshape(1, 1, 2), hn[0].reshape(1, 1, -1), hn[1].reshape(1, 1, -1))
+        # the states are already (1, 1, H) -- the exact layout a single-layer GRU
+        # wants -- so they pass through the graph untouched, as in baseline.onnx
+        p, hn = self.model.forward_step(features[0, 0], [hidden_0, hidden_1])
+        return p.reshape(1, 1, 2), hn[0], hn[1]
 
 
 class IdentityTransformNn(nn.Module):
@@ -440,10 +486,14 @@ def export_inference(model, transform, out_dir, opset=17, verify=True, device='c
              torch.zeros(1, 1, h, device=device))
     path = out / 'model.onnx'
     with torch.no_grad():
+        # dynamo=False selects the TorchScript exporter.  The dynamo exporter is
+        # the default in torch>=2.9 but needs the extra `onnxscript` package, which
+        # is NOT in requirements.txt, so we keep the dependency-free path (it is
+        # also what produced baseline.onnx with producer pytorch 2.5.1).
         torch.onnx.export(graph, dummy, str(path), opset_version=opset,
                           input_names=['features', 'hidden_0', 'hidden_1'],
                           output_names=['prediction', 'next_hidden_0', 'next_hidden_1'],
-                          dynamic_axes=None, do_constant_folding=True)
+                          dynamic_axes=None, do_constant_folding=True, dynamo=False)
     if verify:
         import onnxruntime as ort
         o = ort.SessionOptions()
@@ -660,7 +710,7 @@ def chunk_loss(pred, target, mask, loss_cfg, state=None):
     """
     m = mask if str(loss_cfg.get('mask', 'soft')) == 'soft' else (mask > 0.5).to(mask.dtype)
     y = target.clamp(-METRIC_CLIP, METRIC_CLIP)
-    w = y.abs() * m
+    w = y.abs() * m.unsqueeze(-1)          # m is (B, T): broadcast over the 2 targets
     B, T, K = w.shape
     fw = w.reshape(-1, K)
     fy = y.reshape(-1, K)
@@ -837,7 +887,7 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
         if ema:
             ema.update(model)
         if step % 25 == 0 or step == total_steps - 1:
-            print(f'step {step}/{total_steps} lr {lr:.2e} loss {float(loss):.6f} '
+            print(f'step {step}/{total_steps} lr {lr:.2e} loss {loss.detach().item():.6f} '
                   f'grad_norm {float(gn):.3f} ({time.time()-t_start:.0f}s)', flush=True)
         # ---- periodic evaluation
         if (step + 1) % tcfg['eval_every_steps'] == 0 or step == total_steps - 1:
@@ -848,8 +898,9 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
                            n_sequences=n_valid_seq, device=device)
             model.load_state_dict(bak)
             wp = res['weighted_pearson']
-            print(f'NEW BEST step={step} val_wp={wp:.6f} (t0={res["t0"]:.6f} t1={res["t1"]:.6f} '
-                  f'rows={res["selected_rows"]})', flush=True)
+            print(f'EVAL step={step} val_wp={wp:.6f} (t0={res["t0"]:.6f} t1={res["t1"]:.6f} '
+                  f'rows={res["selected_rows"]}, {"subset" if n_valid_seq < len(valid_store) else "full"})',
+                  flush=True)
             if wp > best_wp:
                 best_wp = wp
                 n_best = sum(1 for h_ in history if h_['wp'] == best_wp)
@@ -882,10 +933,19 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
         t0 = time.time()
         res_full = evaluate(model, transform, valid_store, batch_sequences=4,
                             n_sequences=n_valid_seq if smoke else None, device=device)
-        print(f'full validation rescore ({res_full["selected_rows"]} scored rows, '
+        scope = 'subset' if (smoke or n_valid_seq < len(valid_store)) else 'FULL validation'
+        print(f'final rescore, {scope} ({res_full["selected_rows"]} scored rows over '
+              f'{n_valid_seq if scope != "FULL validation" else len(valid_store)} sequences, '
               f'{time.time()-t0:.0f}s): t0={res_full["t0"]:.6f} t1={res_full["t1"]:.6f} '
               f'mean={res_full["weighted_pearson"]:.6f}', flush=True)
         full_wp = res_full['weighted_pearson']
+        # results.full_valid_wp is reserved for a rescore over EVERY validation
+        # sequence; a smoke/subset number would silently overstate the model
+        is_full = not (smoke or n_valid_seq < len(valid_store))
+        if not is_full:
+            full_wp = None
+            print('NOTE: this rescore covered only a subset of validation, so '
+                  'results.full_valid_wp is left null. It is NOT the official number.', flush=True)
         export_inference(model, transform, ck_dir, opset=cfg['inference']['opset'],
                          device='cpu', verify=True)
         write_yaml_results(cfg_path, cfg, status='smoke' if smoke else 'finished',
@@ -940,7 +1000,10 @@ def main():
     tee = Tee(log_path, resume=args.resume)
     try:
         reproducibility_header(cfg, command)
-        write_yaml_results(cfg_path, cfg, status='running')
+        if not args.export_only:
+            # an --export-only run does not train, so it must not leave the version
+            # looking like a live run to tools/summarize.py
+            write_yaml_results(cfg_path, cfg, status='running')
         device = pick_device(args.device or cfg['training'].get('device', 'auto'))
         print(f'device: {device}', flush=True)
         if args.export_only:
