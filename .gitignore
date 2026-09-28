@@ -1,8 +1,9 @@
+# Single Python 3.11 environment (2026-09-29).  3.11 is the scorer's version, so
+# train and serve run on the same interpreter.  requirements.txt is installed
+# FIRST so numpy 2.2.6 / onnxruntime 1.23.2 / pyarrow 19.0.1 are the versions the
+# organiser pins; torch, pyyaml, onnx, matplotlib and tqdm are then added for
+# training/EDA and must never be imported from solution.py.
 venv/
-# venv311/ is a local reproduction of the SCORER environment: Python 3.11 with
-# exactly `pip install -r requirements.txt` and nothing else.  Used to prove the
-# packaged solution.py runs where the competition actually scores it.
-venv311/
 __pycache__/
 
 # datasets/valid_mask.parquet IS tracked with git-lfs (92 MB, under the 2 GiB

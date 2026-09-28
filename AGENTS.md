@@ -235,13 +235,26 @@ Budget of attempts: prefer many cheap, single-variable comparisons early; reserv
 
 ## 14. Environment facts (measured 2026-09-28)
 
-**Machine.** macOS 27.0.0 (Darwin Kernel 27.0.0, arm64), Apple M2 Max, 12 physical cores, 64 GiB RAM (68719476736 B), 280 GiB free of 926 GiB on `/dev/disk3s5` (project volume). **No CUDA GPU; `torch.backends.mps.is_available() == True`.** This is a development machine — the grader is 1 x86 Linux vCPU, plausibly 2–3x slower per core, so the 75 % rule (§1) is the gate.
+**Machine.** macOS 27.0.0 (Darwin Kernel 27.0.0, arm64), Apple M2 Max, 12 physical cores, 64 GiB RAM (68719476736 B), 224 GiB free of 926 GiB on `/dev/disk3s5` (project volume). **No CUDA GPU; `torch.backends.mps.is_available() == True`.** This is a development machine — the grader is 1 x86 Linux vCPU, plausibly 2–3x slower per core, so the 75 % rule (§1) is the gate.
 
-**Python.** `venv/bin/python` = **3.13.3** and is the *training* environment (torch 2.14, PyYAML, onnx, matplotlib, tqdm). The scorer is **3.11**. `venv311/` is a local, faithful reproduction of the scorer: Python **3.11.9** with **exactly** `pip install -r requirements.txt` and nothing else (numpy 2.2.6, onnxruntime 1.23.2, pyarrow 19.0.1 + their deps); `torch`, `yaml`, `pandas`, `scipy`, `matplotlib`, `tqdm` are all confirmed **absent** there. Rebuild it with:
+**Training throughput, measured 2026-09-29 — USE CPU, NOT MPS.** Real training step (B=16 lanes x chunk_len=2000 = 32,000 rows, 2x128 GRU, identity transform, 40 steps after 10 warm-up):
+
+| Device | s/step | steps/s | rows/s | data+transform | fwd+bwd+opt |
+|---|---:|---:|---:|---:|---:|
+| **CPU** | **0.640** | **1.563** | **50,014** | 0.057 s | 0.583 s |
+| MPS | 1.567 | 0.638 | 20,426 | 0.057 s | 1.509 s |
+
+MPS is **2.45x SLOWER**, and the isolated micro-benchmark says why: a batch-16x2000 `nn.GRU` fwd+bwd takes **790 ms on MPS vs 288 ms on CPU** (fwd alone 276 vs 93 ms), while a plain `Linear` of comparable FLOPs is **3.7x faster on MPS** (152 vs 558 ms). So the MPS penalty is specific to the *recurrent* op: there is no fused GRU kernel for MPS, so it decomposes into many small ops and loses on launch overhead in exactly this bandwidth-bound, many-small-kernel regime. Corollary: MPS would win for the wider/linear-heavy models in §12 Phase 5-6, so re-probe before assuming — but for the 2x128 baseline-sized model, CPU is the right device. At 1.563 steps/s, 1 epoch over all 10,607 sequences (5,320 steps at B=16) is ~57 min, so a 3-seed x 3-epoch comparison is ~8.5 h.
+
+**Python — ONE environment, and it is the scorer's version.** `venv/` is **Python 3.11.9**, the same interpreter the scoring container runs (`python:3.11-slim-bookworm`), so train and serve can never diverge on language semantics. `requirements.txt` is installed **first**, so the organiser's pins win: `numpy 2.2.6`, `onnxruntime 1.23.2`, `pyarrow 19.0.1` (+ protobuf 7.36.2, sympy 1.14.0 and their deps). Added afterwards for training/EDA and **not guaranteed in the scorer**: `torch 2.14.0` (MPS available), `PyYAML 6.0.3`, `onnx 1.23.0`, `matplotlib 3.11.2`, `tqdm 4.70.1`, `pillow 12.3.0`. The old Python 3.13.3 environment and the separate `venv311/` scorer reproduction were both retired on 2026-09-29 and replaced by this one. Rebuild with:
 ```bash
-~/.pyenv/versions/3.11.9/bin/python3.11 -m venv venv311 && venv311/bin/pip install -r requirements.txt
+~/.pyenv/versions/3.11.9/bin/python3.11 -m venv venv
+venv/bin/pip install -r requirements.txt          # organiser pins first, so they win
+venv/bin/pip install torch pyyaml onnx matplotlib tqdm
 ```
-**The 3.11 gate is PASSED** (measured 2026-09-29): the packaged `gru_v000/solution.py` scores **t0 0.579720 / t1 0.643295 / mean 0.611508** on validation sequences 0–4 under `venv311/` — byte-identical to the 3.13.3 result — and is deterministic across two runs. Latency under 3.11: **27.92 µs/row p50, 41.75 p99** (0.46 transform + 25.65 ONNX), gate PASS. Any future bundle must be re-checked with `venv311/bin/python tools/score_solution.py ...` and `venv311/bin/python tools/bench_latency.py --solution ...`; do not use `venv/` for those.
+**The consequence to respect:** `solution.py` may import only `numpy`, `onnxruntime` and the stdlib, *even though those packages are now importable here*, because they are absent in the scorer. `tools/package_submission.py` enforces this statically (AST check of every import) and `ast.parse(..., feature_version=(3,11))` is a backstop.
+
+**The 3.11 gate is PASSED** (measured 2026-09-29): the packaged `gru_v000/solution.py` scores **t0 0.579720 / t1 0.643295 / mean 0.611508** on validation sequences 0–4 — byte-identical to the earlier 3.13.3 result — and is deterministic across two runs. Latency: **27.96 µs/row p50, 41.46 p99** (gate PASS; 18.4 min projected). This was first proven in a *pure* 3.11 environment holding only the three documented packages, before torch was added. Re-check every future bundle with `venv/bin/python tools/score_solution.py ...`.
 
 **Packages.** Pre-existing and *guaranteed in the scorer*: `numpy 2.2.6`, `onnxruntime 1.23.2`, `pyarrow 19.0.1`, `protobuf 7.36.2`, `sympy 1.14.0`, `flatbuffers`, `packaging`, `mpmath`, plus `humanfriendly`/`coloredlogs` (coloredlogs is an onnxruntime dep). Installed by us into `venv/` for **training/EDA only, NOT guaranteed at scoring time**: `torch 2.14.0` (MPS available, 8 torch threads), `PyYAML 6.0.3`, `onnx 1.23.0`, `matplotlib 3.11.2`, `tqdm 4.70.1`, `pillow 12.3.0`.
 
@@ -305,7 +318,7 @@ Budget of attempts: prefer many cheap, single-variable comparisons early; reserv
 7. **`baseline/README.md` and `quick_start.md` disagree on how to zip** (`cd baseline; zip -r submission.zip solution.py baseline.onnx` vs `zip -r ../submission.zip .` from the submission dir). Both put `solution.py` at the root. We follow `tools/package_submission.py` and always build the ZIP from inside the bundle directory.
 8. **torch 2.14 vs the exporter.** `torch.onnx.export` defaults to the dynamo exporter from torch 2.9 on, which imports `onnxscript` — not installed, not in `requirements.txt`. The template passes `dynamo=False` to keep the dependency-free TorchScript path (the one that produced `baseline.onnx`, producer `pytorch 2.5.1`). It emits a `DeprecationWarning`; that is expected, not a problem.
 9. **nn.GRU hidden-state layout.** `nn.GRU` wants one packed tensor `(num_layers, B, H)`, whereas `baseline.onnx` carries `hidden_0`/`hidden_1` as two separate `(1,1,H)` inputs. Exporting a 2-layer `nn.GRU` therefore produces extra Split/Slice/Gather/Concat nodes and a ~30 % latency penalty (see §10.4). The template works around it with a `ModuleList` of single-layer `nn.GRU`s.
-10. **The 3.11 gate — CLOSED 2026-09-29, see §14.** `venv311/` reproduces the scorer exactly and the `gru_v000` bundle scores identically under it. The earlier VERIFY is resolved; §15.5 remains a question for the organisers only in the weaker sense that we have *proved* torch is unnecessary rather than *asked* whether it happens to be installed.
+10. **The 3.11 gate — CLOSED 2026-09-29, see §14.** `venv/` is itself 3.11 and the `gru_v000` bundle scores identically under it; before torch was installed, the gate was proven in a *pure* 3.11 env holding only the three documented packages. §15.5 therefore remains a question for the organisers only in the weaker sense that we have *proved* torch is unnecessary rather than *asked* whether it happens to be installed.
 
 ## 16. Definition of done for any task
 
