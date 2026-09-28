@@ -20,6 +20,7 @@ from __future__ import annotations
 # ===== SECTION: TRAINING IMPORTS & UTILITIES =====
 import argparse
 import json
+import math
 import os
 import platform
 import queue
@@ -841,9 +842,26 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
     opt = torch.optim.AdamW(model.parameters(), lr=ocfg['lr'], weight_decay=ocfg['weight_decay'],
                             betas=tuple(ocfg.get('betas', [0.9, 0.99])))
     ema = EMA(model, ocfg['ema_decay']) if ocfg.get('ema_decay') else None
-    total_steps = int(tcfg.get('smoke_steps', 120)) if smoke else tcfg.get('max_steps')
-    if not total_steps:
-        raise SystemExit('training.max_steps must be set for a real run')
+    if smoke:
+        total_steps = int(tcfg.get('smoke_steps', 120))
+    else:
+        total_steps = tcfg.get('max_steps')
+        if not total_steps:
+            epochs = tcfg.get('epochs')
+            if not epochs:
+                raise SystemExit('set training.max_steps or training.epochs for a real run')
+            # One epoch = every training sequence consumed exactly once. A step
+            # consumes batch_sequences lanes x chunk_len rows and a sequence is
+            # seq_len/chunk_len chunks long, so this is exact rather than an
+            # estimate. data.train_sequences: null means ALL sequences, so
+            # "epochs" and "the entire training set" cannot drift apart.
+            steps_per_epoch = math.ceil(
+                n_train_seq * train_store.seq_len
+                / (tcfg['batch_sequences'] * tcfg['chunk_len']))
+            total_steps = int(steps_per_epoch * epochs)
+            print(f'max_steps derived: {steps_per_epoch:,} steps/epoch x {epochs} epoch(s) '
+                  f'= {total_steps:,} steps over all {n_train_seq:,} training sequences',
+                  flush=True)
     stream = StatefulBatchStream(train_store, tcfg['batch_sequences'], tcfg['chunk_len'],
                                  tcfg['burn_in'], seed=seed, device=device, n_sequences=n_train_seq)
     it = prefetch(iter(stream)) if tcfg.get('stateful', True) else iter(stream)
@@ -971,9 +989,17 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
 
 
 def feature_parity_test(transform, seq_x, tol=1e-6):
-    """.step() applied row by row must equal .batch() on the same sequence."""
+    """.step() applied row by row must equal .batch() on the same sequence.
+
+    The `.copy()` is essential, not defensive: `FeatureTransform.step` returns a
+    REUSED preallocated buffer, so collecting the results in a list and stacking
+    them afterwards would alias one buffer N times and compare the last row N
+    times. That silently produced a parity of 11.0 for the robust_zscore config
+    on a transform that was in fact exact (measured 2026-09-29). It went unnoticed
+    on the identity fast path only because that path returns a fresh array.
+    """
     transform.reset()
-    steps = np.stack([transform.step(seq_x[i]) for i in range(len(seq_x))])
+    steps = np.stack([transform.step(seq_x[i]).copy() for i in range(len(seq_x))])
     batched = transform.batch(seq_x)
     d = float(np.abs(steps - batched).max())
     print(f'feature transform parity: max |step - batch| = {d:.3e} (tol {tol:.0e})', flush=True)
