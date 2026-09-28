@@ -1,2 +1,5 @@
 venv/
 __pycache__/
+
+# Datasets are too large for GitHub (100MB per-file limit); fetch them separately.
+datasets/
