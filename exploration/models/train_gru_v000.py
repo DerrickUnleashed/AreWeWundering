@@ -939,6 +939,13 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
               f'{time.time()-t0:.0f}s): t0={res_full["t0"]:.6f} t1={res_full["t1"]:.6f} '
               f'mean={res_full["weighted_pearson"]:.6f}', flush=True)
         full_wp = res_full['weighted_pearson']
+        # results.full_valid_wp is reserved for a rescore over EVERY validation
+        # sequence; a smoke/subset number would silently overstate the model
+        is_full = not (smoke or n_valid_seq < len(valid_store))
+        if not is_full:
+            full_wp = None
+            print('NOTE: this rescore covered only a subset of validation, so '
+                  'results.full_valid_wp is left null. It is NOT the official number.', flush=True)
         export_inference(model, transform, ck_dir, opset=cfg['inference']['opset'],
                          device='cpu', verify=True)
         write_yaml_results(cfg_path, cfg, status='smoke' if smoke else 'finished',
@@ -993,7 +1000,10 @@ def main():
     tee = Tee(log_path, resume=args.resume)
     try:
         reproducibility_header(cfg, command)
-        write_yaml_results(cfg_path, cfg, status='running')
+        if not args.export_only:
+            # an --export-only run does not train, so it must not leave the version
+            # looking like a live run to tools/summarize.py
+            write_yaml_results(cfg_path, cfg, status='running')
         device = pick_device(args.device or cfg['training'].get('device', 'auto'))
         print(f'device: {device}', flush=True)
         if args.export_only:
