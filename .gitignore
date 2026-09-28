@@ -1,4 +1,8 @@
 venv/
+# venv311/ is a local reproduction of the SCORER environment: Python 3.11 with
+# exactly `pip install -r requirements.txt` and nothing else.  Used to prove the
+# packaged solution.py runs where the competition actually scores it.
+venv311/
 __pycache__/
 
 # datasets/valid_mask.parquet IS tracked with git-lfs (92 MB, under the 2 GiB
