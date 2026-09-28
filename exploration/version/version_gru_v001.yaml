@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v001
   parent: gru_v000
-  status: planned
+  status: running
 description: 'WIDE: 1 layer x 256 units, otherwise identical to gru_v000''s recipe.'
 hypothesis: 'At roughly equal inference latency, width should buy more than depth
   for a tail-weighted global correlation: the same parameter budget concentrated in
@@ -33,7 +33,7 @@ model:
   dropout: 0.0
   layernorm: false
   head: linear
-  param_count: null
+  param_count: 284674
 loss:
   type: seq_weighted_pearson
   mask: soft
