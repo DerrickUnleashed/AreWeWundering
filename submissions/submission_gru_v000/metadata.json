@@ -1,0 +1,197 @@
+{
+ "key": "gru_v000",
+ "packaged_utc": "2026-09-28T18:37:13Z",
+ "git_commit": "30859205855ad4e1edad5d259b4be9e34f722c05",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v000",
+   "parent": "None",
+   "status": "smoke"
+  },
+  "description": "Framework smoke test. Not a real result.\n",
+  "hypothesis": "Every framework code path runs end to end and the promotion gate can pass.\n",
+  "change_vs_parent": "First version; instantiated from tools/templates/train_template.py.\n",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 192258
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.0,
+   "target_clip": 2.0
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 100,
+   "grad_clip": 1.0,
+   "ema_decay": 0.0,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": 2000,
+   "smoke_steps": 60,
+   "epochs": null,
+   "seed": 1337,
+   "eval_every_steps": 250,
+   "eval_subset_sequences": 20,
+   "device": "auto",
+   "stateful": true
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5
+  },
+  "results": {
+   "best_step": 59,
+   "best_val_wp": 0.5703406597960128,
+   "best_val_t0": 0.5570966478934152,
+   "best_val_t1": 0.5835846716986103,
+   "full_valid_wp": 0.5703406597960128,
+   "latency_us_p50": null,
+   "latency_us_p99": null,
+   "train_hours": 0.0117,
+   "finished_utc": "2026-09-28T18:36:44Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v000.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v000",
+   "submission_dir": null
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step59_val0.570341.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v000/best_001_step59_val0.570341.pt",
+  "step": 59,
+  "sha256": "df4bd067b082206009b41b261144bef60f1b19830a5ba6f008f7788506c88928",
+  "train_time_metrics": {
+   "t0": 0.5570966478934152,
+   "t1": 0.5835846716986103,
+   "weighted_pearson": 0.5703406597960128,
+   "selected_rows": 15615,
+   "blocks": 10,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.579720206808377,
+  "t1": 0.6432951318457785,
+  "weighted_pearson": 0.6115076693270778,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 37.5,
+  "call_us_p50": 29.0,
+  "call_us_p99": 47.21,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": null,
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity streaming vs offline: max |diff| = 6.557e-07 (tol 1e-04)  PASS",
+  "score": {
+   "t0": 0.579720206808377,
+   "t1": 0.6432951318457785,
+   "weighted_pearson": 0.6115076693270778,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 37.5,
+   "call_us_p50": 29.0,
+   "call_us_p99": 47.21,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": null,
+  "size": {
+   "zip_bytes": 1421946,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": true
+ },
+ "packages": {
+  "python": "3.13.3",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "04bf11eb59ad59b348339f2f170a44430b4c70872e735682bcbac56dbaa89224",
+  "solution_py": "5c5376d2dd415342a32a03697edd7597a34ecfd9adedd02a26b499fc91343951",
+  "model_onnx": "36de2e7c885a04c050c23824ecaa8d64c1e663ff1a252bc5264ded7d69d4fcdf",
+  "feature_stats_npz": "040dcc1b65c55148420f223676ce894bf04dcd2d9dbf324582f6d98bdd892769"
+ },
+ "zip": {
+  "file": "submission_gru_v000.zip",
+  "bytes": 1421946,
+  "root_entries": [
+   "best_001_step59_val0.570341.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 0.8 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [],
+ "status": "PASS"
+}
