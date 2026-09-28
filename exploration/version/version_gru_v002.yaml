@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v002
   parent: gru_v000
-  status: planned
+  status: running
 description: 'INPUTS: train-only robust z-score with +-8 sigma clipping, on top of
   the organiser-standardised features.'
 hypothesis: The organisers standardise globally rather than per-window, so re-standardising
@@ -34,7 +34,7 @@ model:
   dropout: 0.0
   layernorm: false
   head: linear
-  param_count: null
+  param_count: 192258
 loss:
   type: seq_weighted_pearson
   mask: soft
