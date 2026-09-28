@@ -1,0 +1,87 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v000
+  parent: None
+  status: running
+description: 'Framework smoke test. Not a real result.
+
+  '
+hypothesis: 'Every framework code path runs end to end and the promotion gate can
+  pass.
+
+  '
+change_vs_parent: 'First version; instantiated from tools/templates/train_template.py.
+
+  '
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 100
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: 2000
+  smoke_steps: 60
+  epochs: null
+  seed: 1337
+  eval_every_steps: 250
+  eval_subset_sequences: 20
+  device: auto
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: 59
+  best_val_wp: 0.5703406597960128
+  best_val_t0: 0.5570966478934152
+  best_val_t1: 0.5835846716986103
+  full_valid_wp: 0.5703406597960128
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0117
+  finished_utc: '2026-09-28T18:36:44Z'
+artifacts:
+  log: exploration/logs/log_gru_v000.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v000
+  submission_dir: null
