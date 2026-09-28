@@ -1,0 +1,115 @@
+### new run, log opened 2026-09-29T01:22:43+0530
+==============================================================================
+command            : python exploration/models/train_gru_v002.py --config exploration/version/version_gru_v002.yaml --device cpu
+timestamp          : 2026-09-29T01:22:43+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 62832d0b12db5bd653986b7c049fa9364d0d14a7
+seed               : 1337
+log                : exploration/logs/log_gru_v002.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v002
+  parent: gru_v000
+  status: planned
+description: 'INPUTS: train-only robust z-score with +-8 sigma clipping, on top of
+  the organiser-standardised features.'
+hypothesis: The organisers standardise globally rather than per-window, so re-standardising
+  on train statistics and clipping the tails should add information the model currently
+  cannot see. Costs 4.3 us/row at inference, well inside budget.
+change_vs_parent: features.normalisation none->robust_zscore and features.clip_sigma
+  0->8. Single variable. Trained on all 10,607 sequences for 3 epochs, seed 1337,
+  evaluated on the same fixed 200 validation sequences.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 8
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v002.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v002
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
+train sequences=10607  valid sequences=200  steps=19890
+step 0/19890 lr 4.00e-06 loss 1.057388 grad_norm 2.269 (1s)
+step 25/19890 lr 1.04e-04 loss 0.976030 grad_norm 3.942 (18s)
+step 50/19890 lr 2.04e-04 loss 0.757682 grad_norm 1.124 (35s)
+step 75/19890 lr 3.04e-04 loss 0.693642 grad_norm 1.537 (52s)
+step 100/19890 lr 4.04e-04 loss 0.549580 grad_norm 0.747 (69s)
+step 125/19890 lr 5.04e-04 loss 0.559178 grad_norm 0.576 (86s)
+step 150/19890 lr 6.04e-04 loss 0.666604 grad_norm 0.953 (103s)
+step 175/19890 lr 7.04e-04 loss 0.733536 grad_norm 0.780 (120s)
+step 200/19890 lr 8.04e-04 loss 0.690213 grad_norm 0.837 (136s)
+step 225/19890 lr 9.04e-04 loss 0.583749 grad_norm 1.070 (152s)
+step 250/19890 lr 1.00e-03 loss 0.794258 grad_norm 0.712 (169s)
+step 275/19890 lr 1.10e-03 loss 0.685930 grad_norm 0.764 (185s)
+step 300/19890 lr 1.20e-03 loss 0.653786 grad_norm 0.693 (202s)
