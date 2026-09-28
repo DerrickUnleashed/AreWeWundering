@@ -31,7 +31,9 @@ This file is the project memory for any coding agent or human working in this re
 3. **Latency first.** Before training any new architecture, benchmark its inference step (`tools/bench_latency.py`). Never spend GPU hours on a model that cannot meet the budget.
 4. **Metric fidelity.** Every reported score comes from the reference metric code with the correct mask. Never report a Pearson computed some other way as "WP".
 5. **Immutability.** Never overwrite an existing version's script, yaml, log, checkpoint folder or submission folder. A change of any kind = a new version. Never delete anything unless the user explicitly asks.
-6. **No silent uploads.** Agents never upload to the competition site. The user does that.
+6. **No silent uploads. Agents never push.** Two separate prohibitions:
+   (a) agents never upload anything to the competition site — the user does that;
+   (b) **agents never run `git push` (or `git push --force*`, or `git lfs push`), under any circumstances, even when the user asks about pushing.** The user pushes. Committing locally is fine and expected; the moment a change would cross the network, stop and report. Asking "should I push?" is still not enough — the answer is always no; instead tell the user what is ready and let them run it. **A mistake already made on 2026-09-29:** four pushes and one history rewrite were performed after being asked to "help push" the datasets, and the first push had already been authorised for that one task. Do not generalise from one approval to later, unasked-for pushes.
 7. **No data in RAM.** Stream or memory-map; never `pd.read_parquet` the train file whole.
 8. **Reproducibility.** Every run records seed, config (yaml), git commit if available, package versions, hardware, and the exact command in its log header.
 9. **Don't touch organiser files:** `README.md`, `METRIC.md`, `utils.py`, `requirements.txt`, `baseline/`, `datasets/`, `docs/`.
@@ -235,7 +237,11 @@ Budget of attempts: prefer many cheap, single-variable comparisons early; reserv
 
 **Machine.** macOS 27.0.0 (Darwin Kernel 27.0.0, arm64), Apple M2 Max, 12 physical cores, 64 GiB RAM (68719476736 B), 280 GiB free of 926 GiB on `/dev/disk3s5` (project volume). **No CUDA GPU; `torch.backends.mps.is_available() == True`.** This is a development machine — the grader is 1 x86 Linux vCPU, plausibly 2–3x slower per core, so the 75 % rule (§1) is the gate.
 
-**Python.** `venv/bin/python` = **3.13.3**; the scorer is **3.11** (`python:3.11-slim-bookworm`). Mismatch flagged: do not use 3.12/3.13-only syntax and never rely on 3.13 stdlib behaviour. A 3.11 interpreter is available locally via `~/.pyenv/shims/python3.11` — use it for the gate when a 3.11 venv can be provisioned (VERIFY whether a venv with numpy/onnxruntime on 3.11 exists).
+**Python.** `venv/bin/python` = **3.13.3** and is the *training* environment (torch 2.14, PyYAML, onnx, matplotlib, tqdm). The scorer is **3.11**. `venv311/` is a local, faithful reproduction of the scorer: Python **3.11.9** with **exactly** `pip install -r requirements.txt` and nothing else (numpy 2.2.6, onnxruntime 1.23.2, pyarrow 19.0.1 + their deps); `torch`, `yaml`, `pandas`, `scipy`, `matplotlib`, `tqdm` are all confirmed **absent** there. Rebuild it with:
+```bash
+~/.pyenv/versions/3.11.9/bin/python3.11 -m venv venv311 && venv311/bin/pip install -r requirements.txt
+```
+**The 3.11 gate is PASSED** (measured 2026-09-29): the packaged `gru_v000/solution.py` scores **t0 0.579720 / t1 0.643295 / mean 0.611508** on validation sequences 0–4 under `venv311/` — byte-identical to the 3.13.3 result — and is deterministic across two runs. Latency under 3.11: **27.92 µs/row p50, 41.75 p99** (0.46 transform + 25.65 ONNX), gate PASS. Any future bundle must be re-checked with `venv311/bin/python tools/score_solution.py ...` and `venv311/bin/python tools/bench_latency.py --solution ...`; do not use `venv/` for those.
 
 **Packages.** Pre-existing and *guaranteed in the scorer*: `numpy 2.2.6`, `onnxruntime 1.23.2`, `pyarrow 19.0.1`, `protobuf 7.36.2`, `sympy 1.14.0`, `flatbuffers`, `packaging`, `mpmath`, plus `humanfriendly`/`coloredlogs` (coloredlogs is an onnxruntime dep). Installed by us into `venv/` for **training/EDA only, NOT guaranteed at scoring time**: `torch 2.14.0` (MPS available, 8 torch threads), `PyYAML 6.0.3`, `onnx 1.23.0`, `matplotlib 3.11.2`, `tqdm 4.70.1`, `pillow 12.3.0`.
 
@@ -299,7 +305,7 @@ Budget of attempts: prefer many cheap, single-variable comparisons early; reserv
 7. **`baseline/README.md` and `quick_start.md` disagree on how to zip** (`cd baseline; zip -r submission.zip solution.py baseline.onnx` vs `zip -r ../submission.zip .` from the submission dir). Both put `solution.py` at the root. We follow `tools/package_submission.py` and always build the ZIP from inside the bundle directory.
 8. **torch 2.14 vs the exporter.** `torch.onnx.export` defaults to the dynamo exporter from torch 2.9 on, which imports `onnxscript` — not installed, not in `requirements.txt`. The template passes `dynamo=False` to keep the dependency-free TorchScript path (the one that produced `baseline.onnx`, producer `pytorch 2.5.1`). It emits a `DeprecationWarning`; that is expected, not a problem.
 9. **nn.GRU hidden-state layout.** `nn.GRU` wants one packed tensor `(num_layers, B, H)`, whereas `baseline.onnx` carries `hidden_0`/`hidden_1` as two separate `(1,1,H)` inputs. Exporting a 2-layer `nn.GRU` therefore produces extra Split/Slice/Gather/Concat nodes and a ~30 % latency penalty (see §10.4). The template works around it with a `ModuleList` of single-layer `nn.GRU`s.
-10. **The 3.11 gate is not yet exercised.** Everything measured so far ran on the local 3.13.3 interpreter. `~/.pyenv/shims/python3.11` exists but no 3.11 venv with numpy/onnxruntime has been provisioned, so "the packaged solution runs on 3.11" is still VERIFY. Until it is, the mitigation is the §13 import check plus `ast.parse` with `feature_version=(3, 11)`.
+10. **The 3.11 gate — CLOSED 2026-09-29, see §14.** `venv311/` reproduces the scorer exactly and the `gru_v000` bundle scores identically under it. The earlier VERIFY is resolved; §15.5 remains a question for the organisers only in the weaker sense that we have *proved* torch is unnecessary rather than *asked* whether it happens to be installed.
 
 ## 16. Definition of done for any task
 
