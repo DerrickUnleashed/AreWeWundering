@@ -14,11 +14,10 @@ datasets/valid.parquet
 # Regenerable memmap shard cache (built by tools/make_shards.py).
 cache/
 
-# Training artifacts: large and regenerable from the yaml + seed.
-exploration/checkpoints/
-exploration/logs/
-
-# Packaged submission archives (the unzipped bundles are kept for inspection).
-submissions/*/*.zip
+# exploration/checkpoints/, exploration/logs/ and submissions/ are deliberately
+# TRACKED (2026-09-29): the run logs, the checkpoints and the submission bundles
+# are the record of what was actually trained and shipped, and they are small
+# enough (single-digit MB per version) to keep in git.  Only the regenerable
+# shard cache and the organiser's oversized parquets stay out.
 
 .DS_Store
