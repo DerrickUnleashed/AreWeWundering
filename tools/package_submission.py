@@ -294,6 +294,16 @@ def main():
     }
     (bundle / 'metadata.json').write_text(json.dumps(meta, indent=1))
 
+    # Write the measured latency and the bundle location back into the yaml
+    # (AGENTS.md §6: the packager owns results.latency_* and artifacts.submission_dir).
+    if gate.get('latency'):
+        cfg_on_disk = yaml.safe_load(config.read_text())
+        cfg_on_disk.setdefault('results', {}).update({
+            'latency_us_p50': gate['latency'].get('us_p50'),
+            'latency_us_p99': gate['latency'].get('us_p99')})
+        cfg_on_disk.setdefault('artifacts', {})['submission_dir'] = str(bundle.relative_to(ROOT))
+        config.write_text(yaml.safe_dump(cfg_on_disk, sort_keys=False))
+
     print('\n' + '=' * 70)
     print(f'bundle              : {bundle.relative_to(ROOT)}')
     print(f'zip                 : {zpath.name}  {zip_bytes/1e6:.2f} MB  root={names}')
