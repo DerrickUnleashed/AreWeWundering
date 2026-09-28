@@ -1,0 +1,335 @@
+### new run, log opened 2026-09-29T00:06:48+0530
+==============================================================================
+command            : python exploration/models/train_gru_v000.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v000.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v000/best_001_step59_val0.570341.pt
+timestamp          : 2026-09-29T00:06:48+0530
+host               : macOS-27.0-arm64-arm-64bit-Mach-O  python 3.13.3
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : f6c277a50c16d506442d864f35dde5f4021c2c76
+seed               : 1337
+log                : exploration/logs/log_gru_v000.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v000
+  parent: None
+  status: smoke
+description: 'Framework smoke test. Not a real result.
+
+  '
+hypothesis: 'Every framework code path runs end to end and the promotion gate can
+  pass.
+
+  '
+change_vs_parent: 'First version; instantiated from tools/templates/train_template.py.
+
+  '
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 100
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: 2000
+  smoke_steps: 60
+  epochs: null
+  seed: 1337
+  eval_every_steps: 250
+  eval_subset_sequences: 20
+  device: auto
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: 59
+  best_val_wp: 0.5703406597960128
+  best_val_t0: 0.5570966478934152
+  best_val_t1: 0.5835846716986103
+  full_valid_wp: 0.5703406597960128
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0117
+  finished_utc: '2026-09-28T18:36:44Z'
+artifacts:
+  log: exploration/logs/log_gru_v000.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v000
+  submission_dir: null
+
+==============================================================================
+device: mps
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v000.py:493: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.13/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 2.384e-07
+exported inference artifacts from best_001_step59_val0.570341.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v000
+
+### resume, log reopened 2026-09-29T00:11:30+0530
+==============================================================================
+command            : python exploration/models/train_gru_v000.py --config exploration/version/version_gru_v000.yaml --smoke --resume --device cpu
+timestamp          : 2026-09-29T00:11:30+0530
+host               : macOS-27.0-arm64-arm-64bit-Mach-O  python 3.13.3
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 41e37eeb3d0b804d84f42d47859dfc000ba99537
+seed               : 1337
+log                : exploration/logs/log_gru_v000.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v000
+  parent: None
+  status: running
+description: 'Framework smoke test. Not a real result.
+
+  '
+hypothesis: 'Every framework code path runs end to end and the promotion gate can
+  pass.
+
+  '
+change_vs_parent: 'First version; instantiated from tools/templates/train_template.py.
+
+  '
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 100
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: 2000
+  smoke_steps: 60
+  epochs: null
+  seed: 1337
+  eval_every_steps: 250
+  eval_subset_sequences: 20
+  device: auto
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: 59
+  best_val_wp: 0.5703406597960128
+  best_val_t0: 0.5570966478934152
+  best_val_t1: 0.5835846716986103
+  full_valid_wp: 0.5703406597960128
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0117
+  finished_utc: '2026-09-28T18:36:44Z'
+artifacts:
+  log: exploration/logs/log_gru_v000.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v000
+  submission_dir: null
+
+==============================================================================
+device: cpu
+feature transform parity: max |step - batch| = 0.000e+00 (tol 1e-06)
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+train sequences=20  valid sequences=10  steps=60
+resumed from step 60 (best so far 0.570341)
+eval:   0%|          | 0/10 [00:00<?, ?it/s]eval:  40%|####      | 4/10 [00:00<00:01,  5.48it/s]eval:  80%|########  | 8/10 [00:01<00:00,  5.36it/s]eval: 100%|##########| 10/10 [00:02<00:00,  4.37it/s]                                                     final rescore, subset (15615 scored rows over 10 sequences, 2s): t0=0.557097 t1=0.583585 mean=0.570341
+NOTE: this rescore covered only a subset of validation, so results.full_valid_wp is left null. It is NOT the official number.
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v000.py:493: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.13/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 2.384e-07
+done: {'best_wp': 0.5703406597960128, 'full_wp': None, 'params': 192258}
+
+### resume, log reopened 2026-09-29T00:11:52+0530
+==============================================================================
+command            : python exploration/models/train_gru_v000.py --config exploration/version/version_gru_v000.yaml --smoke --resume --device cpu
+timestamp          : 2026-09-29T00:11:52+0530
+host               : macOS-27.0-arm64-arm-64bit-Mach-O  python 3.13.3
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 41e37eeb3d0b804d84f42d47859dfc000ba99537
+seed               : 1337
+log                : exploration/logs/log_gru_v000.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v000
+  parent: None
+  status: smoke
+description: 'Framework smoke test. Not a real result.
+
+  '
+hypothesis: 'Every framework code path runs end to end and the promotion gate can
+  pass.
+
+  '
+change_vs_parent: 'First version; instantiated from tools/templates/train_template.py.
+
+  '
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 100
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: 2000
+  smoke_steps: 60
+  epochs: null
+  seed: 1337
+  eval_every_steps: 250
+  eval_subset_sequences: 20
+  device: auto
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: 59
+  best_val_wp: 0.5703406597960128
+  best_val_t0: 0.5570966478934152
+  best_val_t1: 0.5835846716986103
+  full_valid_wp: 0.5703406597960128
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0006
+  finished_utc: '2026-09-28T18:41:33Z'
+artifacts:
+  log: exploration/logs/log_gru_v000.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v000
+  submission_dir: null
+
+==============================================================================
+device: cpu
+feature transform parity: max |step - batch| = 0.000e+00 (tol 1e-06)
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+train sequences=20  valid sequences=10  steps=60
+resumed from step 60 (best so far 0.570341)
+eval:   0%|          | 0/10 [00:00<?, ?it/s]eval:  40%|####      | 4/10 [00:00<00:01,  5.52it/s]eval:  80%|########  | 8/10 [00:01<00:00,  5.45it/s]eval: 100%|##########| 10/10 [00:02<00:00,  4.50it/s]                                                     final rescore, subset (15615 scored rows over 10 sequences, 2s): t0=0.557097 t1=0.583585 mean=0.570341
+NOTE: this rescore covered only a subset of validation, so results.full_valid_wp is left null. It is NOT the official number.
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v000.py:502: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.13/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 2.384e-07
+done: {'best_wp': 0.5703406597960128, 'full_wp': None, 'params': 192258}
