@@ -11,7 +11,10 @@ This file is the project memory for any coding agent or human working in this re
 - **Deadline:** submissions close **2026-11-15 23:59 UTC** (verified: `docs/timeline.md`; start SEP 11 2026, winners announced DEC 01 2026).
 - **Scorer limits:** 1 vCPU, CPU only, 16 GB RAM, 60 min for the whole test set, ZIP ≤ 20 MB, Python 3.11 (`python:3.11-slim-bookworm`), no internet.
 - **Test-set size (verified, `docs/faq.md`):** **1,970 sequences = 39,400,000 rows.** Test targets and the scoring mask are hidden.
-- **Derived per-row budget:** 3,600 s / 39.4 M rows = **91.4 µs per row, all-in**. Engineering target: **≤ 68.5 µs/row (75 % of budget) on the dev machine** (headroom for a slower/noisier grader). Measured reference point: the official baseline runs at **27.9 µs/row mean (p50 26.9, p99 45.7)** on this M2 Max — i.e. roughly 2.5x of headroom before the budget is consumed.
+- **Derived per-row budget:** 3,600 s / 39.4 M rows = **91.4 µs per row, all-in**.
+- **⚠ THE GRADER IS 1.62x SLOWER THAN THIS MACHINE — measured, not assumed.** The first real submission (`gru_v000`, 2026-09-28 00:47) ran the full test set in **29 m 47 s = 1,787 s**, i.e. **45.36 µs/row**, against **27.96 µs/row** measured here for the same model. Peak memory 626 MB of the 16 GB allowance (so memory is never the binding constraint; a 2x bigger model costs ~2 MB). **Therefore the real local gate is 42.2 µs/row p50, not 68.5** — because 68.5 µs local would become 111 µs on the grader and blow the 60-minute limit. Use `tools/bench_latency.py`'s PASS/FAIL at 68.5 µs as a *pre-filter only*, and gate promotion on the 1.62x-corrected number.
+- **Grader projection for a model measured at local p50 `L` µs/row: minutes = L x 1.62 x 39.4e6 / 1e6 / 60 = L x 1.064.** So local 30 µs -> 32 min, local 40 µs -> 43 min, local 42 µs -> 45 min (75 %), local 44.3 µs -> 47 min (79 %, over target). The organiser's own baseline runs at 26.9 µs here -> ~29 min on the grader, i.e. **the baseline already uses about half the budget**; that is the headroom everyone is competing within.
+- **The official baseline's real score is 0.5935 on the public leaderboard (17/100 entries at 2026-09-28 00:47), and the 60-step `gru_v000` smoke test scored 0.4986 (21/100).** So the local full-validation 0.617052 and the public 0.5935 are different quantities, and a partially-trained model is not close. Treat any local number as a model-selection signal only; the leaderboard is the ground truth.
 - **Rules digest (verified: `docs/rules.md`, `docs/faq.md`, `docs/submission_guide.md`):**
   - **No external data.** "Your solution must only use the training data we provide" / "All solutions must be trained using only the provided `train.parquet` and `valid.parquet`". Retraining on train+valid is explicitly in scope.
   - **Pre-trained models are allowed** if publicly available and containing **no external market data**. Distillation from a self-trained teacher is therefore not an external-data problem; a pretrained general model is fine; a pretrained *market* model is not.
@@ -299,7 +302,18 @@ venv/bin/pip install torch pyyaml onnx matplotlib tqdm
 
 **Feature statistics over the FULL train set:** per-column means span **−1.81 … +1.98** and stds **0.026 … 2.03**; zero NaN and zero inf across all 212 M × 112 feature values. The organisers' standardisation is real but imperfect (it is a global affine map, not per-window), so `robust_zscore` remains a hypothesis to ablate.
 
-**Baseline latency on this machine** (5 validation sequences, 100,000 rows, real callback loop, 1 ORT thread, spinning disabled): **27.9 µs/row mean, p50 26.9, p90 28.6, p99 45.7**. Projected for the 39.4 M-row test set: **18.3 min at the mean, 30.0 min at p99** — versus a 60 min budget. So the baseline alone would pass; roughly 2.5x of per-row headroom exists for a bigger model or a heavier feature transform.
+**Baseline latency on this machine** (5 validation sequences, 100,000 rows, real callback loop, 1 ORT thread, spinning disabled): **27.9 µs/row mean, p50 26.9, p90 28.6, p99 45.7**. Projected for the 39.4 M-row test set: **18.3 min at the mean, 30.0 min at p99** — versus a 60 min budget. Scaled by the measured 1.62x grader factor that is **29.7 min at p50**, which matches the organiser's own baseline submission duration and leaves roughly half the budget free.
+
+**Per-version grader projections for the four concurrent runs** (local p50 x 1.62, and the 75 % gate applied to the grader number):
+
+| version | local p50 | grader µs/row | minutes at p50 | % of 60 min | p99 minutes | verdict |
+|---|---:|---:|---:|---:|---:|---|
+| `gru_v001` 1x256 | 32.37 | 52.5 | 34.5 | 57 % | 55 | **OK** |
+| `gru_v002` z-score | 31.58 | 51.2 | 33.6 | 56 % | 54 | **OK** |
+| `gru_v003` aux+EMA | 27.67 | 44.9 | 29.5 | 49 % | 45 | **OK** |
+| `gru_v004` 2x192+proj | 44.33 | 71.9 | 47.2 | 79 % | 76 | **DO NOT SHIP** |
+
+`gru_v004` is a legitimate *training* experiment (a real test of the third-party reported shape) but it is **not submittable**: 79 % of the budget at p50 and ~76 min at p99 against a hard 60-minute limit. Its bundle will be marked NOT-READY and must not be uploaded. Keep it for the scientific result only.
 
 **Baseline score on the first 5 validation sequences** (row groups 0–4, i.e. *not* the official full-set number): t0 = 0.6015, t1 = 0.7011, **mean = 0.6513**, 9,110 selected rows. Recorded as the anchor for subset comparisons only; the official 0.617052 refers to all 1,873 sequences. A 5-sequence subset is therefore ~0.034 optimistic relative to the full set and must never be quoted as a full-validation score.
 
