@@ -23,9 +23,18 @@ echo "=== mask + v011 chain started $(date -u +%FT%TZ) ==="
 # low thread count: six training runs already hold all 12 cores
 THREADS=${MASK_THREADS:-2}
 
+# --reuse-ckpt when a trained predictor is already on disk: the first chain run
+# trained the mask to AUC 0.8896 and saved it, then crashed in the labelling pass on
+# the same list-vs-tensor bug. Retraining would throw that away for nothing.
+MASK_ARGS=""
+if [ -f cache/mask_model.pt ]; then
+    echo "reusing existing cache/mask_model.pt"
+    MASK_ARGS="--reuse-ckpt"
+fi
+
 venv/bin/python tools/train_mask_model.py \
     --epochs 4 --steps 600 --lanes 32 --chunk 2000 --threads "$THREADS" \
-    --mask-start 200 --mask-holdout 1600 \
+    --mask-start 200 --mask-holdout 1600 $MASK_ARGS \
     --out cache/train_scored.npy --ckpt cache/mask_model.pt
 rc=$?
 echo "=== train_mask_model.py exit $rc ==="
