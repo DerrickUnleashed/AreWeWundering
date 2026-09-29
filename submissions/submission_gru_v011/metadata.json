@@ -1,0 +1,237 @@
+{
+ "key": "gru_v011",
+ "packaged_utc": "2026-09-29T17:08:04Z",
+ "git_commit": "5eee5fc926351572f686cda3402e9e3555be7400",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v011",
+   "parent": "gru_v003",
+   "status": "finished"
+  },
+  "description": "THIRD-PARTY RECIPE: soft mask on likely-scored rows + periodic state reset, on top of the best scoring base (v003).",
+  "hypothesis": "Scored rows are a distinct regime (0.58 WP on them vs 0.30 on all rows), so a loss weighted by P(is_scored) should help. Separately the recurrent state degrades over 20k rows (Q1 0.70 -> Q4 0.638) and a zero state beats the model's own 10k-row state, so resetting every 4,000 rows during training AND inference should make the model emit a consistent level from a fresh state at any position. Together these are dozken/wunder's best-scoring recipe. CONFOUNDED by design: if it wins we will not know which half did it, and a single-variable follow-up (v012) must attribute it.",
+  "change_vs_parent": "Two changes off gru_v003: (1) loss.mask_model=cache/train_scored.npy, a P(is_scored) predictor from tools/train_mask_model.py, weighting the loss toward rows likely to be scored - TRAINING-ONLY, no inference cost. (2) training.state_reset=4000 and inference.state_reset=4000, the periodic recurrent-state reset, wired into the ONNX solution so it ships.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 192258
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.05,
+   "target_clip": 2.0,
+   "mask_floor": 0.1,
+   "mask_model": "cache/train_scored.npy"
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.999,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true,
+   "state_reset": 4000
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5,
+   "state_reset": 4000
+  },
+  "results": {
+   "best_step": 19889,
+   "best_val_wp": 0.689478538609773,
+   "best_val_t0": 0.685205965598288,
+   "best_val_t1": 0.6937511116212582,
+   "full_valid_wp": 0.6799864682831658,
+   "latency_us_p50": null,
+   "latency_us_p99": null,
+   "train_hours": 4.697,
+   "finished_utc": "2026-09-29T17:02:54Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v011.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v011",
+   "submission_dir": null
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step19889_val0.689479.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v011/best_001_step19889_val0.689479.pt",
+  "step": 19889,
+  "sha256": "4f1dd32f08ba833e5d17281f1b779f855c02987f5c6585ef1f73058da1e3ab63",
+  "train_time_metrics": {
+   "t0": 0.685205965598288,
+   "t1": 0.6937511116212582,
+   "weighted_pearson": 0.689478538609773,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.715150509453697,
+  "t1": 0.7638884998374575,
+  "weighted_pearson": 0.7395195046455773,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 38.4,
+  "call_us_p50": 28.58,
+  "call_us_p99": 48.04,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 28.0,
+  "us_p99": 41.58,
+  "projected_min_p50": 18.4,
+  "projected_min_p99": 27.3,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": true,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 45.36,
+  "grader_us_p99": 67.36,
+  "grader_min_p50": 29.8,
+  "grader_min_p99": 44.2,
+  "grader_pct_budget_p50": 49.6,
+  "grader_target_us_local": 42.3,
+  "grader_safe": true
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 7.081e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.739520 vs offline 0.739520, |diff| = 1.348e-08 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.715150509453697,
+   "t1": 0.7638884998374575,
+   "weighted_pearson": 0.7395195046455773,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 38.4,
+   "call_us_p50": 28.58,
+   "call_us_p99": 48.04,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 28.0,
+   "us_p99": 41.58,
+   "projected_min_p50": 18.4,
+   "projected_min_p99": 27.3,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": true,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 45.36,
+   "grader_us_p99": 67.36,
+   "grader_min_p50": 29.8,
+   "grader_min_p99": 44.2,
+   "grader_pct_budget_p50": 49.6,
+   "grader_target_us_local": 42.3,
+   "grader_safe": true
+  },
+  "size": {
+   "zip_bytes": 2156787,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": true
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "ffa297010044f24d0ec5e0be5201f1dc929039ed2558ffe6304fae8826407400",
+  "solution_py": "60cfd5ae834305ada375ddf5ae10fe486cdfded51bb76feb255d550f19df0bf4",
+  "model_onnx": "327f0eb5dd3869a0564551b15bceefe249a6268a254a7528b5e5d0ec159a694e",
+  "feature_stats_npz": "e2c6a558b520f4d4e43c4df82d73d51b0d99af61a265d4740d5ff5578b9d0242"
+ },
+ "zip": {
+  "file": "submission_gru_v011.zip",
+  "bytes": 2156787,
+  "root_entries": [
+   "best_001_step19889_val0.689479.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 1.6 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [],
+ "status": "PASS"
+}
