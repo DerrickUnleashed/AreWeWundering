@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v010
   parent: gru_v002
-  status: running
+  status: finished
 description: 'SCHEDULE: the gru_v002 recipe trained for 6 epochs instead of 3.'
 hypothesis: Every finished run plateaued by ~step 15,000 of 19,890, which is weak
   evidence that 3 epochs is enough. This is the direct test of the one scheduling
@@ -67,16 +67,16 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 24999
+  best_val_wp: 0.6848702650419769
+  best_val_t0: 0.683501820859485
+  best_val_t1: 0.686238709224469
+  full_valid_wp: 0.6706959356389159
+  latency_us_p50: 31.5
+  latency_us_p99: 37.87
+  train_hours: 9.1164
+  finished_utc: '2026-09-29T18:44:51Z'
 artifacts:
   log: exploration/logs/log_gru_v010.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v010
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v010
