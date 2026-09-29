@@ -219,7 +219,7 @@ def main():
             print('ABORT: the reused checkpoint is below 0.85 AUC; the soft mask would be a '
                   'no-op and v011 would quietly become a state-reset-only run.', flush=True)
             return 3
-        return finish(m, args, root, dev)
+        return finish(m, args, root, dev, best_auc)
 
     opt = torch.optim.AdamW(m.parameters(), lr=args.lr, weight_decay=args.wd)
     pw = torch.tensor(args.pos_weight, device=dev)
