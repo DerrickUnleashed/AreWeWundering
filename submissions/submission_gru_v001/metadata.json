@@ -1,0 +1,247 @@
+{
+ "key": "gru_v001",
+ "packaged_utc": "2026-09-29T06:20:28Z",
+ "git_commit": "689918f87eb6ed5a3be5a36b6a5d55d6bf643596",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v001",
+   "parent": "gru_v000",
+   "status": "finished"
+  },
+  "description": "WIDE: 1 layer x 256 units, otherwise identical to gru_v000's recipe.",
+  "hypothesis": "At roughly equal inference latency, width should buy more than depth for a tail-weighted global correlation: the same parameter budget concentrated in one wider layer gives each step a longer memory per gate.",
+  "change_vs_parent": "model.hidden 128->256 and model.layers 2->1. Single variable. Trained on all 10,607 sequences for 3 epochs, seed 1337, evaluated on the same fixed 200 validation sequences as the other three runs.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 256,
+   "layers": 1,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 284674
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.0,
+   "target_clip": 2.0
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.0,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5
+  },
+  "results": {
+   "best_step": 19889,
+   "best_val_wp": 0.6836933903923514,
+   "best_val_t0": 0.6812022721904728,
+   "best_val_t1": 0.6861845085942302,
+   "full_valid_wp": 0.674315,
+   "latency_us_p50": 32.46,
+   "latency_us_p99": 49.04,
+   "train_hours": 3.2524,
+   "finished_utc": "2026-09-28T23:07:52Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v001.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v001",
+   "submission_dir": "submissions/submission_gru_v001"
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step9999_val0.672927.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v001/best_001_step9999_val0.672927.pt",
+  "step": 9999,
+  "sha256": "554c766673c113d2bf7b7a15a065bd68e6049c556a68a9670b724b67cbe2cde9",
+  "train_time_metrics": {
+   "t0": 0.6686343756516858,
+   "t1": 0.6772200028654568,
+   "weighted_pearson": 0.6729271892585713,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.7556638562414081,
+  "t1": 0.6834096264765722,
+  "weighted_pearson": 0.7195367413589902,
+  "selected_rows": 44975,
+  "rows_seen": 400000,
+  "us_per_row": 40.18,
+  "call_us_p50": 32.63,
+  "call_us_p99": 48.92,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19
+  ],
+  "protocol": "20 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 32.5,
+  "us_p99": 49.04,
+  "projected_min_p50": 21.3,
+  "projected_min_p99": 32.2,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": true,
+  "rows": 39400000
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 3.458e-04 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.719537 vs offline 0.719537, |diff| = 3.263e-07 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.7556638562414081,
+   "t1": 0.6834096264765722,
+   "weighted_pearson": 0.7195367413589902,
+   "selected_rows": 44975,
+   "rows_seen": 400000,
+   "us_per_row": 40.18,
+   "call_us_p50": 32.63,
+   "call_us_p99": 48.92,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "protocol": "20 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 32.5,
+   "us_p99": 49.04,
+   "projected_min_p50": 21.3,
+   "projected_min_p99": 32.2,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": true,
+   "rows": 39400000
+  },
+  "size": {
+   "zip_bytes": 2126782,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": true
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "0b8e11cb9ff67603703d334057ed28b1ed8859af2e0af5e93de8596f2968c893",
+  "solution_py": "10419a263b66f3e7cf825f3dcab24ea08bd83db7ee32c00905e2fdeedbc61dd6",
+  "model_onnx": "743d567d73979cdb33be92ab45cf2508a4d00f18ce1acc9f3cae9b99f2c5867c",
+  "feature_stats_npz": "040dcc1b65c55148420f223676ce894bf04dcd2d9dbf324582f6d98bdd892769"
+ },
+ "zip": {
+  "file": "submission_gru_v001.zip",
+  "bytes": 2126782,
+  "root_entries": [
+   "best_001_step9999_val0.672927.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 1.1 MB checkpoint for provenance",
+  "gate score measured on 20 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [],
+ "status": "PASS"
+}
