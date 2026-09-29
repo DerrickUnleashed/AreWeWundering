@@ -278,7 +278,9 @@ def main():
                     lat['grader_target_us_local'] = round(GRADER_TARGET_US, 2)
                     lat['grader_safe'] = bool(p50 <= GRADER_TARGET_US
                                               and (p99 is None or p99 * GRADER_SLOWDOWN * TEST_ROWS / 1e6 / 60 <= 60))
-            ok = bool(gate.get('latency', {}).get('grader_safe'))
+            # A None latency block means the benchmark never produced a verdict;
+            # that is a failure, not a reason to crash on .get().
+            ok = bool((gate.get('latency') or {}).get('grader_safe'))
             gate['latency_pass'] = ok
             if not ok:
                 lat = gate.get('latency') or {}
