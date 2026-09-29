@@ -18,17 +18,10 @@ reference metric in `tools/metric_ref.py`.
 | 8 | **v005** | baseline config, seed 1338 | 0.674037 | Ready to Submit (latency unverified) | -- | -- | -- |
 | 9 | **v003** | aux MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
 | 10 | **v004** | 2x192 + input projection | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 11 | **v010** | 6 epochs instead of 3 | 0.670696 | Ready to Submit | -- | -- | -- |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
-
-### Still in flight
-
-No final `full_valid_wp` yet, so not ranked.
-
-| Ver | What it changed | best so far (subset) | Status | Public score |
-|---|---|---:|---|---|
-| **v010** | 6 epochs instead of 3 | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -76,6 +69,22 @@ The two failures below are also informative: they are the *objective* and
   term actively hurt the correlation objective.
 - **v004 (2x192 + input projection) is much worse at -12.4 sigma.** Doubling the
   width and adding an input projection is a clear regression.
+- **v010 (6 epochs instead of 3) is worse at -21.9 sigma.** Doubling the
+  schedule to 39,780 steps from 19,890 made the model *worse*, at
+  `full_valid_wp` 0.670696 against a seed mean of 0.674179.
+
+### v010 rules out the obvious alternative explanation
+
+This is the most useful negative result in the batch. v011 gains +0.0058, so the
+natural question is whether it simply trained longer. v010 answers that directly:
+**twice the training steps made things worse by 0.0035**, a gap of 33 sigma
+against v011's gain. So v011's win is not extra optimisation -- it is the soft
+mask and the state reset.
+
+It also bounds the two levers against each other. v010 and v011 share the same
+architecture and the same 3-epoch schedule; they differ in the objective. That
+makes v011's gain attributable to the objective change rather than to capacity or
+training time, which is the claim worth carrying forward.
 
 ## The input-representation dead end
 
