@@ -31,6 +31,7 @@ import argparse
 import ast
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -230,7 +231,6 @@ def main():
             failures.append('the real callback loop failed (contract violation or crash):\n'
                             f'{r.stdout[-2000:]}\n{r.stderr[-2000:]}')
         else:
-            import re
             blob = r.stdout
             m = re.search(r'^\{', blob, re.M)
             data = json.loads(blob[m.start():]) if m else {}

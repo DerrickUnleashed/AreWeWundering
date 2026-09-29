@@ -363,7 +363,7 @@ class PredictionModel:
         # model must emit a consistent level from a FRESH state at any position.
         # The training loop must use the same period or the model is scored far out
         # of regime.
-        self.state_reset = int(np.asarray(stats['state_reset']).reshape(-1)[0]) \
+        self.state_reset = int(_np.asarray(stats['state_reset']).reshape(-1)[0]) \
             if 'state_reset' in stats.files else 0
         options = _ort.SessionOptions()
         options.intra_op_num_threads = 1
