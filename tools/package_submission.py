@@ -55,6 +55,17 @@ ALLOWED_TOP_IMPORTS = {'numpy', 'onnxruntime', 'pyarrow', 'os', 'sys', 'pathlib'
 MAX_ZIP_BYTES = 20 * 1024 * 1024
 STDLIB_HINT = 'stdlib'
 
+# The grader is 1.62x slower than this machine, measured from a real submission
+# (2026-09-28: 29m47s for the 39.4M-row test set = 45.36 us/row, against 27.96
+# us/row here for the same model). A model that only passes the LOCAL 75% rule can
+# still blow the 60-minute limit once that factor is applied, so promotion is gated
+# on the corrected number and the local one is kept only as a pre-filter.
+GRADER_SLOWDOWN = 1.62
+TEST_ROWS = 39_400_000
+TIME_BUDGET_S = 3600.0
+BUDGET_US_PER_ROW = TIME_BUDGET_S / TEST_ROWS * 1e6          # 91.37
+GRADER_TARGET_US = 0.75 * BUDGET_US_PER_ROW / GRADER_SLOWDOWN  # 42.2 local
+
 
 def sha256(path):
     h = hashlib.sha256()
@@ -225,13 +236,13 @@ def main():
                  '--solution', bundle / 'solution.py', '--sequences', args.sequences,
                  '--parity-against-offline', '--offline-script', script,
                  '--offline-config', config, '--offline-checkpoint', ck, '--json'])
-        if r.returncode or 'parity streaming vs offline' not in r.stdout:
+        if r.returncode or 'parity overall' not in r.stdout:
             failures.append('parity check against the offline model could not be run')
         else:
-            line = [l for l in r.stdout.splitlines() if l.startswith('parity streaming')][-1]
-            gate['parity'] = line
-            if 'PASS' not in line:
-                failures.append(f'parity FAILED: {line}')
+            lines = [l for l in r.stdout.splitlines() if l.startswith('parity')]
+            gate['parity'] = ' | '.join(l.strip() for l in lines)
+            if 'parity overall         : PASS' not in r.stdout:
+                failures.append(f'parity FAILED: {gate["parity"]}')
         if not args.skip_latency:
             r = run([args.python, ROOT / 'tools' / 'bench_latency.py',
                      '--solution', bundle / 'solution.py', '--rows', args.latency_rows,
@@ -240,10 +251,30 @@ def main():
             m = re.search(r'^\{', r.stdout, re.M)
             if m:
                 gate['latency'] = json.loads(r.stdout[m.start():])
-            ok = r.returncode == 0
+            lat = gate.get('latency') or {}
+            if lat:
+                p50, p99 = lat.get('us_p50'), lat.get('us_p99')
+                if p50 is not None:
+                    lat['grader_slowdown'] = GRADER_SLOWDOWN
+                    lat['grader_us_p50'] = round(p50 * GRADER_SLOWDOWN, 2)
+                    lat['grader_us_p99'] = round(p99 * GRADER_SLOWDOWN, 2) if p99 else None
+                    lat['grader_min_p50'] = round(p50 * GRADER_SLOWDOWN * TEST_ROWS / 1e6 / 60, 1)
+                    lat['grader_min_p99'] = (round(p99 * GRADER_SLOWDOWN * TEST_ROWS / 1e6 / 60, 1)
+                                             if p99 else None)
+                    lat['grader_pct_budget_p50'] = round(p50 * GRADER_SLOWDOWN / BUDGET_US_PER_ROW * 100, 1)
+                    lat['grader_target_us_local'] = round(GRADER_TARGET_US, 2)
+                    lat['grader_safe'] = bool(p50 <= GRADER_TARGET_US
+                                              and (p99 is None or p99 * GRADER_SLOWDOWN * TEST_ROWS / 1e6 / 60 <= 60))
+            ok = bool(gate.get('latency', {}).get('grader_safe'))
             gate['latency_pass'] = ok
             if not ok:
-                failures.append('latency gate FAILED (> 75 % of the 60 min budget)')
+                lat = gate.get('latency') or {}
+                failures.append(
+                    f'latency gate FAILED against the grader: {lat.get("us_p50")} us/row local '
+                    f'x {GRADER_SLOWDOWN} = {lat.get("grader_min_p50")} min at p50 '
+                    f'({lat.get("grader_pct_budget_p50")}% of the 60 min budget) and '
+                    f'{lat.get("grader_min_p99")} min at p99. '
+                    f'Local target is {GRADER_TARGET_US:.1f} us/row. DO NOT UPLOAD.')
             for l in r.stdout.splitlines():
                 if 'projected total' in l or 'µs/row' in l or 'GATE' in l:
                     print('   ' + l)
