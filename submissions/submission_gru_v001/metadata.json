@@ -1,7 +1,7 @@
 {
  "key": "gru_v001",
- "packaged_utc": "2026-09-29T06:20:28Z",
- "git_commit": "689918f87eb6ed5a3be5a36b6a5d55d6bf643596",
+ "packaged_utc": "2026-09-29T06:28:59Z",
+ "git_commit": "365a747d127bd32a915ba39ce8ab590368406d07",
  "config": {
   "schema_version": 1,
   "identity": {
@@ -84,7 +84,7 @@
    "best_val_t0": 0.6812022721904728,
    "best_val_t1": 0.6861845085942302,
    "full_valid_wp": 0.674315,
-   "latency_us_p50": 32.46,
+   "latency_us_p50": 32.5,
    "latency_us_p99": 49.04,
    "train_hours": 3.2524,
    "finished_utc": "2026-09-28T23:07:52Z"
@@ -120,9 +120,9 @@
   "weighted_pearson": 0.7195367413589902,
   "selected_rows": 44975,
   "rows_seen": 400000,
-  "us_per_row": 40.18,
+  "us_per_row": 40.25,
   "call_us_p50": 32.63,
-  "call_us_p99": 48.92,
+  "call_us_p99": 48.29,
   "sequences": [
    0,
    1,
@@ -150,13 +150,21 @@
  "latency": {
   "budget_us_per_row": 91.37,
   "target_us_per_row": 68.53,
-  "us_p50": 32.5,
-  "us_p99": 49.04,
-  "projected_min_p50": 21.3,
-  "projected_min_p99": 32.2,
+  "us_p50": 32.54,
+  "us_p99": 49.79,
+  "projected_min_p50": 21.4,
+  "projected_min_p99": 32.7,
   "pass_p50_75pct": true,
   "pass_p99_75pct": true,
-  "rows": 39400000
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 52.71,
+  "grader_us_p99": 80.66,
+  "grader_min_p50": 34.6,
+  "grader_min_p99": 53.0,
+  "grader_pct_budget_p50": 57.7,
+  "grader_target_us_local": 42.3,
+  "grader_safe": true
  },
  "gate": {
   "contract": "PASS",
@@ -168,9 +176,9 @@
    "weighted_pearson": 0.7195367413589902,
    "selected_rows": 44975,
    "rows_seen": 400000,
-   "us_per_row": 40.18,
+   "us_per_row": 40.25,
    "call_us_p50": 32.63,
-   "call_us_p99": 48.92,
+   "call_us_p99": 48.29,
    "sequences": [
     0,
     1,
@@ -198,16 +206,24 @@
   "latency": {
    "budget_us_per_row": 91.37,
    "target_us_per_row": 68.53,
-   "us_p50": 32.5,
-   "us_p99": 49.04,
-   "projected_min_p50": 21.3,
-   "projected_min_p99": 32.2,
+   "us_p50": 32.54,
+   "us_p99": 49.79,
+   "projected_min_p50": 21.4,
+   "projected_min_p99": 32.7,
    "pass_p50_75pct": true,
    "pass_p99_75pct": true,
-   "rows": 39400000
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 52.71,
+   "grader_us_p99": 80.66,
+   "grader_min_p50": 34.6,
+   "grader_min_p99": 53.0,
+   "grader_pct_budget_p50": 57.7,
+   "grader_target_us_local": 42.3,
+   "grader_safe": true
   },
   "size": {
-   "zip_bytes": 2126782,
+   "zip_bytes": 2126783,
    "limit_bytes": 20971520,
    "pass": true
   },
@@ -223,13 +239,13 @@
  "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
  "sha256": {
   "train_script": "0b8e11cb9ff67603703d334057ed28b1ed8859af2e0af5e93de8596f2968c893",
-  "solution_py": "10419a263b66f3e7cf825f3dcab24ea08bd83db7ee32c00905e2fdeedbc61dd6",
+  "solution_py": "329d1626b0c820572c58324209dafd98d1f848cd1d3ff46193d18df8285802ee",
   "model_onnx": "743d567d73979cdb33be92ab45cf2508a4d00f18ce1acc9f3cae9b99f2c5867c",
   "feature_stats_npz": "040dcc1b65c55148420f223676ce894bf04dcd2d9dbf324582f6d98bdd892769"
  },
  "zip": {
   "file": "submission_gru_v001.zip",
-  "bytes": 2126782,
+  "bytes": 2126783,
   "root_entries": [
    "best_001_step9999_val0.672927.pt",
    "feature_stats.npz",
