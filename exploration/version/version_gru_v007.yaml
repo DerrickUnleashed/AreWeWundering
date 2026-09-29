@@ -1,0 +1,115 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v007
+  parent: gru_v002
+  status: running
+description: 'INPUTS: first differences of the i0 top-of-book prices and the trade
+  features.'
+hypothesis: LOB prediction is dominated by short-horizon dynamics, and the features
+  are snapshot levels. First differences give the model velocity/flow information
+  it cannot recover from levels alone. Costs no extra inference FLOPs once folded
+  into layer 1.
+change_vs_parent: features.first_differences [] -> the 30 indices of the i0 price
+  block (0-21) and i0 trade block (44-51). Single variable off gru_v002.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 8
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 203778
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v007.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v007
+  submission_dir: null
