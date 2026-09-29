@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v004
   parent: gru_v000
-  status: running
+  status: finished
 description: 'THIRD-PARTY ARCHITECTURE: 2 layers x 192 with a 128-unit input projection,
   trained on our own data with our own objective.'
 hypothesis: A third-party report claims this shape reaches ~0.62 public / ~0.67 held-out
@@ -70,16 +70,16 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 13259
+  best_val_wp: 0.6792550218175468
+  best_val_t0: 0.6742670271202489
+  best_val_t1: 0.6842430165148446
+  full_valid_wp: 0.672206
+  latency_us_p50: 43.96
+  latency_us_p99: 62.79
+  train_hours: 3.7327
+  finished_utc: '2026-09-28T23:36:41Z'
 artifacts:
   log: exploration/logs/log_gru_v004.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v004
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v004
