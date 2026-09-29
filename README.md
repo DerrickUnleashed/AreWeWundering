@@ -8,7 +8,7 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v011** | soft mask on P(is_scored) + state reset | 0.679986 | Yet to package | -- | -- | -- |
+| 1 | **v011** | soft mask on P(is_scored) + state reset | 0.679986 | Ready to Submit | -- | -- | -- |
 | 2 | **v009** | signed-log volumes | 0.674456 | Ready to Submit (latency unverified) | -- | -- | -- |
 | 3 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | Ready to Submit (latency unverified) | -- | -- | -- |
 | 4 | **v002** | baseline config, seed 1337 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
