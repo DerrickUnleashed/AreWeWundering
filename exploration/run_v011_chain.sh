@@ -43,9 +43,28 @@ if [ $rc -ne 0 ] || [ ! -f cache/train_scored.npy ]; then
     exit 1
 fi
 
-AUC=$(venv/bin/python -c "import json;print(json.load(open('cache/train_scored.json'))['auc'])" 2>/dev/null || echo 0)
+# Read the AUC with python, not jq/awk: a missing or non-numeric AUC used to come
+# back as the STRING "nan", and awk compared that as text -- 'nan' > '0.85'
+# lexically, so the gate PASSED on a broken value. v011 launched through that hole.
+# Anything unparseable must now be a hard abort.
+AUC=$(venv/bin/python -c "
+import json,sys
+try:
+    a=float(json.load(open('cache/train_scored.json'))['auc'])
+except Exception as e:
+    print('nan'); sys.exit(0)
+if a != a:            # NaN
+    print('nan'); sys.exit(0)
+print(f'{a:.4f}')
+")
 echo "=== mask holdout AUC: $AUC ==="
-awk -v a="$AUC" 'BEGIN{exit !(a>=0.85)}' || {
+venv/bin/python -c "
+import sys
+try:
+    a=float('$AUC')
+except Exception:
+    sys.exit(1)
+sys.exit(0 if (a==a and a>=0.85) else 1)" || {
     echo "ABORT: holdout AUC $AUC is below 0.85. The soft mask would be a no-op and"
     echo "       v011 would quietly become a state-reset-only run. Not launching."
     exit 2
