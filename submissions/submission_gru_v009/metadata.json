@@ -1,235 +1,237 @@
 {
- "key": "gru_v009",
- "packaged_utc": "2026-09-29T16:38:55Z",
- "git_commit": "c23e78649760479f835edb288f6d7420de6abf45",
- "config": {
-  "schema_version": 1,
-  "identity": {
-   "model": "gru",
-   "version": "v009",
-   "parent": "gru_v002",
-   "status": "finished"
+  "key": "gru_v009",
+  "packaged_utc": "2026-09-29T16:38:55Z",
+  "git_commit": "c23e78649760479f835edb288f6d7420de6abf45",
+  "config": {
+    "schema_version": 1,
+    "identity": {
+      "model": "gru",
+      "version": "v009",
+      "parent": "gru_v002",
+      "status": "finished"
+    },
+    "description": "INPUTS: append sign(x)*log1p(|x|) of every feature, to compress the heavy tails.",
+    "hypothesis": "The features saturate near +-2.33 and carry a -5.199 floor sentinel, so the distribution is heavy-tailed. A signed-log copy gives the model a compressed view of the same information, which is often easier to fit for a tail-weighted metric. NOTE: the template applies this to ALL 112 columns, not a selectable subset.",
+    "change_vs_parent": "features.signed_log_volumes false -> true (appends 112 signed-log columns). Single variable off gru_v002.",
+    "data": {
+      "train_shards": "cache/train",
+      "valid_shards": "cache/valid",
+      "seq_len": 20000,
+      "warmup_steps": 99,
+      "target_clip": 2.0,
+      "train_sequences": null
+    },
+    "features": {
+      "normalisation": "robust_zscore",
+      "signed_log_volumes": true,
+      "first_differences": [],
+      "cross_instrument": [],
+      "step_feature": false,
+      "clip_sigma": 8
+    },
+    "model": {
+      "arch": "gru",
+      "input_proj": 0,
+      "hidden": 128,
+      "layers": 2,
+      "dropout": 0.0,
+      "layernorm": false,
+      "head": "linear",
+      "param_count": 235266
+    },
+    "loss": {
+      "type": "seq_weighted_pearson",
+      "mask": "soft",
+      "aux_mse_weight": 0.0,
+      "target_clip": 2.0
+    },
+    "optim": {
+      "name": "adamw",
+      "lr": 0.002,
+      "weight_decay": 0.01,
+      "betas": [
+        0.9,
+        0.99
+      ],
+      "schedule": "cosine",
+      "warmup_steps": 500,
+      "grad_clip": 1.0,
+      "ema_decay": 0.0,
+      "precision": "fp32"
+    },
+    "training": {
+      "chunk_len": 2000,
+      "burn_in": 99,
+      "batch_sequences": 16,
+      "max_steps": null,
+      "smoke_steps": 60,
+      "epochs": 3,
+      "seed": 1337,
+      "eval_every_steps": 2500,
+      "eval_subset_sequences": 200,
+      "device": "cpu",
+      "stateful": true
+    },
+    "inference": {
+      "export": "onnx",
+      "opset": 17,
+      "ort_threads": 1,
+      "target_us_per_row": 68.5
+    },
+    "results": {
+      "best_step": 17499,
+      "best_val_wp": 0.6845813217495288,
+      "best_val_t0": 0.6820735430476278,
+      "best_val_t1": 0.6870891004514298,
+      "full_valid_wp": 0.6744563466816397,
+      "latency_us_p50": null,
+      "latency_us_p99": null,
+      "train_hours": 6.038,
+      "finished_utc": "2026-09-29T15:40:08Z"
+    },
+    "artifacts": {
+      "log": "exploration/logs/log_gru_v009.log",
+      "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v009",
+      "submission_dir": null
+    }
   },
-  "description": "INPUTS: append sign(x)*log1p(|x|) of every feature, to compress the heavy tails.",
-  "hypothesis": "The features saturate near +-2.33 and carry a -5.199 floor sentinel, so the distribution is heavy-tailed. A signed-log copy gives the model a compressed view of the same information, which is often easier to fit for a tail-weighted metric. NOTE: the template applies this to ALL 112 columns, not a selectable subset.",
-  "change_vs_parent": "features.signed_log_volumes false -> true (appends 112 signed-log columns). Single variable off gru_v002.",
-  "data": {
-   "train_shards": "cache/train",
-   "valid_shards": "cache/valid",
-   "seq_len": 20000,
-   "warmup_steps": 99,
-   "target_clip": 2.0,
-   "train_sequences": null
+  "checkpoint": {
+    "file": "best_001_step17499_val0.684581.pt",
+    "path": "exploration/checkpoints/checkpoint_gru_v009/best_001_step17499_val0.684581.pt",
+    "step": 17499,
+    "sha256": "ef8ba6a8b3084536e6621dfe071b9095943c1fced97a5f2b638a6a8e554f6ba8",
+    "train_time_metrics": {
+      "t0": 0.6820735430476278,
+      "t1": 0.6870891004514298,
+      "weighted_pearson": 0.6845813217495288,
+      "selected_rows": 374199,
+      "blocks": 200,
+      "metric_clip": [
+        -2.0,
+        2.0
+      ],
+      "metric_specification": "global_wp",
+      "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+    }
   },
-  "features": {
-   "normalisation": "robust_zscore",
-   "signed_log_volumes": true,
-   "first_differences": [],
-   "cross_instrument": [],
-   "step_feature": false,
-   "clip_sigma": 8
-  },
-  "model": {
-   "arch": "gru",
-   "input_proj": 0,
-   "hidden": 128,
-   "layers": 2,
-   "dropout": 0.0,
-   "layernorm": false,
-   "head": "linear",
-   "param_count": 235266
-  },
-  "loss": {
-   "type": "seq_weighted_pearson",
-   "mask": "soft",
-   "aux_mse_weight": 0.0,
-   "target_clip": 2.0
-  },
-  "optim": {
-   "name": "adamw",
-   "lr": 0.002,
-   "weight_decay": 0.01,
-   "betas": [
-    0.9,
-    0.99
-   ],
-   "schedule": "cosine",
-   "warmup_steps": 500,
-   "grad_clip": 1.0,
-   "ema_decay": 0.0,
-   "precision": "fp32"
-  },
-  "training": {
-   "chunk_len": 2000,
-   "burn_in": 99,
-   "batch_sequences": 16,
-   "max_steps": null,
-   "smoke_steps": 60,
-   "epochs": 3,
-   "seed": 1337,
-   "eval_every_steps": 2500,
-   "eval_subset_sequences": 200,
-   "device": "cpu",
-   "stateful": true
-  },
-  "inference": {
-   "export": "onnx",
-   "opset": 17,
-   "ort_threads": 1,
-   "target_us_per_row": 68.5
-  },
-  "results": {
-   "best_step": 17499,
-   "best_val_wp": 0.6845813217495288,
-   "best_val_t0": 0.6820735430476278,
-   "best_val_t1": 0.6870891004514298,
-   "full_valid_wp": 0.6744563466816397,
-   "latency_us_p50": null,
-   "latency_us_p99": null,
-   "train_hours": 6.038,
-   "finished_utc": "2026-09-29T15:40:08Z"
-  },
-  "artifacts": {
-   "log": "exploration/logs/log_gru_v009.log",
-   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v009",
-   "submission_dir": null
-  }
- },
- "checkpoint": {
-  "file": "best_001_step17499_val0.684581.pt",
-  "path": "exploration/checkpoints/checkpoint_gru_v009/best_001_step17499_val0.684581.pt",
-  "step": 17499,
-  "sha256": "ef8ba6a8b3084536e6621dfe071b9095943c1fced97a5f2b638a6a8e554f6ba8",
-  "train_time_metrics": {
-   "t0": 0.6820735430476278,
-   "t1": 0.6870891004514298,
-   "weighted_pearson": 0.6845813217495288,
-   "selected_rows": 374199,
-   "blocks": 200,
-   "metric_clip": [
-    -2.0,
-    2.0
-   ],
-   "metric_specification": "global_wp",
-   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
-  }
- },
- "scores": {
-  "t0": 0.7090652764852757,
-  "t1": 0.7500115116469525,
-  "weighted_pearson": 0.7295383940661141,
-  "selected_rows": 9110,
-  "rows_seen": 100000,
-  "us_per_row": 79.9,
-  "call_us_p50": 65.0,
-  "call_us_p99": 132.54,
-  "sequences": [
-   0,
-   1,
-   2,
-   3,
-   4
-  ],
-  "protocol": "5 validation sequences"
- },
- "latency": {
-  "budget_us_per_row": 91.37,
-  "target_us_per_row": 68.53,
-  "us_p50": 62.0,
-  "us_p99": 109.71,
-  "projected_min_p50": 40.7,
-  "projected_min_p99": 72.0,
-  "pass_p50_75pct": true,
-  "pass_p99_75pct": false,
-  "rows": 39400000,
-  "grader_slowdown": 1.62,
-  "grader_us_p50": 100.44,
-  "grader_us_p99": 177.73,
-  "grader_min_p50": 66.0,
-  "grader_min_p99": 116.7,
-  "grader_pct_budget_p50": 109.9,
-  "grader_target_us_local": 42.3,
-  "grader_safe": false
- },
- "gate": {
-  "contract": "PASS",
-  "determinism": "PASS",
-  "parity": "parity raw predictions : max |diff| = 5.305e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.729538 vs offline 0.729538, |diff| = 6.937e-07 (tol 1e-04)  PASS | parity overall         : PASS",
-  "score": {
-   "t0": 0.7090652764852757,
-   "t1": 0.7500115116469525,
-   "weighted_pearson": 0.7295383940661141,
-   "selected_rows": 9110,
-   "rows_seen": 100000,
-   "us_per_row": 79.9,
-   "call_us_p50": 65.0,
-   "call_us_p99": 132.54,
-   "sequences": [
-    0,
-    1,
-    2,
-    3,
-    4
-   ],
-   "protocol": "5 validation sequences"
+  "scores": {
+    "t0": 0.7090652764852757,
+    "t1": 0.7500115116469525,
+    "weighted_pearson": 0.7295383940661141,
+    "selected_rows": 9110,
+    "rows_seen": 100000,
+    "us_per_row": 79.9,
+    "call_us_p50": 65.0,
+    "call_us_p99": 132.54,
+    "sequences": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "protocol": "5 validation sequences"
   },
   "latency": {
-   "budget_us_per_row": 91.37,
-   "target_us_per_row": 68.53,
-   "us_p50": 62.0,
-   "us_p99": 109.71,
-   "projected_min_p50": 40.7,
-   "projected_min_p99": 72.0,
-   "pass_p50_75pct": true,
-   "pass_p99_75pct": false,
-   "rows": 39400000,
-   "grader_slowdown": 1.62,
-   "grader_us_p50": 100.44,
-   "grader_us_p99": 177.73,
-   "grader_min_p50": 66.0,
-   "grader_min_p99": 116.7,
-   "grader_pct_budget_p50": 109.9,
-   "grader_target_us_local": 42.3,
-   "grader_safe": false
+    "budget_us_per_row": 91.37,
+    "target_us_per_row": 68.53,
+    "us_p50": 62.0,
+    "us_p99": 109.71,
+    "projected_min_p50": 40.7,
+    "projected_min_p99": 72.0,
+    "pass_p50_75pct": true,
+    "pass_p99_75pct": false,
+    "rows": 39400000,
+    "grader_slowdown": 1.62,
+    "grader_us_p50": 100.44,
+    "grader_us_p99": 177.73,
+    "grader_min_p50": 66.0,
+    "grader_min_p99": 116.7,
+    "grader_pct_budget_p50": 109.9,
+    "grader_target_us_local": 42.3,
+    "grader_safe": false
   },
-  "size": {
-   "zip_bytes": 1761489,
-   "limit_bytes": 20971520,
-   "pass": true
+  "gate": {
+    "contract": "PASS",
+    "determinism": "PASS",
+    "parity": "parity raw predictions : max |diff| = 5.305e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.729538 vs offline 0.729538, |diff| = 6.937e-07 (tol 1e-04)  PASS | parity overall         : PASS",
+    "score": {
+      "t0": 0.7090652764852757,
+      "t1": 0.7500115116469525,
+      "weighted_pearson": 0.7295383940661141,
+      "selected_rows": 9110,
+      "rows_seen": 100000,
+      "us_per_row": 79.9,
+      "call_us_p50": 65.0,
+      "call_us_p99": 132.54,
+      "sequences": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "protocol": "5 validation sequences"
+    },
+    "latency": {
+      "budget_us_per_row": 91.37,
+      "target_us_per_row": 68.53,
+      "us_p50": 62.0,
+      "us_p99": 109.71,
+      "projected_min_p50": 40.7,
+      "projected_min_p99": 72.0,
+      "pass_p50_75pct": true,
+      "pass_p99_75pct": false,
+      "rows": 39400000,
+      "grader_slowdown": 1.62,
+      "grader_us_p50": 100.44,
+      "grader_us_p99": 177.73,
+      "grader_min_p50": 66.0,
+      "grader_min_p99": 116.7,
+      "grader_pct_budget_p50": 109.9,
+      "grader_target_us_local": 42.3,
+      "grader_safe": false
+    },
+    "size": {
+      "zip_bytes": 1761489,
+      "limit_bytes": 20971520,
+      "pass": true
+    },
+    "imports": [],
+    "latency_pass": false
   },
-  "imports": [],
-  "latency_pass": false
- },
- "packages": {
-  "python": "3.11.9",
-  "numpy": "2.2.6",
-  "onnxruntime": "1.23.2",
-  "torch": "2.14.0"
- },
- "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
- "sha256": {
-  "train_script": "537a8e823efe555477702b3f0b509d36bb43d06e0fa7cf5bccd34bab52031b27",
-  "solution_py": "3d20cb20e0f41fe196c50ba990c1624c0a7f9220f4e34269ca1189f80dac3f9c",
-  "model_onnx": "b270998dcba051e7d059f549444c34083db2aefc79e0ec7b42667488fc5ea364",
-  "feature_stats_npz": "2a6680576b0a703d500b3a3e78e18d0420a552616ed5dbf7bdf57893a69e2105"
- },
- "zip": {
-  "file": "submission_gru_v009.zip",
-  "bytes": 1761489,
-  "root_entries": [
-   "best_001_step17499_val0.684581.pt",
-   "feature_stats.npz",
-   "model.onnx",
-   "solution.py"
-  ]
- },
- "notes": [
-  "included the 1.0 MB checkpoint for provenance",
-  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
- ],
- "warnings": [],
- "failures": [
-  "latency gate FAILED against the grader: 62.0 us/row local x 1.62 = 66.0 min at p50 (109.9% of the 60 min budget) and 116.7 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
- ],
- "status": "NOT-READY"
+  "packages": {
+    "python": "3.11.9",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "torch": "2.14.0"
+  },
+  "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+  "sha256": {
+    "train_script": "537a8e823efe555477702b3f0b509d36bb43d06e0fa7cf5bccd34bab52031b27",
+    "solution_py": "3d20cb20e0f41fe196c50ba990c1624c0a7f9220f4e34269ca1189f80dac3f9c",
+    "model_onnx": "b270998dcba051e7d059f549444c34083db2aefc79e0ec7b42667488fc5ea364",
+    "feature_stats_npz": "2a6680576b0a703d500b3a3e78e18d0420a552616ed5dbf7bdf57893a69e2105"
+  },
+  "zip": {
+    "file": "submission_gru_v009.zip",
+    "bytes": 1761489,
+    "root_entries": [
+      "best_001_step17499_val0.684581.pt",
+      "feature_stats.npz",
+      "model.onnx",
+      "solution.py"
+    ]
+  },
+  "notes": [
+    "included the 1.0 MB checkpoint for provenance",
+    "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+  ],
+  "warnings": [],
+  "failures": [
+    "latency gate FAILED against the grader: 62.0 us/row local x 1.62 = 66.0 min at p50 (109.9% of the 60 min budget) and 116.7 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
+  ],
+  "status": "NOT-READY",
+  "latency_contaminated": true,
+  "latency_contamination_note": "Latency measured while gru_v010 and gru_v011 were training on the same cores. Reference: gru_v003 measured 27.71 us/row on an idle box and 48.12 us/row in that window (1.7x). This verdict reflects contention, not the model. Re-run the gate on an idle box before shipping."
 }
