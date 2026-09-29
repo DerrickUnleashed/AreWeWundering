@@ -1,11 +1,11 @@
-### new run, log opened 2026-09-29T01:22:43+0530
+### new run, log opened 2026-09-29T11:55:26+0530
 ==============================================================================
-command            : python exploration/models/train_gru_v004.py --config exploration/version/version_gru_v004.yaml --device cpu
-timestamp          : 2026-09-29T01:22:43+0530
+command            : python exploration/models/train_gru_v004.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v004.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v004/best_001_step9999_val0.676029.pt
+timestamp          : 2026-09-29T11:55:26+0530
 host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
 packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
 cuda               : False   mps: True
-git commit         : 62832d0b12db5bd653986b7c049fa9364d0d14a7
+git commit         : 689918f87eb6ed5a3be5a36b6a5d55d6bf643596
 seed               : 1337
 log                : exploration/logs/log_gru_v004.log
 config:
@@ -14,7 +14,7 @@ identity:
   model: gru
   version: v004
   parent: gru_v000
-  status: planned
+  status: finished
 description: 'THIRD-PARTY ARCHITECTURE: 2 layers x 192 with a 128-unit input projection,
   trained on our own data with our own objective.'
 hypothesis: A third-party report claims this shape reaches ~0.62 public / ~0.67 held-out
@@ -45,7 +45,7 @@ model:
   dropout: 0.0
   layernorm: false
   head: linear
-  param_count: null
+  param_count: 422658
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -81,63 +81,25 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 13259
+  best_val_wp: 0.6792550218175468
+  best_val_t0: 0.6742670271202489
+  best_val_t1: 0.6842430165148446
+  full_valid_wp: 0.672206
+  latency_us_p50: 44.04
+  latency_us_p99: 62.5
+  train_hours: 3.7327
+  finished_utc: '2026-09-28T23:36:41Z'
 artifacts:
   log: exploration/logs/log_gru_v004.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v004
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v004
 
 ==============================================================================
 device: cpu
-model: gru hidden=192 layers=2 input_proj=128 in_dim=112 params=422,658
-max_steps derived: 6,630 steps/epoch x 2 epoch(s) = 13,260 steps over all 10,607 training sequences
-train sequences=10607  valid sequences=200  steps=13260
-step 0/13260 lr 4.00e-06 loss 0.915273 grad_norm 4.588 (1s)
-step 25/13260 lr 1.04e-04 loss 0.677322 grad_norm 3.167 (27s)
-step 50/13260 lr 2.04e-04 loss 0.787486 grad_norm 1.643 (52s)
-step 75/13260 lr 3.04e-04 loss 0.715912 grad_norm 1.691 (77s)
-step 100/13260 lr 4.04e-04 loss 0.615443 grad_norm 0.779 (102s)
-step 125/13260 lr 5.04e-04 loss 0.610978 grad_norm 0.895 (127s)
-step 150/13260 lr 6.04e-04 loss 0.678242 grad_norm 0.990 (151s)
-step 175/13260 lr 7.04e-04 loss 0.787746 grad_norm 0.835 (176s)
-step 200/13260 lr 8.04e-04 loss 0.695300 grad_norm 0.793 (200s)
-step 225/13260 lr 9.04e-04 loss 0.693018 grad_norm 1.749 (225s)
-step 250/13260 lr 1.00e-03 loss 0.873959 grad_norm 0.850 (249s)
-step 275/13260 lr 1.10e-03 loss 0.717259 grad_norm 0.883 (273s)
-step 300/13260 lr 1.20e-03 loss 0.714897 grad_norm 0.804 (299s)
-step 325/13260 lr 1.30e-03 loss 0.649453 grad_norm 0.565 (325s)
-step 350/13260 lr 1.40e-03 loss 0.634464 grad_norm 0.493 (351s)
-step 375/13260 lr 1.50e-03 loss 0.582300 grad_norm 0.706 (378s)
-step 400/13260 lr 1.60e-03 loss 0.733242 grad_norm 0.794 (406s)
-step 425/13260 lr 1.70e-03 loss 0.672173 grad_norm 0.384 (433s)
-step 450/13260 lr 1.80e-03 loss 0.760011 grad_norm 0.746 (459s)
-step 475/13260 lr 1.90e-03 loss 0.558676 grad_norm 0.264 (484s)
-step 500/13260 lr 2.00e-03 loss 0.794216 grad_norm 0.786 (509s)
-step 525/13260 lr 2.00e-03 loss 0.751803 grad_norm 0.414 (534s)
-step 550/13260 lr 2.00e-03 loss 0.583926 grad_norm 0.352 (559s)
-step 575/13260 lr 2.00e-03 loss 0.730961 grad_norm 0.410 (585s)
-step 600/13260 lr 2.00e-03 loss 0.702372 grad_norm 0.406 (610s)
-step 625/13260 lr 2.00e-03 loss 0.730440 grad_norm 0.556 (635s)
-step 650/13260 lr 2.00e-03 loss 0.622308 grad_norm 0.385 (660s)
-step 675/13260 lr 2.00e-03 loss 0.566125 grad_norm 0.481 (685s)
-step 700/13260 lr 2.00e-03 loss 0.892774 grad_norm 1.021 (711s)
-step 725/13260 lr 2.00e-03 loss 0.646962 grad_norm 0.547 (737s)
-step 750/13260 lr 2.00e-03 loss 0.634291 grad_norm 0.264 (764s)
-step 775/13260 lr 2.00e-03 loss 0.586423 grad_norm 0.445 (789s)
-step 800/13260 lr 2.00e-03 loss 0.598246 grad_norm 0.542 (814s)
-step 825/13260 lr 2.00e-03 loss 0.543134 grad_norm 0.580 (839s)
-step 850/13260 lr 2.00e-03 loss 0.463733 grad_norm 0.429 (865s)
-step 875/13260 lr 2.00e-03 loss 0.570137 grad_norm 0.483 (890s)
-step 900/13260 lr 2.00e-03 loss 0.564348 grad_norm 0.609 (916s)
-step 925/13260 lr 1.99e-03 loss 0.576971 grad_norm 0.448 (943s)
-step 950/13260 lr 1.99e-03 loss 0.689209 grad_norm 0.537 (968s)
-step 975/13260 lr 1.99e-03 loss 0.632059 grad_norm 0.515 (993s)
-step 1000/13260 lr 1.99e-03 loss 0.725650 grad_norm 0.542 (1017s)
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v004.py:503: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 2.861e-06
+exported inference artifacts from best_001_step9999_val0.676029.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v004
