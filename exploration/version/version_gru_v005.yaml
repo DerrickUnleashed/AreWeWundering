@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v005
   parent: gru_v002
-  status: running
+  status: finished
 description: SEED REPLICATE of the gru_v002 recipe, seed 1338. A control, not a candidate.
 hypothesis: Changing nothing but the seed reproduces gru_v002's 0.674350 to within
   a small tolerance. The spread across the three seeds IS the noise floor that decides
@@ -67,15 +67,15 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
+  best_step: 17499
+  best_val_wp: 0.685775545192201
+  best_val_t0: 0.6830219915076959
+  best_val_t1: 0.6885290988767061
   full_valid_wp: null
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.9372
+  finished_utc: '2026-09-29T15:13:00Z'
 artifacts:
   log: exploration/logs/log_gru_v005.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v005
