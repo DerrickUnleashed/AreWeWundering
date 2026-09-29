@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v009
   parent: gru_v002
-  status: running
+  status: finished
 description: 'INPUTS: append sign(x)*log1p(|x|) of every feature, to compress the
   heavy tails.'
 hypothesis: 'The features saturate near +-2.33 and carry a -5.199 floor sentinel,
@@ -70,15 +70,15 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 17499
+  best_val_wp: 0.6845813217495288
+  best_val_t0: 0.6820735430476278
+  best_val_t1: 0.6870891004514298
+  full_valid_wp: 0.6744563466816397
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 6.038
+  finished_utc: '2026-09-29T15:40:08Z'
 artifacts:
   log: exploration/logs/log_gru_v009.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v009
