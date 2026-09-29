@@ -358,6 +358,13 @@ class PredictionModel:
     def __init__(self):
         stats = _np.load(_os.path.join(ARTIFACT_DIR, 'feature_stats.npz'))
         self.transform = FeatureTransform(stats)
+        # Periodic state reset: 0 = never reset (one contiguous 20k context).
+        # A positive N zeroes the recurrent state every N rows of a sequence, so the
+        # model must emit a consistent level from a FRESH state at any position.
+        # The training loop must use the same period or the model is scored far out
+        # of regime.
+        self.state_reset = int(np.asarray(stats['state_reset']).reshape(-1)[0]) \
+            if 'state_reset' in stats.files else 0
         options = _ort.SessionOptions()
         options.intra_op_num_threads = 1
         options.inter_op_num_threads = 1
@@ -399,6 +406,10 @@ class PredictionModel:
         if self.previous_step is not None and step != self.previous_step + 1:
             raise ValueError('rows must arrive in sequence order')
         self.previous_step = step
+        # amortised cost: two buffer fills every `state_reset` rows, i.e. free
+        if self.state_reset and step and not step % self.state_reset:
+            self._h0.fill(0.0)
+            self._h1.fill(0.0)
         if self.transform.identity:
             _np.copyto(self._x[0, 0], data_point.state)
         else:
@@ -495,7 +506,8 @@ class IdentityTransformNn(nn.Module):
     without checking that a future version does not want the transform fused."""
 
 
-def export_inference(model, transform, out_dir, opset=17, verify=True, device='cpu'):
+def export_inference(model, transform, out_dir, opset=17, verify=True, device='cpu',
+                     state_reset=0):
     """Write model.onnx + feature_stats.npz and verify ONNX == PyTorch within 1e-4."""
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -510,7 +522,8 @@ def export_inference(model, transform, out_dir, opset=17, verify=True, device='c
              signed_log_volume=np.int32(1 if transform.signed_log else 0),
              first_differences=transform.diff,
              cross_instrument=transform.cross,
-             step_feature=np.int32(transform.step_feature))
+             step_feature=np.int32(transform.step_feature),
+             state_reset=np.int32(state_reset))
     graph = StepGraph(model).to(device).eval()
     h = model.hidden
     dummy = (torch.zeros(1, 1, fdim, device=device),
@@ -575,11 +588,28 @@ class ShardStore:
     def __len__(self):
         return self.n_seq
 
-    def sequence(self, i):
+    def sequence(self, i, soft_mask=None):
         a, b = int(self.seq_index[i]), int(self.seq_index[i + 1])
         return (np.asarray(self.X[a:b], dtype=np.float32),
                 np.asarray(self.y[a:b], dtype=np.float32),
-                np.asarray(self.need[a:b], dtype=bool))
+                np.asarray(self.need[a:b], dtype=bool),
+                None if soft_mask is None else soft_mask(a, b))
+
+
+class SoftMaskStore:
+    """P(is_scored) per row, produced by tools/train_mask_model.py.
+
+    float16 and memory-mapped: 212 M rows x 2 B = 424 MB, the same order as the
+    feature cache. Read-only and never touched at inference.
+    """
+
+    def __init__(self, path):
+        self.path = Path(path)
+        self.p = np.load(self.path, mmap_mode='r')
+        self.n = self.p.shape[0]
+
+    def __call__(self, lo, hi):
+        return np.asarray(self.p[lo:hi], dtype=np.float32)
 
 
 class StatefulBatchStream:
@@ -597,7 +627,7 @@ class StatefulBatchStream:
     """
 
     def __init__(self, store, batch_sequences, chunk_len, burn_in, seed=0, device='cpu',
-                 n_sequences=None, thread_prefetch=True):
+                 n_sequences=None, thread_prefetch=True, state_reset=0, soft_mask=None):
         if store.seq_len % chunk_len:
             raise ValueError(f'chunk_len ({chunk_len}) must divide the sequence length '
                              f'({store.seq_len}) so lanes end on sequence boundaries')
@@ -606,7 +636,25 @@ class StatefulBatchStream:
         self.T = chunk_len
         self.burn_in = burn_in
         self.chunks_per_seq = store.seq_len // chunk_len
+        # A reset must land on a chunk boundary, otherwise the lane would be cut
+        # mid-chunk. state_reset must therefore be a whole number of chunks.
+        if state_reset:
+            if store.seq_len % state_reset:
+                raise ValueError(f'state_reset ({state_reset}) must divide the sequence '
+                                 f'length ({store.seq_len})')
+            if state_reset % chunk_len:
+                raise ValueError(f'state_reset ({state_reset}) must be a multiple of '
+                                 f'chunk_len ({chunk_len}) so resets land on chunk boundaries')
+            if state_reset <= chunk_len:
+                raise ValueError(
+                    f'state_reset ({state_reset}) must be STRICTLY GREATER than chunk_len '
+                    f'({chunk_len}). A reset at every chunk boundary discards all carried '
+                    f'state, leaving a model with no memory beyond one chunk -- silently, '
+                    f'and the error message would not otherwise say so. Use 2*chunk_len or '
+                    f'more (e.g. 4000 with chunk_len 2000) to keep one chunk of carry.')
         self.device = device
+        self.state_reset = state_reset
+        self.soft_mask = soft_mask
         self.n = n_sequences if n_sequences is not None else len(store)
         self.rng = np.random.default_rng(seed)
         self.thread_prefetch = thread_prefetch
@@ -624,23 +672,27 @@ class StatefulBatchStream:
         X = np.empty((self.B, self.T, N_FEATURES), dtype=np.float32)
         Y = np.empty((self.B, self.T, 2), dtype=np.float32)
         M = np.zeros((self.B, self.T), dtype=np.float32)
+        S = None if self.soft_mask is None else np.empty((self.B, self.T), dtype=np.float32)
         R = np.zeros(self.B, dtype=bool)
         for i in range(self.B):
             seq = self.lane_seq[i]
             chunk = self.lane_chunk[i]
-            x, y, need = self.store.sequence(seq)
+            x, y, need, sm = self.store.sequence(seq, self.soft_mask)
             a = chunk * self.T
             b = a + self.T
             X[i] = x[a:b]
             Y[i] = y[a:b]
             step = np.arange(a, b)
             M[i] = (step >= self.burn_in).astype(np.float32) * need[a:b].astype(np.float32)
-            R[i] = (chunk == 0)
+            if S is not None:
+                S[i] = sm[a:b]
+            R[i] = (chunk == 0) or (self.state_reset
+                                 and (chunk * self.T) % self.state_reset == 0)
             self.lane_chunk[i] = chunk + 1
             if self.lane_chunk[i] >= self.chunks_per_seq:
                 self.lane_seq[i] = -1
         self._new_lane()
-        return X, Y, M, R
+        return X, Y, M, R, S
 
     def __iter__(self):
         while True:
@@ -688,7 +740,7 @@ class ValidationStream:
             M = np.empty((len(idx), self.store.seq_len), dtype=np.float32)
             S = np.empty((len(idx), self.store.seq_len), dtype=bool)
             for j, i in enumerate(idx):
-                x, y, need = self.store.sequence(i)
+                x, y, need, _ = self.store.sequence(i)
                 X[j] = x
                 Y[j] = y
                 M[j] = need.astype(np.float32)
@@ -731,7 +783,7 @@ def build_transform_from_stats(stats_dict, transform_cfg, n_features=N_FEATURES)
     })
 
 
-def chunk_loss(pred, target, mask, loss_cfg, state=None):
+def chunk_loss(pred, target, mask, loss_cfg, state=None, soft_mask=None):
     """1 - Global WP over the whole chunk-batch, plus optional weighted MSE.
 
     WHY THIS SHAPE (AGENTS.md §12 Phase 2): the metric is ONE weighted Pearson
@@ -741,6 +793,15 @@ def chunk_loss(pred, target, mask, loss_cfg, state=None):
     moments across chunks so the statistic is cumulative rather than restarted.
     """
     m = mask if str(loss_cfg.get('mask', 'soft')) == 'soft' else (mask > 0.5).to(mask.dtype)
+    # Soft mask: weight each row by the probability that it will be scored. Only
+    # ~10% of required rows are scored and they are a DISTINCT regime (measured
+    # 0.58 WP on them vs 0.30 on all rows), so the loss should concentrate there.
+    # `floor` keeps a non-zero weight on every row so no gradient is ever lost
+    # outright. This is a TRAINING-ONLY change: at inference we still predict every
+    # required row, so it costs nothing in latency and needs no extra artifacts.
+    if soft_mask is not None:
+        floor = float(loss_cfg.get('mask_floor', 0.1))
+        m = m * (floor + (1.0 - floor) * soft_mask)
     y = target.clamp(-METRIC_CLIP, METRIC_CLIP)
     w = y.abs() * m.unsqueeze(-1)          # m is (B, T): broadcast over the 2 targets
     B, T, K = w.shape
@@ -766,7 +827,7 @@ def chunk_loss(pred, target, mask, loss_cfg, state=None):
 
 @torch.no_grad()
 def evaluate(model, transform, store, batch_sequences=8, n_sequences=None, device='cpu',
-             max_rows=None, progress=True):
+             max_rows=None, progress=True, state_reset=0):
     """Offline Global WP over the validation shard, streamed, no predictions kept."""
     model.eval()
     acc = metric_ref.StreamingWP()
@@ -782,8 +843,14 @@ def evaluate(model, transform, store, batch_sequences=8, n_sequences=None, devic
         Xt = torch.from_numpy(np.stack([transform.batch(X[b].numpy()) for b in range(B)]))
         Xt = Xt.to(device)
         preds = np.empty((B, store.seq_len, 2), dtype=np.float32)
-        for a in range(0, store.seq_len, 2000):
-            b = min(a + 2000, store.seq_len)
+        sub = 2000
+        for a in range(0, store.seq_len, sub):
+            b = min(a + sub, store.seq_len)
+            # a reset-trained model MUST be evaluated with the same period it was
+            # trained on, otherwise it is scored out of regime
+            if state_reset and a and a % state_reset == 0:
+                for layer in h:
+                    layer.zero_()
             p, h = model.forward_chunk(Xt[:, a:b], h)
             preds[:, a:b] = p.float().cpu().numpy()
         for b_ in range(B):
@@ -884,8 +951,19 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
             print(f'max_steps derived: {steps_per_epoch:,} steps/epoch x {epochs} epoch(s) '
                   f'= {total_steps:,} steps over all {n_train_seq:,} training sequences',
                   flush=True)
+    state_reset = int(tcfg.get('state_reset') or 0)
+    mask_path = cfg['loss'].get('mask_model')
+    soft = SoftMaskStore(mask_path) if mask_path else None
+    if soft is not None:
+        if soft.n != train_store.n_seq * train_store.seq_len:
+            raise SystemExit(f'soft mask has {soft.n:,} rows but the train shard has '
+                             f'{train_store.n_seq * train_store.seq_len:,}; rebuild it with '
+                             f'tools/train_mask_model.py')
+        print(f'soft mask: {soft.path} ({soft.n:,} rows, floor {cfg["loss"].get("mask_floor", 0.1)})',
+              flush=True)
     stream = StatefulBatchStream(train_store, tcfg['batch_sequences'], tcfg['chunk_len'],
-                                 tcfg['burn_in'], seed=seed, device=device, n_sequences=n_train_seq)
+                                 tcfg['burn_in'], seed=seed, device=device, n_sequences=n_train_seq,
+                                 state_reset=state_reset, soft_mask=soft)
     it = prefetch(iter(stream)) if tcfg.get('stateful', True) else iter(stream)
     print(f'train sequences={n_train_seq}  valid sequences={n_valid_seq}  steps={total_steps}', flush=True)
 
@@ -917,18 +995,22 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
         lr = lr_at(step, total_steps, ocfg.get('warmup_steps', 0), ocfg['lr'])
         for g in opt.param_groups:
             g['lr'] = lr
-        Xb, Yb, Mb, Rb = next(it)
+        Xb, Yb, Mb, Rb, Sb = next(it)
         Xt = torch.from_numpy(prepare(Xb)).to(device)
         Yt = torch.from_numpy(Yb).to(device)
         Mt = torch.from_numpy(Mb).to(device)
         h = [torch.zeros(1, Xb.shape[0], model.hidden, device=device) for _ in range(model.layers)]
         with torch.no_grad():
+            # Rb marks lanes that must start this chunk from a ZERO state: either a
+            # new sequence, or a periodic state_reset boundary. Inference does the
+            # same at the same positions (see PredictionModel.predict).
             for i, flag in enumerate(Rb):
                 if flag:
                     for layer in h:
                         layer[:, i, :].zero_()
         pred, _ = model.forward_chunk(Xt, h)
-        loss, _ = chunk_loss(pred, Yt, Mt, cfg['loss'])
+        loss, _ = chunk_loss(pred, Yt, Mt, cfg['loss'],
+                             soft_mask=None if Sb is None else torch.from_numpy(Sb).to(device))
         opt.zero_grad(set_to_none=True)
         loss.backward()
         gn = torch.nn.utils.clip_grad_norm_(model.parameters(), ocfg.get('grad_clip', 1.0))
@@ -944,7 +1026,7 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
             if ema:
                 model.load_state_dict(ema.state_dict())
             res = evaluate(model, transform, valid_store, batch_sequences=4,
-                           n_sequences=n_valid_seq, device=device)
+                           n_sequences=n_valid_seq, device=device, state_reset=state_reset)
             model.load_state_dict(bak)
             wp = res['weighted_pearson']
             print(f'EVAL step={step} val_wp={wp:.6f} (t0={res["t0"]:.6f} t1={res["t1"]:.6f} '
@@ -988,7 +1070,7 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
         # (measured 2026-09-29 on gru_v001..v004).
         rescore_n = n_valid_seq if smoke else None
         res_full = evaluate(model, transform, valid_store, batch_sequences=4,
-                            n_sequences=rescore_n, device=device)
+                            n_sequences=rescore_n, device=device, state_reset=state_reset)
         is_full = not smoke
         scope = 'FULL validation' if is_full else f'subset of {n_valid_seq} sequences'
         n_seq_scored = len(valid_store) if is_full else n_valid_seq
@@ -1002,7 +1084,7 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
             print('NOTE: this rescore covered only a subset of validation, so '
                   'results.full_valid_wp is left null. It is NOT the official number.', flush=True)
         export_inference(model, transform, ck_dir, opset=cfg['inference']['opset'],
-                         device='cpu', verify=True)
+                         device='cpu', verify=True, state_reset=state_reset)
         write_yaml_results(cfg_path, cfg, status='smoke' if smoke else 'finished',
                            results={'best_step': st['step'],
                                     'best_val_wp': st['metrics']['weighted_pearson'],
@@ -1080,7 +1162,8 @@ def main():
                              layers=cfg['model']['layers'],
                              input_proj=cfg['model'].get('input_proj') or 0)
             model.load_state_dict(st['model'])
-            export_inference(model, transform, ck.parent, opset=cfg['inference']['opset'])
+            export_inference(model, transform, ck.parent, opset=cfg['inference']['opset'],
+                             state_reset=int(st.get('state_reset', 0)))
             print(f'exported inference artifacts from {ck.name} into {ck.parent}', flush=True)
             return 0
         if args.smoke:
@@ -1092,7 +1175,7 @@ def main():
                 sd = {'mean': np.zeros(N_FEATURES, np.float32), 'std': np.ones(N_FEATURES, np.float32)}
             tr = build_transform_from_stats(sd, fcfg)
             store = ShardStore(cfg['data']['valid_shards'])
-            x, _, _ = store.sequence(0)
+            x, _, _, _ = store.sequence(0)
             feature_parity_test(tr, x[:2000])
         out = run_training(cfg, cfg_path, device, args.smoke, args.resume)
         print('done:', out, flush=True)
