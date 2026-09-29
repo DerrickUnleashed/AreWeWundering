@@ -1,236 +1,238 @@
 {
- "key": "gru_v006",
- "packaged_utc": "2026-09-29T16:41:34Z",
- "git_commit": "c23e78649760479f835edb288f6d7420de6abf45",
- "config": {
-  "schema_version": 1,
-  "identity": {
-   "model": "gru",
-   "version": "v006",
-   "parent": "gru_v002",
-   "status": "finished"
+  "key": "gru_v006",
+  "packaged_utc": "2026-09-29T16:41:34Z",
+  "git_commit": "c23e78649760479f835edb288f6d7420de6abf45",
+  "config": {
+    "schema_version": 1,
+    "identity": {
+      "model": "gru",
+      "version": "v006",
+      "parent": "gru_v002",
+      "status": "finished"
+    },
+    "description": "SEED REPLICATE of the gru_v002 recipe, seed 1339. A control, not a candidate.",
+    "hypothesis": "As v005, and together with v002 and v005 it gives a three-point sample whose standard deviation is the noise floor.",
+    "change_vs_parent": "training.seed 1337->1339. NOTHING else changes.",
+    "data": {
+      "train_shards": "cache/train",
+      "valid_shards": "cache/valid",
+      "seq_len": 20000,
+      "warmup_steps": 99,
+      "target_clip": 2.0,
+      "train_sequences": null
+    },
+    "features": {
+      "normalisation": "robust_zscore",
+      "signed_log_volumes": false,
+      "first_differences": [],
+      "cross_instrument": [],
+      "step_feature": false,
+      "clip_sigma": 8
+    },
+    "model": {
+      "arch": "gru",
+      "input_proj": 0,
+      "hidden": 128,
+      "layers": 2,
+      "dropout": 0.0,
+      "layernorm": false,
+      "head": "linear",
+      "param_count": 192258
+    },
+    "loss": {
+      "type": "seq_weighted_pearson",
+      "mask": "soft",
+      "aux_mse_weight": 0.0,
+      "target_clip": 2.0
+    },
+    "optim": {
+      "name": "adamw",
+      "lr": 0.002,
+      "weight_decay": 0.01,
+      "betas": [
+        0.9,
+        0.99
+      ],
+      "schedule": "cosine",
+      "warmup_steps": 500,
+      "grad_clip": 1.0,
+      "ema_decay": 0.0,
+      "precision": "fp32"
+    },
+    "training": {
+      "chunk_len": 2000,
+      "burn_in": 99,
+      "batch_sequences": 16,
+      "max_steps": null,
+      "smoke_steps": 60,
+      "epochs": 3,
+      "seed": 1339,
+      "eval_every_steps": 2500,
+      "eval_subset_sequences": 200,
+      "device": "cpu",
+      "stateful": true
+    },
+    "inference": {
+      "export": "onnx",
+      "opset": 17,
+      "ort_threads": 1,
+      "target_us_per_row": 68.5
+    },
+    "results": {
+      "best_step": 17499,
+      "best_val_wp": 0.6854350292217444,
+      "best_val_t0": 0.6825940448325499,
+      "best_val_t1": 0.6882760136109387,
+      "full_valid_wp": 0.674149,
+      "latency_us_p50": null,
+      "latency_us_p99": null,
+      "train_hours": 5.9366,
+      "finished_utc": "2026-09-29T15:12:58Z",
+      "full_valid_note": "backfilled from the run's own log on 2026-09-29: that rescore covered 3,528,273 scored rows over all 1873 validation sequences, identical to the full-validation count; only the printed scope label was wrong (a bug fixed in later scripts). No re-run was needed."
+    },
+    "artifacts": {
+      "log": "exploration/logs/log_gru_v006.log",
+      "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v006",
+      "submission_dir": null
+    }
   },
-  "description": "SEED REPLICATE of the gru_v002 recipe, seed 1339. A control, not a candidate.",
-  "hypothesis": "As v005, and together with v002 and v005 it gives a three-point sample whose standard deviation is the noise floor.",
-  "change_vs_parent": "training.seed 1337->1339. NOTHING else changes.",
-  "data": {
-   "train_shards": "cache/train",
-   "valid_shards": "cache/valid",
-   "seq_len": 20000,
-   "warmup_steps": 99,
-   "target_clip": 2.0,
-   "train_sequences": null
+  "checkpoint": {
+    "file": "best_001_step17499_val0.685435.pt",
+    "path": "exploration/checkpoints/checkpoint_gru_v006/best_001_step17499_val0.685435.pt",
+    "step": 17499,
+    "sha256": "f496d937de05bdec00337fff8d0ae77da738108d50ea5b87aa057d4142211e7b",
+    "train_time_metrics": {
+      "t0": 0.6825940448325499,
+      "t1": 0.6882760136109387,
+      "weighted_pearson": 0.6854350292217444,
+      "selected_rows": 374199,
+      "blocks": 200,
+      "metric_clip": [
+        -2.0,
+        2.0
+      ],
+      "metric_specification": "global_wp",
+      "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+    }
   },
-  "features": {
-   "normalisation": "robust_zscore",
-   "signed_log_volumes": false,
-   "first_differences": [],
-   "cross_instrument": [],
-   "step_feature": false,
-   "clip_sigma": 8
-  },
-  "model": {
-   "arch": "gru",
-   "input_proj": 0,
-   "hidden": 128,
-   "layers": 2,
-   "dropout": 0.0,
-   "layernorm": false,
-   "head": "linear",
-   "param_count": 192258
-  },
-  "loss": {
-   "type": "seq_weighted_pearson",
-   "mask": "soft",
-   "aux_mse_weight": 0.0,
-   "target_clip": 2.0
-  },
-  "optim": {
-   "name": "adamw",
-   "lr": 0.002,
-   "weight_decay": 0.01,
-   "betas": [
-    0.9,
-    0.99
-   ],
-   "schedule": "cosine",
-   "warmup_steps": 500,
-   "grad_clip": 1.0,
-   "ema_decay": 0.0,
-   "precision": "fp32"
-  },
-  "training": {
-   "chunk_len": 2000,
-   "burn_in": 99,
-   "batch_sequences": 16,
-   "max_steps": null,
-   "smoke_steps": 60,
-   "epochs": 3,
-   "seed": 1339,
-   "eval_every_steps": 2500,
-   "eval_subset_sequences": 200,
-   "device": "cpu",
-   "stateful": true
-  },
-  "inference": {
-   "export": "onnx",
-   "opset": 17,
-   "ort_threads": 1,
-   "target_us_per_row": 68.5
-  },
-  "results": {
-   "best_step": 17499,
-   "best_val_wp": 0.6854350292217444,
-   "best_val_t0": 0.6825940448325499,
-   "best_val_t1": 0.6882760136109387,
-   "full_valid_wp": 0.674149,
-   "latency_us_p50": null,
-   "latency_us_p99": null,
-   "train_hours": 5.9366,
-   "finished_utc": "2026-09-29T15:12:58Z",
-   "full_valid_note": "backfilled from the run's own log on 2026-09-29: that rescore covered 3,528,273 scored rows over all 1873 validation sequences, identical to the full-validation count; only the printed scope label was wrong (a bug fixed in later scripts). No re-run was needed."
-  },
-  "artifacts": {
-   "log": "exploration/logs/log_gru_v006.log",
-   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v006",
-   "submission_dir": null
-  }
- },
- "checkpoint": {
-  "file": "best_001_step17499_val0.685435.pt",
-  "path": "exploration/checkpoints/checkpoint_gru_v006/best_001_step17499_val0.685435.pt",
-  "step": 17499,
-  "sha256": "f496d937de05bdec00337fff8d0ae77da738108d50ea5b87aa057d4142211e7b",
-  "train_time_metrics": {
-   "t0": 0.6825940448325499,
-   "t1": 0.6882760136109387,
-   "weighted_pearson": 0.6854350292217444,
-   "selected_rows": 374199,
-   "blocks": 200,
-   "metric_clip": [
-    -2.0,
-    2.0
-   ],
-   "metric_specification": "global_wp",
-   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
-  }
- },
- "scores": {
-  "t0": 0.6906771053414092,
-  "t1": 0.7461804213418384,
-  "weighted_pearson": 0.7184287633416238,
-  "selected_rows": 9110,
-  "rows_seen": 100000,
-  "us_per_row": 60.6,
-  "call_us_p50": 49.71,
-  "call_us_p99": 69.25,
-  "sequences": [
-   0,
-   1,
-   2,
-   3,
-   4
-  ],
-  "protocol": "5 validation sequences"
- },
- "latency": {
-  "budget_us_per_row": 91.37,
-  "target_us_per_row": 68.53,
-  "us_p50": 48.75,
-  "us_p99": 67.5,
-  "projected_min_p50": 32.0,
-  "projected_min_p99": 44.3,
-  "pass_p50_75pct": true,
-  "pass_p99_75pct": true,
-  "rows": 39400000,
-  "grader_slowdown": 1.62,
-  "grader_us_p50": 78.98,
-  "grader_us_p99": 109.35,
-  "grader_min_p50": 51.9,
-  "grader_min_p99": 71.8,
-  "grader_pct_budget_p50": 86.4,
-  "grader_target_us_local": 42.3,
-  "grader_safe": false
- },
- "gate": {
-  "contract": "PASS",
-  "determinism": "PASS",
-  "parity": "parity raw predictions : max |diff| = 4.202e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.718429 vs offline 0.718429, |diff| = 5.009e-08 (tol 1e-04)  PASS | parity overall         : PASS",
-  "score": {
-   "t0": 0.6906771053414092,
-   "t1": 0.7461804213418384,
-   "weighted_pearson": 0.7184287633416238,
-   "selected_rows": 9110,
-   "rows_seen": 100000,
-   "us_per_row": 60.6,
-   "call_us_p50": 49.71,
-   "call_us_p99": 69.25,
-   "sequences": [
-    0,
-    1,
-    2,
-    3,
-    4
-   ],
-   "protocol": "5 validation sequences"
+  "scores": {
+    "t0": 0.6906771053414092,
+    "t1": 0.7461804213418384,
+    "weighted_pearson": 0.7184287633416238,
+    "selected_rows": 9110,
+    "rows_seen": 100000,
+    "us_per_row": 60.6,
+    "call_us_p50": 49.71,
+    "call_us_p99": 69.25,
+    "sequences": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "protocol": "5 validation sequences"
   },
   "latency": {
-   "budget_us_per_row": 91.37,
-   "target_us_per_row": 68.53,
-   "us_p50": 48.75,
-   "us_p99": 67.5,
-   "projected_min_p50": 32.0,
-   "projected_min_p99": 44.3,
-   "pass_p50_75pct": true,
-   "pass_p99_75pct": true,
-   "rows": 39400000,
-   "grader_slowdown": 1.62,
-   "grader_us_p50": 78.98,
-   "grader_us_p99": 109.35,
-   "grader_min_p50": 51.9,
-   "grader_min_p99": 71.8,
-   "grader_pct_budget_p50": 86.4,
-   "grader_target_us_local": 42.3,
-   "grader_safe": false
+    "budget_us_per_row": 91.37,
+    "target_us_per_row": 68.53,
+    "us_p50": 48.75,
+    "us_p99": 67.5,
+    "projected_min_p50": 32.0,
+    "projected_min_p99": 44.3,
+    "pass_p50_75pct": true,
+    "pass_p99_75pct": true,
+    "rows": 39400000,
+    "grader_slowdown": 1.62,
+    "grader_us_p50": 78.98,
+    "grader_us_p99": 109.35,
+    "grader_min_p50": 51.9,
+    "grader_min_p99": 71.8,
+    "grader_pct_budget_p50": 86.4,
+    "grader_target_us_local": 42.3,
+    "grader_safe": false
   },
-  "size": {
-   "zip_bytes": 1439685,
-   "limit_bytes": 20971520,
-   "pass": true
+  "gate": {
+    "contract": "PASS",
+    "determinism": "PASS",
+    "parity": "parity raw predictions : max |diff| = 4.202e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.718429 vs offline 0.718429, |diff| = 5.009e-08 (tol 1e-04)  PASS | parity overall         : PASS",
+    "score": {
+      "t0": 0.6906771053414092,
+      "t1": 0.7461804213418384,
+      "weighted_pearson": 0.7184287633416238,
+      "selected_rows": 9110,
+      "rows_seen": 100000,
+      "us_per_row": 60.6,
+      "call_us_p50": 49.71,
+      "call_us_p99": 69.25,
+      "sequences": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "protocol": "5 validation sequences"
+    },
+    "latency": {
+      "budget_us_per_row": 91.37,
+      "target_us_per_row": 68.53,
+      "us_p50": 48.75,
+      "us_p99": 67.5,
+      "projected_min_p50": 32.0,
+      "projected_min_p99": 44.3,
+      "pass_p50_75pct": true,
+      "pass_p99_75pct": true,
+      "rows": 39400000,
+      "grader_slowdown": 1.62,
+      "grader_us_p50": 78.98,
+      "grader_us_p99": 109.35,
+      "grader_min_p50": 51.9,
+      "grader_min_p99": 71.8,
+      "grader_pct_budget_p50": 86.4,
+      "grader_target_us_local": 42.3,
+      "grader_safe": false
+    },
+    "size": {
+      "zip_bytes": 1439685,
+      "limit_bytes": 20971520,
+      "pass": true
+    },
+    "imports": [],
+    "latency_pass": false
   },
-  "imports": [],
-  "latency_pass": false
- },
- "packages": {
-  "python": "3.11.9",
-  "numpy": "2.2.6",
-  "onnxruntime": "1.23.2",
-  "torch": "2.14.0"
- },
- "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
- "sha256": {
-  "train_script": "fb6b137307cfb41be75b1d5133a085aed851dda67e8333da74d5d61b664572da",
-  "solution_py": "2f1d8d910f94ce874d99117f33933fd3bdb4b3c862201d70c20fd75ca1c109ca",
-  "model_onnx": "05186ce332b37ec278e94ff779f638bdc2984885a31e693f14d67c6ae96b25fe",
-  "feature_stats_npz": "a15c7eb16e5d3a8e1a961ba4729bb5bcabc6331ea5425825ff9f2c14d341b902"
- },
- "zip": {
-  "file": "submission_gru_v006.zip",
-  "bytes": 1439685,
-  "root_entries": [
-   "best_001_step17499_val0.685435.pt",
-   "feature_stats.npz",
-   "model.onnx",
-   "solution.py"
-  ]
- },
- "notes": [
-  "included the 0.8 MB checkpoint for provenance",
-  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
- ],
- "warnings": [],
- "failures": [
-  "latency gate FAILED against the grader: 48.75 us/row local x 1.62 = 51.9 min at p50 (86.4% of the 60 min budget) and 71.8 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
- ],
- "status": "NOT-READY"
+  "packages": {
+    "python": "3.11.9",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "torch": "2.14.0"
+  },
+  "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+  "sha256": {
+    "train_script": "fb6b137307cfb41be75b1d5133a085aed851dda67e8333da74d5d61b664572da",
+    "solution_py": "2f1d8d910f94ce874d99117f33933fd3bdb4b3c862201d70c20fd75ca1c109ca",
+    "model_onnx": "05186ce332b37ec278e94ff779f638bdc2984885a31e693f14d67c6ae96b25fe",
+    "feature_stats_npz": "a15c7eb16e5d3a8e1a961ba4729bb5bcabc6331ea5425825ff9f2c14d341b902"
+  },
+  "zip": {
+    "file": "submission_gru_v006.zip",
+    "bytes": 1439685,
+    "root_entries": [
+      "best_001_step17499_val0.685435.pt",
+      "feature_stats.npz",
+      "model.onnx",
+      "solution.py"
+    ]
+  },
+  "notes": [
+    "included the 0.8 MB checkpoint for provenance",
+    "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+  ],
+  "warnings": [],
+  "failures": [
+    "latency gate FAILED against the grader: 48.75 us/row local x 1.62 = 51.9 min at p50 (86.4% of the 60 min budget) and 71.8 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
+  ],
+  "status": "NOT-READY",
+  "latency_contaminated": true,
+  "latency_contamination_note": "Latency measured while gru_v010 and gru_v011 were training on the same cores. Reference: gru_v003 measured 27.71 us/row on an idle box and 48.12 us/row in that window (1.7x). This verdict reflects contention, not the model. Re-run the gate on an idle box before shipping."
 }
