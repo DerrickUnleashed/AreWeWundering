@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v007
   parent: gru_v002
-  status: running
+  status: finished
 description: 'INPUTS: first differences of the i0 top-of-book prices and the trade
   features.'
 hypothesis: LOB prediction is dominated by short-horizon dynamics, and the features
@@ -100,15 +100,15 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 19889
+  best_val_wp: 0.6840870321553041
+  best_val_t0: 0.6796941517394591
+  best_val_t1: 0.6884799125711492
+  full_valid_wp: 0.6742576117503425
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.8275
+  finished_utc: '2026-09-29T15:27:31Z'
 artifacts:
   log: exploration/logs/log_gru_v007.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v007
