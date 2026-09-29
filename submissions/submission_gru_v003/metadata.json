@@ -1,0 +1,247 @@
+{
+ "key": "gru_v003",
+ "packaged_utc": "2026-09-29T06:23:06Z",
+ "git_commit": "689918f87eb6ed5a3be5a36b6a5d55d6bf643596",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v003",
+   "parent": "gru_v000",
+   "status": "finished"
+  },
+  "description": "TRAINING STABILITY: add a 0.05 |t|-weighted auxiliary MSE term and enable EMA weights.",
+  "hypothesis": "The weighted-Pearson gradient vanishes where the target variance collapses, so a clip-aware weighted MSE term should stabilise exactly the heavy tails that dominate the metric. EMA then averages away seed noise for free at inference, since it costs nothing per row.",
+  "change_vs_parent": "loss.aux_mse_weight 0.0->0.05 and optim.ema_decay 0.0->0.999. Deliberately grouped as one 'training stability' hypothesis, so a win here is a win for the pair, not for either alone. Trained on all 10,607 sequences for 3 epochs, seed 1337, evaluated on the same fixed 200 validation sequences.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 192258
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.05,
+   "target_clip": 2.0
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.999,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5
+  },
+  "results": {
+   "best_step": 14999,
+   "best_val_wp": 0.6862242511630261,
+   "best_val_t0": 0.6825057719137231,
+   "best_val_t1": 0.6899427304123292,
+   "full_valid_wp": 0.673711,
+   "latency_us_p50": null,
+   "latency_us_p99": null,
+   "train_hours": 3.7638,
+   "finished_utc": "2026-09-28T23:38:33Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v003.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v003",
+   "submission_dir": null
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step9999_val0.683114.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v003/best_001_step9999_val0.683114.pt",
+  "step": 9999,
+  "sha256": "5e84d48c3db8870aa611eb94af9e3d2ab5b353ce2941e2e01ad09041604ee445",
+  "train_time_metrics": {
+   "t0": 0.6793861927647294,
+   "t1": 0.6868414990612746,
+   "weighted_pearson": 0.683113845913002,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.7579384570123241,
+  "t1": 0.6880715984334806,
+  "weighted_pearson": 0.7230050277229023,
+  "selected_rows": 44975,
+  "rows_seen": 400000,
+  "us_per_row": 34.83,
+  "call_us_p50": 27.83,
+  "call_us_p99": 41.33,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19
+  ],
+  "protocol": "20 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 27.87,
+  "us_p99": 43.0,
+  "projected_min_p50": 18.3,
+  "projected_min_p99": 28.2,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": true,
+  "rows": 39400000
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 1.233e-04 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.723005 vs offline 0.723006, |diff| = 5.273e-07 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.7579384570123241,
+   "t1": 0.6880715984334806,
+   "weighted_pearson": 0.7230050277229023,
+   "selected_rows": 44975,
+   "rows_seen": 400000,
+   "us_per_row": 34.83,
+   "call_us_p50": 27.83,
+   "call_us_p99": 41.33,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "protocol": "20 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 27.87,
+   "us_p99": 43.0,
+   "projected_min_p50": 18.3,
+   "projected_min_p99": 28.2,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": true,
+   "rows": 39400000
+  },
+  "size": {
+   "zip_bytes": 2155616,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": true
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "fef5a7eea44d977f9f777a29c46e7987e50c58fbf444ae5e72345a69c064afb4",
+  "solution_py": "4eb162d3177edd6c31be859492df0b04f321e649793f40107ebef732578ab027",
+  "model_onnx": "46cec6c9c25585c7f9e551f3f19d6c2d92aefc6ec1ebf7cb5f6ca8d04f9d3ae8",
+  "feature_stats_npz": "040dcc1b65c55148420f223676ce894bf04dcd2d9dbf324582f6d98bdd892769"
+ },
+ "zip": {
+  "file": "submission_gru_v003.zip",
+  "bytes": 2155616,
+  "root_entries": [
+   "best_001_step9999_val0.683114.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 1.6 MB checkpoint for provenance",
+  "gate score measured on 20 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [],
+ "status": "PASS"
+}
