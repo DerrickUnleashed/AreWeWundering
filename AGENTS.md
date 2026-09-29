@@ -315,9 +315,25 @@ venv/bin/pip install torch pyyaml onnx matplotlib tqdm
 | `gru_v001` 1x256 | 32.37 | 52.5 | 34.5 | 57 % | 55 | **OK** |
 | `gru_v002` z-score | 31.58 | 51.2 | 33.6 | 56 % | 54 | **OK** |
 | `gru_v003` aux+EMA | 27.67 | 44.9 | 29.5 | 49 % | 45 | **OK** |
-| `gru_v004` 2x192+proj | 44.33 | 71.9 | 47.2 | 79 % | 76 | **DO NOT SHIP** |
+| `gru_v004` 2x192+proj | 44.33 | 71.9 | 47.2 | 79 % | 76 | ~~DO NOT SHIP~~ **wrong, see below** |
 
-`gru_v004` is a legitimate *training* experiment (a real test of the third-party reported shape) but it is **not submittable**: 79 % of the budget at p50 and ~76 min at p99 against a hard 60-minute limit. Its bundle will be marked NOT-READY and must not be uploaded. Keep it for the scientific result only.
+**⚠ THE v004 "DO NOT SHIP" VERDICT WAS WRONG, AND IT WAS SUBMITTED.** Measured grader results for all five of our bundles (the grader's own readings on the 39.4 M-row test set, taken 2026-09-29):
+
+| version | projected p50 | **actual grader** | % of 60 min | peak mem | public score |
+|---|---:|---:|---:|---:|---:|
+| `baseline` organiser | -- | 26m21s | 43.9 % | 624 MB | 0.5935 |
+| `gru_v000` (smoke) | 18.2 | 29m47s | 49.6 % | 626 MB | 0.4986 |
+| `gru_v003` | 29.5 | **30m57s** | 51.6 % | 627 MB | **0.6457** |
+| `gru_v001` | 34.5 | **34m02s** | 56.7 % | 626 MB | 0.6416 |
+| `gru_v002` | 33.6 | **35m02s** | 58.4 % | 628 MB | 0.6435 |
+| `gru_v004` | 47.2 | **43m16s** | **72.1 %** | 630 MB | 0.6446 |
+
+**Two lessons, both learned the expensive way.**
+
+1. **v004 was never actually unshippable.** The 79 %-at-p50 and ~76-min-at-p99 projection was too pessimistic: the grader ran it in 43m16s, 72.1 % of the limit, and it scored 0.6446 — the *second-best* public score of our entries. The p99 tail is thinner on the grader than a **contended local p99** suggests. Note the predictions were the *opposite* direction of error: p50 said 47.2 min and the truth was 43.2, so the 1.62x factor over-projected while the p99 tail over-warned. The 1.62x factor was calibrated from `gru_v000` on a 2x128 model and does not transfer cleanly to a wider model with more per-row work. **Do not treat a local p99 as a hard blocker; re-derive it from a real submission.**
+2. **v004 remains the worst model locally** (`full_valid_wp` 0.672206, −12.4σ vs the seed mean), so it is still not the model to ship — but that is a *score* argument, not a latency one, and the original "must not be uploaded" language was simply false.
+
+`gru_v000`'s 0.4986 is the 60-step framework smoke test, **not** a modelling result: it is below the organiser's own 0.5935 because it has barely trained, and it was uploaded to validate the submission path. Its 29m47s vs the organiser's 26m21s is the closest thing to a clean measurement of the per-call overhead we add, and it says our ONNX inference is ~3.5 min slower than the reference over the full test set.
 
 **Baseline score on the first 5 validation sequences** (row groups 0–4, i.e. *not* the official full-set number): t0 = 0.6015, t1 = 0.7011, **mean = 0.6513**, 9,110 selected rows. Recorded as the anchor for subset comparisons only; the official 0.617052 refers to all 1,873 sequences. A 5-sequence subset is therefore ~0.034 optimistic relative to the full set and must never be quoted as a full-validation score.
 
