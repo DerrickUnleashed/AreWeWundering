@@ -1,0 +1,265 @@
+{
+ "key": "gru_v004",
+ "packaged_utc": "2026-09-29T06:27:10Z",
+ "git_commit": "689918f87eb6ed5a3be5a36b6a5d55d6bf643596",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v004",
+   "parent": "gru_v000",
+   "status": "finished"
+  },
+  "description": "THIRD-PARTY ARCHITECTURE: 2 layers x 192 with a 128-unit input projection, trained on our own data with our own objective.",
+  "hypothesis": "A third-party report claims this shape reaches ~0.62 public / ~0.67 held-out for this competition. If the shape matters it should beat the 2x128 baseline here; if the report is noise it should not. Either outcome is worth knowing.",
+  "change_vs_parent": "model.hidden 128->192, model.input_proj 0->128. Single variable, matched to the reported third-party configuration. Cut to 2 epochs because it is ~1.65x slower per step, so this keeps the row budget comparable with the others.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 128,
+   "hidden": 192,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 422658
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.0,
+   "target_clip": 2.0
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.0,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 2,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5
+  },
+  "results": {
+   "best_step": 13259,
+   "best_val_wp": 0.6792550218175468,
+   "best_val_t0": 0.6742670271202489,
+   "best_val_t1": 0.6842430165148446,
+   "full_valid_wp": 0.672206,
+   "latency_us_p50": 44.04,
+   "latency_us_p99": 62.5,
+   "train_hours": 3.7327,
+   "finished_utc": "2026-09-28T23:36:41Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v004.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v004",
+   "submission_dir": "submissions/submission_gru_v004"
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step9999_val0.676029.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v004/best_001_step9999_val0.676029.pt",
+  "step": 9999,
+  "sha256": "997739e7f860ec8d81e107d8b233ec48eb9082f4ec93ee78b2c293cb218a898b",
+  "train_time_metrics": {
+   "t0": 0.6717194702380949,
+   "t1": 0.6803391282157293,
+   "weighted_pearson": 0.6760292992269121,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.7614984863339159,
+  "t1": 0.6942669271723367,
+  "weighted_pearson": 0.7278827067531264,
+  "selected_rows": 44975,
+  "rows_seen": 400000,
+  "us_per_row": 52.28,
+  "call_us_p50": 44.17,
+  "call_us_p99": 64.5,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19
+  ],
+  "protocol": "20 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 43.96,
+  "us_p99": 62.79,
+  "projected_min_p50": 28.9,
+  "projected_min_p99": 41.2,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": true,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 71.22,
+  "grader_us_p99": 101.72,
+  "grader_min_p50": 46.8,
+  "grader_min_p99": 66.8,
+  "grader_pct_budget_p50": 77.9,
+  "grader_target_us_local": 42.3,
+  "grader_safe": false
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 8.106e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.727883 vs offline 0.727883, |diff| = 4.152e-07 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.7614984863339159,
+   "t1": 0.6942669271723367,
+   "weighted_pearson": 0.7278827067531264,
+   "selected_rows": 44975,
+   "rows_seen": 400000,
+   "us_per_row": 52.28,
+   "call_us_p50": 44.17,
+   "call_us_p99": 64.5,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+   ],
+   "protocol": "20 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 43.96,
+   "us_p99": 62.79,
+   "projected_min_p50": 28.9,
+   "projected_min_p99": 41.2,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": true,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 71.22,
+   "grader_us_p99": 101.72,
+   "grader_min_p50": 46.8,
+   "grader_min_p99": 66.8,
+   "grader_pct_budget_p50": 77.9,
+   "grader_target_us_local": 42.3,
+   "grader_safe": false
+  },
+  "size": {
+   "zip_bytes": 3151504,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": false
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "c59d1ee8b18b8a5c81d106371520412c549a59b935c6385ae38b2c120dd7b9a8",
+  "solution_py": "bef7e3b1c73eece72e2aebd4ea57b01407eaac830be35061852016c18851b1b5",
+  "model_onnx": "76da8639fca7fcce0db4424b76d5efde34d6c6602d589701b9622ce2f53dd398",
+  "feature_stats_npz": "040dcc1b65c55148420f223676ce894bf04dcd2d9dbf324582f6d98bdd892769"
+ },
+ "zip": {
+  "file": "submission_gru_v004.zip",
+  "bytes": 3151504,
+  "root_entries": [
+   "best_001_step9999_val0.676029.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 1.7 MB checkpoint for provenance",
+  "gate score measured on 20 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [
+  "latency gate FAILED against the grader: 43.96 us/row local x 1.62 = 46.8 min at p50 (77.9% of the 60 min budget) and 66.8 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
+ ],
+ "status": "NOT-READY"
+}
