@@ -77,8 +77,8 @@ results:
   best_val_t0: 0.6825057719137231
   best_val_t1: 0.6899427304123292
   full_valid_wp: 0.673711
-  latency_us_p50: 27.87
-  latency_us_p99: 43.0
+  latency_us_p50: 27.71
+  latency_us_p99: 41.58
   train_hours: 3.7638
   finished_utc: '2026-09-28T23:38:33Z'
 artifacts:

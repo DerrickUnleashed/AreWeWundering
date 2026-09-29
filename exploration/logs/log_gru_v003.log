@@ -1,11 +1,11 @@
-### new run, log opened 2026-09-29T11:51:54+0530
+### new run, log opened 2026-09-29T12:00:22+0530
 ==============================================================================
 command            : python exploration/models/train_gru_v003.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v003.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v003/best_001_step9999_val0.683114.pt
-timestamp          : 2026-09-29T11:51:54+0530
+timestamp          : 2026-09-29T12:00:22+0530
 host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
 packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
 cuda               : False   mps: True
-git commit         : 689918f87eb6ed5a3be5a36b6a5d55d6bf643596
+git commit         : 365a747d127bd32a915ba39ce8ab590368406d07
 seed               : 1337
 log                : exploration/logs/log_gru_v003.log
 config:
@@ -88,14 +88,14 @@ results:
   best_val_t0: 0.6825057719137231
   best_val_t1: 0.6899427304123292
   full_valid_wp: 0.673711
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 27.87
+  latency_us_p99: 43.0
   train_hours: 3.7638
   finished_utc: '2026-09-28T23:38:33Z'
 artifacts:
   log: exploration/logs/log_gru_v003.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v003
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v003
 
 ==============================================================================
 device: cpu
