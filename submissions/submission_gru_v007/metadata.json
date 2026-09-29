@@ -1,0 +1,266 @@
+{
+ "key": "gru_v007",
+ "packaged_utc": "2026-09-29T16:40:51Z",
+ "git_commit": "c23e78649760479f835edb288f6d7420de6abf45",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v007",
+   "parent": "gru_v002",
+   "status": "finished"
+  },
+  "description": "INPUTS: first differences of the i0 top-of-book prices and the trade features.",
+  "hypothesis": "LOB prediction is dominated by short-horizon dynamics, and the features are snapshot levels. First differences give the model velocity/flow information it cannot recover from levels alone. Costs no extra inference FLOPs once folded into layer 1.",
+  "change_vs_parent": "features.first_differences [] -> the 30 indices of the i0 price block (0-21) and i0 trade block (44-51). Single variable off gru_v002.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "robust_zscore",
+   "signed_log_volumes": false,
+   "first_differences": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51
+   ],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 8
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 203778
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.0,
+   "target_clip": 2.0
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.0,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5
+  },
+  "results": {
+   "best_step": 19889,
+   "best_val_wp": 0.6840870321553041,
+   "best_val_t0": 0.6796941517394591,
+   "best_val_t1": 0.6884799125711492,
+   "full_valid_wp": 0.6742576117503425,
+   "latency_us_p50": null,
+   "latency_us_p99": null,
+   "train_hours": 5.8275,
+   "finished_utc": "2026-09-29T15:27:31Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v007.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v007",
+   "submission_dir": null
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step19889_val0.684087.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v007/best_001_step19889_val0.684087.pt",
+  "step": 19889,
+  "sha256": "f594c96594c25f660a55d840af7bb8a5625c15df853fd139275dede619990613",
+  "train_time_metrics": {
+   "t0": 0.6796941517394591,
+   "t1": 0.6884799125711492,
+   "weighted_pearson": 0.6840870321553041,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.6968124501662568,
+  "t1": 0.7644286962355931,
+  "weighted_pearson": 0.730620573200925,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 64.4,
+  "call_us_p50": 53.96,
+  "call_us_p99": 70.62,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 56.38,
+  "us_p99": 119.96,
+  "projected_min_p50": 37.0,
+  "projected_min_p99": 78.8,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": false,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 91.34,
+  "grader_us_p99": 194.34,
+  "grader_min_p50": 60.0,
+  "grader_min_p99": 127.6,
+  "grader_pct_budget_p50": 100.0,
+  "grader_target_us_local": 42.3,
+  "grader_safe": false
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 2.337e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.730621 vs offline 0.730621, |diff| = 2.046e-08 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.6968124501662568,
+   "t1": 0.7644286962355931,
+   "weighted_pearson": 0.730620573200925,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 64.4,
+   "call_us_p50": 53.96,
+   "call_us_p99": 70.62,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 56.38,
+   "us_p99": 119.96,
+   "projected_min_p50": 37.0,
+   "projected_min_p99": 78.8,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": false,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 91.34,
+   "grader_us_p99": 194.34,
+   "grader_min_p50": 60.0,
+   "grader_min_p99": 127.6,
+   "grader_pct_budget_p50": 100.0,
+   "grader_target_us_local": 42.3,
+   "grader_safe": false
+  },
+  "size": {
+   "zip_bytes": 1525953,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": false
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "e94809f6acf485cf9f36ec66c8616d256b89bae171f0f76540fc7d2acf2e4143",
+  "solution_py": "4277f3cbb5214c2f6a1217fee3b7b4afeef8411256169a595fd62b7a267c6b69",
+  "model_onnx": "4fb0944e29bdb636d7d3e260381a8541335d99bc9cd453f1d22f54e5005d5912",
+  "feature_stats_npz": "9054dd3994a871329ab320519b5f7c27a70023e8cdec7e8276d96b85a3e493a9"
+ },
+ "zip": {
+  "file": "submission_gru_v007.zip",
+  "bytes": 1525953,
+  "root_entries": [
+   "best_001_step19889_val0.684087.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 0.8 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [
+  "latency gate FAILED against the grader: 56.38 us/row local x 1.62 = 60.0 min at p50 (100.0% of the 60 min budget) and 127.6 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
+ ],
+ "status": "NOT-READY"
+}
