@@ -65,17 +65,27 @@ WARMUP_STATES = 200_000   # flat state used to un-warm the recurrent state
 
 
 class MaskGRU(nn.Module):
-    """1-layer GRU -> logit(is_scored). Deliberately tiny: this is a labelling
-    device, not a competitor to the main model."""
+    """logit(is_scored) = w.x + GRU(x), i.e. a per-row linear path PLUS a context path.
+
+    WHY THE LINEAR SKIP (measured 2026-09-29): plain logistic regression on the
+    CURRENT ROW, using no history at all, already reaches holdout AUC 0.807, with
+    `a3` (column 107) carrying most of the weight. The mask is therefore mostly a
+    per-row function. A pure GRU has to route that signal through a recurrent state
+    carried across 2,000-row chunks, and it does not: its loss falls (it learns the
+    base rate) while its AUC sits at 0.507, i.e. chance. The skip gives the model
+    the easy per-row path directly and lets the recurrence add only whatever genuine
+    history-dependent part exists on top.
+    """
 
     def __init__(self, hidden=64):
         super().__init__()
         self.gru = nn.GRU(N_FEATURES, hidden, 1, batch_first=True)
         self.head = nn.Linear(hidden, 1)
+        self.skip = nn.Linear(N_FEATURES, 1)      # per-row path, no recurrence
 
     def forward_chunk(self, x, h):
         y, hn = self.gru(x, h)
-        return self.head(y).squeeze(-1), hn
+        return (self.head(y) + self.skip(x)).squeeze(-1), hn
 
 
 def auc(scores, labels):
@@ -182,14 +192,14 @@ def main():
     fit_ids = list(range(args.mask_start, min(args.mask_holdout, holdout_end)))
     hold_ids = list(range(min(args.mask_holdout, holdout_end), holdout_end))
     assert fit_ids and hold_ids, 'no sequences in the fit or holdout range'
-    print(f'fit     : {len(fit_ids)} sequences [{fit_ids[0]}..{fit_ids[-1]}]')
-    print(f'holdout : {len(hold_ids)} sequences [{hold_ids[0]}..{hold_ids[-1]}]')
+    print(f'fit     : {len(fit_ids)} sequences [{fit_ids[0]}..{fit_ids[-1]}]', flush=True)
+    print(f'holdout : {len(hold_ids)} sequences [{hold_ids[0]}..{hold_ids[-1]}]', flush=True)
     print(f'EVAL    : sequences [0..{args.mask_start - 1}] are never touched here '
-          f'(that is what every version in this repo scores on)')
+          f'(that is what every version in this repo scores on)', flush=True)
 
     X_all, ids_fit, Sf, vidx = load_split(root, fit_ids)
     _, ids_hold, Sh, _ = load_split(root, hold_ids)
-    print(f'positive rate: fit {Sf.mean():.4f}   holdout {Sh.mean():.4f}')
+    print(f'positive rate: fit {Sf.mean():.4f}   holdout {Sh.mean():.4f}', flush=True)
 
     m = MaskGRU(args.hidden).to(dev)
     opt = torch.optim.AdamW(m.parameters(), lr=args.lr, weight_decay=args.wd)
@@ -228,14 +238,14 @@ def main():
 
     m.load_state_dict(best_state)
     m.eval()
-    print(f'\nbest holdout AUC: {best_auc:.4f}')
+    print(f'\nbest holdout AUC: {best_auc:.4f}', flush=True)
     if best_auc < 0.85:
         print('WARNING: AUC below 0.85 means the mask is barely predictable; the soft '
               'mask will be close to a no-op. Do not use it.')
     torch.save({'model': m.state_dict(), 'hidden': args.hidden, 'auc': best_auc,
                 'fit_ids': [fit_ids[0], fit_ids[-1]], 'holdout_ids': [hold_ids[0], hold_ids[-1]]},
                args.ckpt)
-    print(f'saved predictor -> {args.ckpt}')
+    print(f'saved predictor -> {args.ckpt}', flush=True)
 
     if args.no_label:
         return
@@ -268,7 +278,13 @@ def main():
 
 @torch.no_grad()
 def evaluate_mask(m, X, ids, S, idx, lanes, chunk, dev):
-    """AUC over whole sequences, state carried, reset at each sequence start."""
+    """AUC over whole sequences, state carried, reset at each sequence start.
+
+    The per-batch score matrix is filled across the time axis and then batches are
+    joined, so scores and labels stay row-aligned. Concatenating the per-CHUNK
+    outputs instead silently produced 640,000 scores against 5,460,000 labels and
+    reported AUC 0.506 (chance) for a model whose real holdout AUC is 0.836.
+    """
     scores, labels = [], []
     for s0 in range(0, len(ids), lanes):
         sel = ids[s0:s0 + lanes]
@@ -278,10 +294,12 @@ def evaluate_mask(m, X, ids, S, idx, lanes, chunk, dev):
         sb = S[s0:s0 + lanes]
         B = xb.shape[0]
         h = torch.zeros(1, B, m.gru.hidden_size, device=dev)
+        sc = np.empty((B, SEQUENCE_LENGTH), dtype=np.float32)
         for c in range(0, SEQUENCE_LENGTH, chunk):
             d = min(c + chunk, SEQUENCE_LENGTH)
             logit, h = m.forward_chunk(xb[:, c:d], h)
-            scores.append(torch.sigmoid(logit).cpu().numpy())
+            sc[:, c:d] = torch.sigmoid(logit).cpu().numpy()
+        scores.append(sc)
         labels.append(sb)
     return auc(np.concatenate(scores, axis=0).reshape(-1),
                np.concatenate(labels, axis=0).reshape(-1))
