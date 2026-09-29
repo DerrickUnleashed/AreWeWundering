@@ -1,0 +1,37 @@
+{
+  "_comment": "Public leaderboard readings, transcribed from the competition UI on 2026-09-29. grader_seconds is the grader's own wall-clock for the full 39.4M-row test set; budget is 3600 s. Manual source of truth for tools/update_readme.py -- the scores live on the website, not in this repo.",
+  "baseline": {
+    "public_score": 0.5935,
+    "grader_seconds": 1581,
+    "memory_mb": 624,
+    "note": "organiser baseline_submission.zip, 17/100"
+  },
+  "v000": {
+    "public_score": 0.4986,
+    "grader_seconds": 1787,
+    "memory_mb": 626,
+    "note": "60-step framework smoke test, NOT a modelling result; uploaded only to validate the submission path"
+  },
+  "v001": {
+    "public_score": 0.6416,
+    "grader_seconds": 2042,
+    "memory_mb": 626
+  },
+  "v002": {
+    "public_score": 0.6435,
+    "grader_seconds": 2102,
+    "memory_mb": 628
+  },
+  "v003": {
+    "public_score": 0.6457,
+    "grader_seconds": 1857,
+    "memory_mb": 627,
+    "note": "best public entry so far"
+  },
+  "v004": {
+    "public_score": 0.6446,
+    "grader_seconds": 2596,
+    "memory_mb": 630,
+    "note": "projected 79% of budget at p50 and marked DO NOT SHIP; the grader ran it in 72.1% and it finished, so that verdict was wrong"
+  }
+}
