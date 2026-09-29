@@ -39,7 +39,7 @@ This file is the project memory for any coding agent or human working in this re
    (b) **agents never run `git push` (or `git push --force*`, or `git lfs push`), under any circumstances, even when the user asks about pushing.** The user pushes. Committing locally is fine and expected; the moment a change would cross the network, stop and report. Asking "should I push?" is still not enough — the answer is always no; instead tell the user what is ready and let them run it. **A mistake already made on 2026-09-29:** four pushes and one history rewrite were performed after being asked to "help push" the datasets, and the first push had already been authorised for that one task. Do not generalise from one approval to later, unasked-for pushes.
 7. **No data in RAM.** Stream or memory-map; never `pd.read_parquet` the train file whole.
 8. **Reproducibility.** Every run records seed, config (yaml), git commit if available, package versions, hardware, and the exact command in its log header.
-9. **Don't touch organiser files:** `README.md`, `METRIC.md`, `utils.py`, `requirements.txt`, `baseline/`, `datasets/`, `docs/`.
+9. **Don't touch organiser files:** `utils.py`, `requirements.txt`, `baseline/`, `datasets/`, `docs/`.
 
 ## 3. Repository map
 
