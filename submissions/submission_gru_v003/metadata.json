@@ -1,7 +1,7 @@
 {
  "key": "gru_v003",
- "packaged_utc": "2026-09-29T06:23:06Z",
- "git_commit": "689918f87eb6ed5a3be5a36b6a5d55d6bf643596",
+ "packaged_utc": "2026-09-29T06:31:34Z",
+ "git_commit": "365a747d127bd32a915ba39ce8ab590368406d07",
  "config": {
   "schema_version": 1,
   "identity": {
@@ -84,15 +84,15 @@
    "best_val_t0": 0.6825057719137231,
    "best_val_t1": 0.6899427304123292,
    "full_valid_wp": 0.673711,
-   "latency_us_p50": null,
-   "latency_us_p99": null,
+   "latency_us_p50": 27.87,
+   "latency_us_p99": 43.0,
    "train_hours": 3.7638,
    "finished_utc": "2026-09-28T23:38:33Z"
   },
   "artifacts": {
    "log": "exploration/logs/log_gru_v003.log",
    "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v003",
-   "submission_dir": null
+   "submission_dir": "submissions/submission_gru_v003"
   }
  },
  "checkpoint": {
@@ -120,9 +120,9 @@
   "weighted_pearson": 0.7230050277229023,
   "selected_rows": 44975,
   "rows_seen": 400000,
-  "us_per_row": 34.83,
-  "call_us_p50": 27.83,
-  "call_us_p99": 41.33,
+  "us_per_row": 35.3,
+  "call_us_p50": 27.88,
+  "call_us_p99": 44.0,
   "sequences": [
    0,
    1,
@@ -150,13 +150,21 @@
  "latency": {
   "budget_us_per_row": 91.37,
   "target_us_per_row": 68.53,
-  "us_p50": 27.87,
-  "us_p99": 43.0,
-  "projected_min_p50": 18.3,
-  "projected_min_p99": 28.2,
+  "us_p50": 27.71,
+  "us_p99": 41.58,
+  "projected_min_p50": 18.2,
+  "projected_min_p99": 27.3,
   "pass_p50_75pct": true,
   "pass_p99_75pct": true,
-  "rows": 39400000
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 44.89,
+  "grader_us_p99": 67.36,
+  "grader_min_p50": 29.5,
+  "grader_min_p99": 44.2,
+  "grader_pct_budget_p50": 49.1,
+  "grader_target_us_local": 42.3,
+  "grader_safe": true
  },
  "gate": {
   "contract": "PASS",
@@ -168,9 +176,9 @@
    "weighted_pearson": 0.7230050277229023,
    "selected_rows": 44975,
    "rows_seen": 400000,
-   "us_per_row": 34.83,
-   "call_us_p50": 27.83,
-   "call_us_p99": 41.33,
+   "us_per_row": 35.3,
+   "call_us_p50": 27.88,
+   "call_us_p99": 44.0,
    "sequences": [
     0,
     1,
@@ -198,13 +206,21 @@
   "latency": {
    "budget_us_per_row": 91.37,
    "target_us_per_row": 68.53,
-   "us_p50": 27.87,
-   "us_p99": 43.0,
-   "projected_min_p50": 18.3,
-   "projected_min_p99": 28.2,
+   "us_p50": 27.71,
+   "us_p99": 41.58,
+   "projected_min_p50": 18.2,
+   "projected_min_p99": 27.3,
    "pass_p50_75pct": true,
    "pass_p99_75pct": true,
-   "rows": 39400000
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 44.89,
+   "grader_us_p99": 67.36,
+   "grader_min_p50": 29.5,
+   "grader_min_p99": 44.2,
+   "grader_pct_budget_p50": 49.1,
+   "grader_target_us_local": 42.3,
+   "grader_safe": true
   },
   "size": {
    "zip_bytes": 2155616,
@@ -223,7 +239,7 @@
  "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
  "sha256": {
   "train_script": "fef5a7eea44d977f9f777a29c46e7987e50c58fbf444ae5e72345a69c064afb4",
-  "solution_py": "4eb162d3177edd6c31be859492df0b04f321e649793f40107ebef732578ab027",
+  "solution_py": "0d1b5d6600fe7b754792338ebff378c8cd77b02493221a3794785c3a6129ee44",
   "model_onnx": "46cec6c9c25585c7f9e551f3f19d6c2d92aefc6ec1ebf7cb5f6ca8d04f9d3ae8",
   "feature_stats_npz": "040dcc1b65c55148420f223676ce894bf04dcd2d9dbf324582f6d98bdd892769"
  },
