@@ -143,15 +143,16 @@ def validate(model, version):
         raise SystemExit('v000 is reserved for the gru framework smoke test (AGENTS.md §4)')
 
 
-def set_dotted(cfg, dotted, value):
+def set_dotted(cfg, dotted, value, allow_new=False):
     node = cfg
     parts = dotted.split('.')
     for p in parts[:-1]:
         if p not in node or not isinstance(node[p], dict):
             raise SystemExit(f'--set {dotted}: {p} is not a section of the yaml')
         node = node[p]
-    if parts[-1] not in node:
-        raise SystemExit(f'--set {dotted}: key {parts[-1]!r} does not exist; use --set-new to add it')
+    if parts[-1] not in node and not allow_new:
+        raise SystemExit(f'--set {dotted}: key {parts[-1]!r} does not exist; '
+                         f'pass --set-new to add it')
     node[parts[-1]] = value
 
 
@@ -174,6 +175,9 @@ def main():
     ap.add_argument('--change', default=None, help='exact delta vs the parent')
     ap.add_argument('--set', action='append', default=[], metavar='dotted.key=value',
                     help='override a yaml key, e.g. --set model.hidden=256')
+    ap.add_argument('--set-new', action='append', default=[], metavar='dotted.key=value',
+                    help='add a key that the schema does not define yet (a new loss or '
+                         'training option); use sparingly and say so in change_vs_parent')
     args = ap.parse_args()
 
     validate(args.model, args.version)
@@ -244,11 +248,12 @@ def main():
     cfg['artifacts']['checkpoint_dir'] = \
         f'exploration/checkpoints/checkpoint_{args.model}_{args.version}'
 
-    for kv in args.set:
-        if '=' not in kv:
-            raise SystemExit(f'--set expects dotted.key=value, got {kv!r}')
-        k, v = kv.split('=', 1)
-        set_dotted(cfg, k.strip(), coerce(v.strip()))
+    for flag, allow in ((args.set, False), (args.set_new, True)):
+        for kv in flag:
+            if '=' not in kv:
+                raise SystemExit(f'--set expects dotted.key=value, got {kv!r}')
+            k, v = kv.split('=', 1)
+            set_dotted(cfg, k.strip(), coerce(v.strip()), allow_new=allow)
 
     config.write_text(yaml.safe_dump(cfg, sort_keys=False))
     print(f'created {script.relative_to(ROOT)}')
