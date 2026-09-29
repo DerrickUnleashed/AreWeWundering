@@ -1,11 +1,11 @@
-### new run, log opened 2026-09-29T01:22:43+0530
+### new run, log opened 2026-09-29T11:51:54+0530
 ==============================================================================
-command            : python exploration/models/train_gru_v003.py --config exploration/version/version_gru_v003.yaml --device cpu
-timestamp          : 2026-09-29T01:22:43+0530
+command            : python exploration/models/train_gru_v003.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v003.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v003/best_001_step9999_val0.683114.pt
+timestamp          : 2026-09-29T11:51:54+0530
 host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
 packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
 cuda               : False   mps: True
-git commit         : 62832d0b12db5bd653986b7c049fa9364d0d14a7
+git commit         : 689918f87eb6ed5a3be5a36b6a5d55d6bf643596
 seed               : 1337
 log                : exploration/logs/log_gru_v003.log
 config:
@@ -14,7 +14,7 @@ identity:
   model: gru
   version: v003
   parent: gru_v000
-  status: planned
+  status: finished
 description: 'TRAINING STABILITY: add a 0.05 |t|-weighted auxiliary MSE term and enable
   EMA weights.'
 hypothesis: The weighted-Pearson gradient vanishes where the target variance collapses,
@@ -47,7 +47,7 @@ model:
   dropout: 0.0
   layernorm: false
   head: linear
-  param_count: null
+  param_count: 192258
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -83,15 +83,15 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 14999
+  best_val_wp: 0.6862242511630261
+  best_val_t0: 0.6825057719137231
+  best_val_t1: 0.6899427304123292
+  full_valid_wp: 0.673711
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 3.7638
+  finished_utc: '2026-09-28T23:38:33Z'
 artifacts:
   log: exploration/logs/log_gru_v003.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v003
@@ -99,68 +99,9 @@ artifacts:
 
 ==============================================================================
 device: cpu
-model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
-max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
-train sequences=10607  valid sequences=200  steps=19890
-step 0/19890 lr 4.00e-06 loss 1.165002 grad_norm 2.488 (1s)
-step 25/19890 lr 1.04e-04 loss 0.842303 grad_norm 3.670 (18s)
-step 50/19890 lr 2.04e-04 loss 0.869095 grad_norm 1.179 (35s)
-step 75/19890 lr 3.04e-04 loss 0.798572 grad_norm 1.540 (52s)
-step 100/19890 lr 4.04e-04 loss 0.669086 grad_norm 1.168 (70s)
-step 125/19890 lr 5.04e-04 loss 0.664603 grad_norm 0.923 (87s)
-step 150/19890 lr 6.04e-04 loss 0.745122 grad_norm 1.241 (103s)
-step 175/19890 lr 7.04e-04 loss 0.879454 grad_norm 1.050 (120s)
-step 200/19890 lr 8.04e-04 loss 0.788279 grad_norm 0.998 (136s)
-step 225/19890 lr 9.04e-04 loss 0.783857 grad_norm 2.199 (153s)
-step 250/19890 lr 1.00e-03 loss 0.951310 grad_norm 0.966 (169s)
-step 275/19890 lr 1.10e-03 loss 0.770579 grad_norm 1.012 (186s)
-step 300/19890 lr 1.20e-03 loss 0.764178 grad_norm 0.839 (202s)
-step 325/19890 lr 1.30e-03 loss 0.685921 grad_norm 0.672 (219s)
-step 350/19890 lr 1.40e-03 loss 0.684855 grad_norm 0.548 (236s)
-step 375/19890 lr 1.50e-03 loss 0.596854 grad_norm 0.565 (252s)
-step 400/19890 lr 1.60e-03 loss 0.827095 grad_norm 0.462 (269s)
-step 425/19890 lr 1.70e-03 loss 0.731714 grad_norm 0.491 (286s)
-step 450/19890 lr 1.80e-03 loss 0.895999 grad_norm 0.876 (303s)
-step 475/19890 lr 1.90e-03 loss 0.642958 grad_norm 0.329 (320s)
-step 500/19890 lr 2.00e-03 loss 0.832856 grad_norm 0.705 (338s)
-step 525/19890 lr 2.00e-03 loss 0.746001 grad_norm 0.437 (355s)
-step 550/19890 lr 2.00e-03 loss 0.656071 grad_norm 0.484 (373s)
-step 575/19890 lr 2.00e-03 loss 0.809004 grad_norm 0.541 (391s)
-step 600/19890 lr 2.00e-03 loss 0.758855 grad_norm 0.493 (409s)
-step 625/19890 lr 2.00e-03 loss 0.818860 grad_norm 0.638 (427s)
-step 650/19890 lr 2.00e-03 loss 0.716062 grad_norm 0.500 (445s)
-step 675/19890 lr 2.00e-03 loss 0.614713 grad_norm 0.494 (463s)
-step 700/19890 lr 2.00e-03 loss 0.914612 grad_norm 1.091 (479s)
-step 725/19890 lr 2.00e-03 loss 0.695808 grad_norm 0.508 (496s)
-step 750/19890 lr 2.00e-03 loss 0.684350 grad_norm 0.363 (513s)
-step 775/19890 lr 2.00e-03 loss 0.688621 grad_norm 0.596 (529s)
-step 800/19890 lr 2.00e-03 loss 0.604284 grad_norm 0.545 (546s)
-step 825/19890 lr 2.00e-03 loss 0.613419 grad_norm 0.606 (563s)
-step 850/19890 lr 2.00e-03 loss 0.546107 grad_norm 0.521 (580s)
-step 875/19890 lr 2.00e-03 loss 0.651690 grad_norm 0.576 (596s)
-step 900/19890 lr 2.00e-03 loss 0.610184 grad_norm 0.479 (613s)
-step 925/19890 lr 2.00e-03 loss 0.694387 grad_norm 0.813 (630s)
-step 950/19890 lr 2.00e-03 loss 0.783593 grad_norm 0.551 (646s)
-step 975/19890 lr 2.00e-03 loss 0.680757 grad_norm 0.515 (663s)
-step 1000/19890 lr 2.00e-03 loss 0.767823 grad_norm 0.716 (680s)
-step 1025/19890 lr 2.00e-03 loss 0.734502 grad_norm 0.622 (697s)
-step 1050/19890 lr 2.00e-03 loss 0.582688 grad_norm 0.386 (714s)
-step 1075/19890 lr 2.00e-03 loss 0.668256 grad_norm 0.449 (732s)
-step 1100/19890 lr 2.00e-03 loss 0.752188 grad_norm 0.447 (750s)
-step 1125/19890 lr 1.99e-03 loss 0.584831 grad_norm 0.435 (767s)
-step 1150/19890 lr 1.99e-03 loss 0.825465 grad_norm 0.512 (784s)
-step 1175/19890 lr 1.99e-03 loss 0.771084 grad_norm 0.560 (801s)
-step 1200/19890 lr 1.99e-03 loss 0.772086 grad_norm 0.707 (817s)
-step 1225/19890 lr 1.99e-03 loss 0.662881 grad_norm 0.806 (834s)
-step 1250/19890 lr 1.99e-03 loss 0.761492 grad_norm 0.831 (851s)
-step 1275/19890 lr 1.99e-03 loss 0.666117 grad_norm 0.402 (867s)
-step 1300/19890 lr 1.99e-03 loss 0.663194 grad_norm 0.626 (884s)
-step 1325/19890 lr 1.99e-03 loss 0.756245 grad_norm 0.687 (901s)
-step 1350/19890 lr 1.99e-03 loss 1.008020 grad_norm 0.951 (919s)
-step 1375/19890 lr 1.99e-03 loss 0.730188 grad_norm 0.382 (936s)
-step 1400/19890 lr 1.99e-03 loss 0.690936 grad_norm 0.944 (953s)
-step 1425/19890 lr 1.99e-03 loss 0.836157 grad_norm 0.631 (970s)
-step 1450/19890 lr 1.99e-03 loss 0.650434 grad_norm 0.662 (986s)
-step 1475/19890 lr 1.99e-03 loss 0.736872 grad_norm 0.809 (1003s)
-step 1500/19890 lr 1.99e-03 loss 0.741017 grad_norm 0.771 (1019s)
-step 1525/19890 lr 1.99e-03 loss 0.699477 grad_norm 0.540 (1036s)
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v003.py:503: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 1.043e-06
+exported inference artifacts from best_001_step9999_val0.683114.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v003
