@@ -99,20 +99,23 @@ def auc(scores, labels):
 
 
 def load_split(root, seq_ids):
-    """Load a list of sequences from the valid shard as float32 arrays."""
+    """Return (X_memmap, ids, labels) for a set of sequences.
+
+    X is NOT copied or stacked. Stacking the default fit range as float32 costs
+    15 GB (1400 x 20,000 x 112 x 4) and would thrash alongside the concurrent
+    training runs; the valid shard is already a float16 memmap, so we index into
+    it per sequence and cast the one chunk we are using. Only the bool labels are
+    materialised, at 1400 x 20,000 = 28 MB.
+    """
     X = np.load(root / 'valid' / 'X.npy', mmap_mode='r')
-    y = None
     sc = np.load(root / 'valid' / 'is_scored.npy', mmap_mode='r')
     idx = np.load(root / 'valid' / 'seq_index.npy')
-    Xs, Ss = [], []
-    for i in seq_ids:
-        a, b = int(idx[i]), int(idx[i + 1])
-        Xs.append(np.asarray(X[a:b], dtype=np.float32))
-        Ss.append(np.asarray(sc[a:b], dtype=bool))
-    return np.stack(Xs), np.stack(Ss)
+    ids = np.asarray(seq_ids, dtype=np.int64)
+    S = np.stack([np.asarray(sc[int(idx[i]):int(idx[i + 1])], dtype=bool) for i in ids])
+    return X, ids, S, idx
 
 
-def chunks(X, S, lanes, chunk, hidden):
+def chunks(X, ids, S, idx, lanes, chunk, hidden):
     """Yield (Xb, yb, valid, h) walking `lanes` sequences `chunk` rows at a time.
 
     A lane that exhausts its sequence starts a new one: its hidden state is zeroed
@@ -134,7 +137,8 @@ def chunks(X, S, lanes, chunk, hidden):
             a = pos[i]
             b = min(a + chunk, SEQUENCE_LENGTH)
             n = b - a
-            Xb[i, :n] = X[i, a:b]
+            off = int(idx[ids[i]])
+            Xb[i, :n] = np.asarray(X[off + a:off + b], dtype=np.float32)
             yb[i, :n] = S[i, a:b].astype(np.float32)
             vb[i, :n] = 1.0
             pos[i] = b
@@ -183,8 +187,8 @@ def main():
     print(f'EVAL    : sequences [0..{args.mask_start - 1}] are never touched here '
           f'(that is what every version in this repo scores on)')
 
-    Xf, Sf = load_split(root, fit_ids)
-    Xh, Sh = load_split(root, hold_ids)
+    X_all, ids_fit, Sf, vidx = load_split(root, fit_ids)
+    _, ids_hold, Sh, _ = load_split(root, hold_ids)
     print(f'positive rate: fit {Sf.mean():.4f}   holdout {Sh.mean():.4f}')
 
     m = MaskGRU(args.hidden).to(dev)
@@ -197,9 +201,8 @@ def main():
     for ep in range(args.epochs):
         m.train()
         order = rng.permutation(len(fit_ids))
-        # reshuffle which sequences share a lane each step
-        Xs, Ss = Xf[order], Sf[order]
-        gen = chunks(Xs, Ss, args.lanes, args.chunk, args.hidden)
+        gen = chunks(X_all, ids_fit[order], Sf[order], vidx, args.lanes,
+                     args.chunk, args.hidden)
         running = 0.0
         for step in range(args.steps):
             Xb, yb, vb, h = next(gen)
@@ -214,7 +217,8 @@ def main():
             h = h.detach()
             running += float(loss.detach())
             if (step + 1) % args.eval_every == 0 or step == args.steps - 1:
-                a = evaluate_mask(m, Xh, Sh, args.lanes, args.chunk, dev)
+                a = evaluate_mask(m, X_all, ids_hold, Sh, vidx, args.lanes,
+                                 args.chunk, dev)
                 if a > best_auc:
                     best_auc = a
                     best_state = {k: v.detach().clone() for k, v in m.state_dict().items()}
@@ -263,11 +267,14 @@ def main():
 
 
 @torch.no_grad()
-def evaluate_mask(m, X, S, lanes, chunk, dev):
+def evaluate_mask(m, X, ids, S, idx, lanes, chunk, dev):
     """AUC over whole sequences, state carried, reset at each sequence start."""
     scores, labels = [], []
-    for s0 in range(0, len(X), lanes):
-        xb = torch.from_numpy(X[s0:s0 + lanes]).to(dev)
+    for s0 in range(0, len(ids), lanes):
+        sel = ids[s0:s0 + lanes]
+        xb = torch.from_numpy(np.stack([
+            np.asarray(X[int(idx[j]):int(idx[j]) + SEQUENCE_LENGTH], dtype=np.float32)
+            for j in sel])).to(dev)
         sb = S[s0:s0 + lanes]
         B = xb.shape[0]
         h = torch.zeros(1, B, m.gru.hidden_size, device=dev)
