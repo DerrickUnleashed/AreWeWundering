@@ -1,11 +1,11 @@
-### new run, log opened 2026-09-29T15:07:50+0530
+### new run, log opened 2026-09-30T01:49:56+0530
 ==============================================================================
-command            : python exploration/models/train_gru_v010.py --config exploration/version/version_gru_v010.yaml --device cpu
-timestamp          : 2026-09-29T15:07:50+0530
+command            : python exploration/models/train_gru_v010.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v010.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v010/best_001_step24999_val0.684870.pt
+timestamp          : 2026-09-30T01:49:56+0530
 host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
 packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
 cuda               : False   mps: True
-git commit         : e5daf9a88513d2aa1f33fefcaba83b4c96602027
+git commit         : 50474641edc760425ce6290d5d32673789b88528
 seed               : 1337
 log                : exploration/logs/log_gru_v010.log
 config:
@@ -14,7 +14,7 @@ identity:
   model: gru
   version: v010
   parent: gru_v002
-  status: planned
+  status: finished
 description: 'SCHEDULE: the gru_v002 recipe trained for 6 epochs instead of 3.'
 hypothesis: Every finished run plateaued by ~step 15,000 of 19,890, which is weak
   evidence that 3 epochs is enough. This is the direct test of the one scheduling
@@ -42,7 +42,7 @@ model:
   dropout: 0.0
   layernorm: false
   head: linear
-  param_count: null
+  param_count: 192258
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -78,15 +78,15 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 24999
+  best_val_wp: 0.6848702650419769
+  best_val_t0: 0.683501820859485
+  best_val_t1: 0.686238709224469
+  full_valid_wp: 0.6706959356389159
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 9.1164
+  finished_utc: '2026-09-29T18:44:51Z'
 artifacts:
   log: exploration/logs/log_gru_v010.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v010
@@ -94,1239 +94,9 @@ artifacts:
 
 ==============================================================================
 device: cpu
-model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
-max_steps derived: 6,630 steps/epoch x 6 epoch(s) = 39,780 steps over all 10,607 training sequences
-train sequences=10607  valid sequences=200  steps=39780
-step 0/39780 lr 4.00e-06 loss 1.057388 grad_norm 2.269 (2s)
-step 25/39780 lr 1.04e-04 loss 0.976030 grad_norm 3.942 (26s)
-step 50/39780 lr 2.04e-04 loss 0.757682 grad_norm 1.124 (53s)
-step 75/39780 lr 3.04e-04 loss 0.693642 grad_norm 1.537 (80s)
-step 100/39780 lr 4.04e-04 loss 0.549580 grad_norm 0.747 (107s)
-step 125/39780 lr 5.04e-04 loss 0.559178 grad_norm 0.576 (136s)
-step 150/39780 lr 6.04e-04 loss 0.666604 grad_norm 0.953 (162s)
-step 175/39780 lr 7.04e-04 loss 0.733536 grad_norm 0.780 (189s)
-step 200/39780 lr 8.04e-04 loss 0.690213 grad_norm 0.837 (216s)
-step 225/39780 lr 9.04e-04 loss 0.583749 grad_norm 1.070 (242s)
-step 250/39780 lr 1.00e-03 loss 0.794258 grad_norm 0.712 (268s)
-step 275/39780 lr 1.10e-03 loss 0.685930 grad_norm 0.764 (294s)
-step 300/39780 lr 1.20e-03 loss 0.653786 grad_norm 0.693 (318s)
-step 325/39780 lr 1.30e-03 loss 0.603859 grad_norm 0.503 (342s)
-step 350/39780 lr 1.40e-03 loss 0.600422 grad_norm 0.467 (366s)
-step 375/39780 lr 1.50e-03 loss 0.534603 grad_norm 0.359 (393s)
-step 400/39780 lr 1.60e-03 loss 0.731412 grad_norm 0.373 (418s)
-step 425/39780 lr 1.70e-03 loss 0.646096 grad_norm 0.369 (444s)
-step 450/39780 lr 1.80e-03 loss 0.776636 grad_norm 0.664 (468s)
-step 475/39780 lr 1.90e-03 loss 0.560345 grad_norm 0.293 (493s)
-step 500/39780 lr 2.00e-03 loss 0.755128 grad_norm 0.674 (523s)
-step 525/39780 lr 2.00e-03 loss 0.700604 grad_norm 0.411 (555s)
-step 550/39780 lr 2.00e-03 loss 0.598247 grad_norm 0.371 (586s)
-step 575/39780 lr 2.00e-03 loss 0.734391 grad_norm 0.516 (617s)
-step 600/39780 lr 2.00e-03 loss 0.673937 grad_norm 0.401 (645s)
-step 625/39780 lr 2.00e-03 loss 0.742768 grad_norm 0.568 (671s)
-step 650/39780 lr 2.00e-03 loss 0.660731 grad_norm 0.469 (698s)
-step 675/39780 lr 2.00e-03 loss 0.562630 grad_norm 0.422 (725s)
-step 700/39780 lr 2.00e-03 loss 0.796158 grad_norm 1.008 (750s)
-step 725/39780 lr 2.00e-03 loss 0.661502 grad_norm 0.620 (776s)
-step 750/39780 lr 2.00e-03 loss 0.600828 grad_norm 0.296 (801s)
-step 775/39780 lr 2.00e-03 loss 0.604015 grad_norm 0.411 (827s)
-step 800/39780 lr 2.00e-03 loss 0.557360 grad_norm 0.673 (853s)
-step 825/39780 lr 2.00e-03 loss 0.527014 grad_norm 0.533 (879s)
-step 850/39780 lr 2.00e-03 loss 0.449593 grad_norm 0.413 (905s)
-step 875/39780 lr 2.00e-03 loss 0.600892 grad_norm 0.633 (935s)
-step 900/39780 lr 2.00e-03 loss 0.572462 grad_norm 0.700 (968s)
-step 925/39780 lr 2.00e-03 loss 0.529834 grad_norm 0.331 (999s)
-step 950/39780 lr 2.00e-03 loss 0.669549 grad_norm 0.463 (1029s)
-step 975/39780 lr 2.00e-03 loss 0.656097 grad_norm 0.471 (1059s)
-step 1000/39780 lr 2.00e-03 loss 0.703507 grad_norm 0.656 (1091s)
-step 1025/39780 lr 2.00e-03 loss 0.679238 grad_norm 0.604 (1124s)
-step 1050/39780 lr 2.00e-03 loss 0.502987 grad_norm 0.286 (1157s)
-step 1075/39780 lr 2.00e-03 loss 0.567120 grad_norm 0.384 (1188s)
-step 1100/39780 lr 2.00e-03 loss 0.719794 grad_norm 0.434 (1218s)
-step 1125/39780 lr 2.00e-03 loss 0.506622 grad_norm 0.379 (1248s)
-step 1150/39780 lr 2.00e-03 loss 0.767168 grad_norm 0.403 (1276s)
-step 1175/39780 lr 2.00e-03 loss 0.709821 grad_norm 0.552 (1305s)
-step 1200/39780 lr 2.00e-03 loss 0.622740 grad_norm 0.682 (1333s)
-step 1225/39780 lr 2.00e-03 loss 0.631852 grad_norm 0.817 (1361s)
-step 1250/39780 lr 2.00e-03 loss 0.780648 grad_norm 0.951 (1388s)
-step 1275/39780 lr 2.00e-03 loss 0.594190 grad_norm 0.398 (1417s)
-step 1300/39780 lr 2.00e-03 loss 0.570651 grad_norm 0.427 (1445s)
-step 1325/39780 lr 2.00e-03 loss 0.679426 grad_norm 0.584 (1472s)
-step 1350/39780 lr 2.00e-03 loss 1.017159 grad_norm 0.716 (1504s)
-step 1375/39780 lr 2.00e-03 loss 0.657813 grad_norm 0.323 (1537s)
-step 1400/39780 lr 2.00e-03 loss 0.663344 grad_norm 0.700 (1572s)
-step 1425/39780 lr 2.00e-03 loss 0.706685 grad_norm 0.515 (1605s)
-step 1450/39780 lr 2.00e-03 loss 0.611110 grad_norm 0.827 (1638s)
-step 1475/39780 lr 2.00e-03 loss 0.641598 grad_norm 0.428 (1672s)
-step 1500/39780 lr 2.00e-03 loss 0.668830 grad_norm 0.797 (1706s)
-step 1525/39780 lr 2.00e-03 loss 0.606848 grad_norm 0.331 (1738s)
-step 1550/39780 lr 2.00e-03 loss 0.452895 grad_norm 0.275 (1770s)
-step 1575/39780 lr 2.00e-03 loss 0.496269 grad_norm 0.355 (1801s)
-step 1600/39780 lr 2.00e-03 loss 0.663018 grad_norm 0.445 (1832s)
-step 1625/39780 lr 2.00e-03 loss 0.612438 grad_norm 0.597 (1860s)
-step 1650/39780 lr 2.00e-03 loss 0.693048 grad_norm 0.698 (1888s)
-step 1675/39780 lr 2.00e-03 loss 0.545784 grad_norm 0.471 (1914s)
-step 1700/39780 lr 2.00e-03 loss 0.779991 grad_norm 0.597 (1941s)
-step 1725/39780 lr 2.00e-03 loss 0.548254 grad_norm 0.596 (1971s)
-step 1750/39780 lr 2.00e-03 loss 0.471123 grad_norm 0.784 (2010s)
-step 1775/39780 lr 1.99e-03 loss 0.550618 grad_norm 0.514 (2043s)
-step 1800/39780 lr 1.99e-03 loss 0.559188 grad_norm 0.514 (2076s)
-step 1825/39780 lr 1.99e-03 loss 0.575417 grad_norm 0.331 (2111s)
-step 1850/39780 lr 1.99e-03 loss 0.531445 grad_norm 0.372 (2145s)
-step 1875/39780 lr 1.99e-03 loss 0.637184 grad_norm 0.785 (2179s)
-step 1900/39780 lr 1.99e-03 loss 0.586019 grad_norm 0.466 (2212s)
-step 1925/39780 lr 1.99e-03 loss 0.548325 grad_norm 0.482 (2246s)
-step 1950/39780 lr 1.99e-03 loss 0.811512 grad_norm 0.701 (2278s)
-step 1975/39780 lr 1.99e-03 loss 0.478632 grad_norm 0.244 (2306s)
-step 2000/39780 lr 1.99e-03 loss 0.653615 grad_norm 0.506 (2334s)
-step 2025/39780 lr 1.99e-03 loss 0.638934 grad_norm 0.626 (2361s)
-step 2050/39780 lr 1.99e-03 loss 0.611928 grad_norm 0.577 (2387s)
-step 2075/39780 lr 1.99e-03 loss 0.520305 grad_norm 0.414 (2414s)
-step 2100/39780 lr 1.99e-03 loss 0.501395 grad_norm 0.371 (2442s)
-step 2125/39780 lr 1.99e-03 loss 0.603911 grad_norm 0.490 (2471s)
-step 2150/39780 lr 1.99e-03 loss 0.562111 grad_norm 0.411 (2499s)
-step 2175/39780 lr 1.99e-03 loss 0.604404 grad_norm 0.543 (2527s)
-step 2200/39780 lr 1.99e-03 loss 0.567810 grad_norm 0.287 (2561s)
-step 2225/39780 lr 1.99e-03 loss 0.492303 grad_norm 0.374 (2591s)
-step 2250/39780 lr 1.99e-03 loss 0.561277 grad_norm 0.558 (2621s)
-step 2275/39780 lr 1.99e-03 loss 0.512312 grad_norm 0.457 (2647s)
-step 2300/39780 lr 1.99e-03 loss 0.564227 grad_norm 0.552 (2672s)
-step 2325/39780 lr 1.99e-03 loss 0.552849 grad_norm 0.478 (2697s)
-step 2350/39780 lr 1.99e-03 loss 0.507596 grad_norm 0.521 (2721s)
-step 2375/39780 lr 1.99e-03 loss 0.581331 grad_norm 0.911 (2746s)
-step 2400/39780 lr 1.99e-03 loss 0.698357 grad_norm 0.778 (2770s)
-step 2425/39780 lr 1.99e-03 loss 0.425543 grad_norm 0.463 (2794s)
-step 2450/39780 lr 1.99e-03 loss 0.591141 grad_norm 0.452 (2817s)
-step 2475/39780 lr 1.99e-03 loss 0.528259 grad_norm 0.429 (2841s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<01:12,  2.69it/s]eval:   4%|4         | 8/200 [00:03<01:12,  2.66it/s]eval:   6%|6         | 12/200 [00:04<01:11,  2.65it/s]eval:   8%|8         | 16/200 [00:05<01:08,  2.68it/s]eval:  10%|#         | 20/200 [00:07<01:04,  2.79it/s]eval:  12%|#2        | 24/200 [00:08<01:02,  2.84it/s]eval:  14%|#4        | 28/200 [00:09<00:59,  2.90it/s]eval:  16%|#6        | 32/200 [00:11<01:01,  2.75it/s]eval:  18%|#8        | 36/200 [00:13<01:00,  2.70it/s]eval:  20%|##        | 40/200 [00:14<00:59,  2.70it/s]eval:  22%|##2       | 44/200 [00:16<00:57,  2.71it/s]eval:  24%|##4       | 48/200 [00:17<00:55,  2.74it/s]eval:  26%|##6       | 52/200 [00:19<00:55,  2.69it/s]eval:  28%|##8       | 56/200 [00:20<00:54,  2.66it/s]eval:  30%|###       | 60/200 [00:22<00:51,  2.71it/s]eval:  32%|###2      | 64/200 [00:23<00:49,  2.77it/s]eval:  34%|###4      | 68/200 [00:24<00:47,  2.78it/s]eval:  36%|###6      | 72/200 [00:26<00:45,  2.83it/s]eval:  38%|###8      | 76/200 [00:27<00:42,  2.89it/s]eval:  40%|####      | 80/200 [00:28<00:41,  2.88it/s]eval:  42%|####2     | 84/200 [00:30<00:39,  2.91it/s]eval:  44%|####4     | 88/200 [00:31<00:38,  2.94it/s]eval:  46%|####6     | 92/200 [00:32<00:36,  2.95it/s]eval:  48%|####8     | 96/200 [00:34<00:34,  2.98it/s]eval:  50%|#####     | 100/200 [00:35<00:35,  2.80it/s]eval:  52%|#####2    | 104/200 [00:37<00:33,  2.85it/s]eval:  54%|#####4    | 108/200 [00:38<00:32,  2.87it/s]eval:  56%|#####6    | 112/200 [00:39<00:30,  2.88it/s]eval:  58%|#####8    | 116/200 [00:41<00:29,  2.87it/s]eval:  60%|######    | 120/200 [00:42<00:27,  2.90it/s]eval:  62%|######2   | 124/200 [00:43<00:25,  2.96it/s]eval:  64%|######4   | 128/200 [00:45<00:24,  2.96it/s]eval:  66%|######6   | 132/200 [00:46<00:22,  2.98it/s]eval:  68%|######8   | 136/200 [00:47<00:21,  3.02it/s]eval:  70%|#######   | 140/200 [00:49<00:20,  2.98it/s]eval:  72%|#######2  | 144/200 [00:50<00:18,  2.97it/s]eval:  74%|#######4  | 148/200 [00:52<00:17,  2.95it/s]eval:  76%|#######6  | 152/200 [00:53<00:16,  2.95it/s]eval:  78%|#######8  | 156/200 [00:54<00:14,  2.97it/s]eval:  80%|########  | 160/200 [00:56<00:13,  2.93it/s]eval:  82%|########2 | 164/200 [00:57<00:12,  2.94it/s]eval:  84%|########4 | 168/200 [00:58<00:10,  2.91it/s]eval:  86%|########6 | 172/200 [01:00<00:09,  2.98it/s]eval:  88%|########8 | 176/200 [01:01<00:08,  2.99it/s]eval:  90%|######### | 180/200 [01:02<00:06,  2.97it/s]eval:  92%|#########2| 184/200 [01:04<00:05,  3.01it/s]eval:  94%|#########3| 188/200 [01:05<00:03,  3.02it/s]eval:  96%|#########6| 192/200 [01:06<00:02,  3.03it/s]eval:  98%|#########8| 196/200 [01:08<00:01,  3.02it/s]eval: 100%|##########| 200/200 [01:09<00:00,  3.02it/s]                                                       EVAL step=2499 val_wp=0.667926 (t0=0.654111 t1=0.681741 rows=374199, subset)
-NEW BEST saved best_001_step2499_val0.667926.pt
-step 2500/39780 lr 1.99e-03 loss 0.491647 grad_norm 0.424 (2939s)
-step 2525/39780 lr 1.99e-03 loss 0.582192 grad_norm 0.534 (2964s)
-step 2550/39780 lr 1.99e-03 loss 0.612289 grad_norm 0.458 (2992s)
-step 2575/39780 lr 1.99e-03 loss 0.663800 grad_norm 0.764 (3019s)
-step 2600/39780 lr 1.99e-03 loss 0.625626 grad_norm 1.198 (3044s)
-step 2625/39780 lr 1.99e-03 loss 0.546858 grad_norm 0.389 (3068s)
-step 2650/39780 lr 1.99e-03 loss 0.582021 grad_norm 0.385 (3091s)
-step 2675/39780 lr 1.98e-03 loss 0.556768 grad_norm 0.420 (3116s)
-step 2700/39780 lr 1.98e-03 loss 0.595760 grad_norm 0.333 (3146s)
-step 2725/39780 lr 1.98e-03 loss 0.509801 grad_norm 0.444 (3183s)
-step 2750/39780 lr 1.98e-03 loss 0.485019 grad_norm 0.385 (3223s)
-step 2775/39780 lr 1.98e-03 loss 0.488898 grad_norm 0.285 (3262s)
-step 2800/39780 lr 1.98e-03 loss 0.650706 grad_norm 0.437 (3302s)
-step 2825/39780 lr 1.98e-03 loss 0.604204 grad_norm 0.629 (3339s)
-step 2850/39780 lr 1.98e-03 loss 0.680387 grad_norm 0.339 (3371s)
-step 2875/39780 lr 1.98e-03 loss 0.533104 grad_norm 0.392 (3405s)
-step 2900/39780 lr 1.98e-03 loss 0.530018 grad_norm 0.440 (3437s)
-step 2925/39780 lr 1.98e-03 loss 0.536360 grad_norm 0.406 (3467s)
-step 2950/39780 lr 1.98e-03 loss 0.557267 grad_norm 0.380 (3494s)
-step 2975/39780 lr 1.98e-03 loss 0.619579 grad_norm 0.341 (3522s)
-step 3000/39780 lr 1.98e-03 loss 0.524907 grad_norm 0.374 (3551s)
-step 3025/39780 lr 1.98e-03 loss 0.660134 grad_norm 0.421 (3577s)
-step 3050/39780 lr 1.98e-03 loss 0.587402 grad_norm 0.388 (3603s)
-step 3075/39780 lr 1.98e-03 loss 0.563026 grad_norm 0.475 (3630s)
-step 3100/39780 lr 1.98e-03 loss 0.598171 grad_norm 0.645 (3656s)
-step 3125/39780 lr 1.98e-03 loss 0.685110 grad_norm 0.377 (3679s)
-step 3150/39780 lr 1.98e-03 loss 0.488996 grad_norm 0.374 (3703s)
-step 3175/39780 lr 1.98e-03 loss 0.556641 grad_norm 0.653 (3727s)
-step 3200/39780 lr 1.98e-03 loss 0.570057 grad_norm 0.438 (3751s)
-step 3225/39780 lr 1.98e-03 loss 0.472531 grad_norm 0.397 (3774s)
-step 3250/39780 lr 1.98e-03 loss 0.544524 grad_norm 0.355 (3800s)
-step 3275/39780 lr 1.98e-03 loss 0.746993 grad_norm 0.436 (3833s)
-step 3300/39780 lr 1.98e-03 loss 0.771412 grad_norm 0.653 (3862s)
-step 3325/39780 lr 1.97e-03 loss 0.597476 grad_norm 0.316 (3890s)
-step 3350/39780 lr 1.97e-03 loss 0.597080 grad_norm 0.264 (3918s)
-step 3375/39780 lr 1.97e-03 loss 0.531202 grad_norm 0.319 (3945s)
-step 3400/39780 lr 1.97e-03 loss 0.684491 grad_norm 0.709 (3972s)
-step 3425/39780 lr 1.97e-03 loss 0.508321 grad_norm 0.482 (4002s)
-step 3450/39780 lr 1.97e-03 loss 0.577752 grad_norm 0.365 (4027s)
-step 3475/39780 lr 1.97e-03 loss 0.655353 grad_norm 0.397 (4051s)
-step 3500/39780 lr 1.97e-03 loss 0.708609 grad_norm 0.482 (4077s)
-step 3525/39780 lr 1.97e-03 loss 0.620712 grad_norm 0.419 (4103s)
-step 3550/39780 lr 1.97e-03 loss 0.644277 grad_norm 0.472 (4127s)
-step 3575/39780 lr 1.97e-03 loss 0.474334 grad_norm 0.560 (4153s)
-step 3600/39780 lr 1.97e-03 loss 0.723716 grad_norm 0.847 (4178s)
-step 3625/39780 lr 1.97e-03 loss 0.520655 grad_norm 0.331 (4206s)
-step 3650/39780 lr 1.97e-03 loss 0.717532 grad_norm 0.806 (4230s)
-step 3675/39780 lr 1.97e-03 loss 0.519856 grad_norm 0.513 (4255s)
-step 3700/39780 lr 1.97e-03 loss 0.557608 grad_norm 0.431 (4278s)
-step 3725/39780 lr 1.97e-03 loss 0.564411 grad_norm 0.337 (4302s)
-step 3750/39780 lr 1.97e-03 loss 0.487379 grad_norm 0.388 (4327s)
-step 3775/39780 lr 1.97e-03 loss 0.624715 grad_norm 0.401 (4354s)
-step 3800/39780 lr 1.97e-03 loss 0.566027 grad_norm 0.412 (4381s)
-step 3825/39780 lr 1.96e-03 loss 0.529877 grad_norm 0.367 (4408s)
-step 3850/39780 lr 1.96e-03 loss 0.567278 grad_norm 0.374 (4433s)
-step 3875/39780 lr 1.96e-03 loss 0.537867 grad_norm 0.422 (4458s)
-step 3900/39780 lr 1.96e-03 loss 0.624053 grad_norm 0.378 (4482s)
-step 3925/39780 lr 1.96e-03 loss 0.702951 grad_norm 0.509 (4506s)
-step 3950/39780 lr 1.96e-03 loss 0.470275 grad_norm 0.388 (4530s)
-step 3975/39780 lr 1.96e-03 loss 0.594077 grad_norm 0.408 (4560s)
-step 4000/39780 lr 1.96e-03 loss 0.533647 grad_norm 0.405 (4587s)
-step 4025/39780 lr 1.96e-03 loss 0.663587 grad_norm 0.481 (4612s)
-step 4050/39780 lr 1.96e-03 loss 0.562107 grad_norm 0.407 (4637s)
-step 4075/39780 lr 1.96e-03 loss 0.569415 grad_norm 0.466 (4664s)
-step 4100/39780 lr 1.96e-03 loss 0.510509 grad_norm 0.307 (4690s)
-step 4125/39780 lr 1.96e-03 loss 0.611355 grad_norm 0.407 (4716s)
-step 4150/39780 lr 1.96e-03 loss 0.586206 grad_norm 0.393 (4741s)
-step 4175/39780 lr 1.96e-03 loss 0.769876 grad_norm 0.472 (4767s)
-step 4200/39780 lr 1.96e-03 loss 0.585152 grad_norm 0.638 (4792s)
-step 4225/39780 lr 1.96e-03 loss 0.557804 grad_norm 0.414 (4818s)
-step 4250/39780 lr 1.96e-03 loss 0.599483 grad_norm 0.320 (4844s)
-step 4275/39780 lr 1.95e-03 loss 0.584909 grad_norm 0.405 (4871s)
-step 4300/39780 lr 1.95e-03 loss 0.699798 grad_norm 0.497 (4900s)
-step 4325/39780 lr 1.95e-03 loss 0.585493 grad_norm 0.387 (4928s)
-step 4350/39780 lr 1.95e-03 loss 0.623414 grad_norm 0.476 (4957s)
-step 4375/39780 lr 1.95e-03 loss 0.566463 grad_norm 0.436 (4987s)
-step 4400/39780 lr 1.95e-03 loss 0.577376 grad_norm 0.341 (5014s)
-step 4425/39780 lr 1.95e-03 loss 0.563276 grad_norm 0.399 (5040s)
-step 4450/39780 lr 1.95e-03 loss 0.637661 grad_norm 0.419 (5066s)
-step 4475/39780 lr 1.95e-03 loss 0.807028 grad_norm 0.592 (5091s)
-step 4500/39780 lr 1.95e-03 loss 0.645111 grad_norm 0.418 (5117s)
-step 4525/39780 lr 1.95e-03 loss 0.604398 grad_norm 0.341 (5142s)
-step 4550/39780 lr 1.95e-03 loss 0.674896 grad_norm 0.532 (5166s)
-step 4575/39780 lr 1.95e-03 loss 0.468988 grad_norm 0.319 (5191s)
-step 4600/39780 lr 1.95e-03 loss 0.614617 grad_norm 0.299 (5216s)
-step 4625/39780 lr 1.95e-03 loss 0.557115 grad_norm 0.471 (5240s)
-step 4650/39780 lr 1.95e-03 loss 0.549178 grad_norm 0.465 (5262s)
-step 4675/39780 lr 1.94e-03 loss 0.642426 grad_norm 0.638 (5283s)
-step 4700/39780 lr 1.94e-03 loss 0.694925 grad_norm 0.694 (5304s)
-step 4725/39780 lr 1.94e-03 loss 0.537307 grad_norm 0.266 (5326s)
-step 4750/39780 lr 1.94e-03 loss 0.734816 grad_norm 0.549 (5347s)
-step 4775/39780 lr 1.94e-03 loss 0.536931 grad_norm 0.436 (5368s)
-step 4800/39780 lr 1.94e-03 loss 0.570463 grad_norm 0.437 (5390s)
-step 4825/39780 lr 1.94e-03 loss 0.413114 grad_norm 0.366 (5412s)
-step 4850/39780 lr 1.94e-03 loss 0.510216 grad_norm 0.317 (5434s)
-step 4875/39780 lr 1.94e-03 loss 0.648710 grad_norm 0.316 (5456s)
-step 4900/39780 lr 1.94e-03 loss 0.680490 grad_norm 0.387 (5479s)
-step 4925/39780 lr 1.94e-03 loss 0.543687 grad_norm 0.360 (5502s)
-step 4950/39780 lr 1.94e-03 loss 0.684984 grad_norm 0.429 (5525s)
-step 4975/39780 lr 1.94e-03 loss 0.606521 grad_norm 0.407 (5549s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<01:01,  3.20it/s]eval:   4%|4         | 8/200 [00:02<00:59,  3.21it/s]eval:   6%|6         | 12/200 [00:03<00:57,  3.25it/s]eval:   8%|8         | 16/200 [00:04<00:56,  3.26it/s]eval:  10%|#         | 20/200 [00:06<00:54,  3.29it/s]eval:  12%|#2        | 24/200 [00:07<00:53,  3.27it/s]eval:  14%|#4        | 28/200 [00:08<00:52,  3.28it/s]eval:  16%|#6        | 32/200 [00:09<00:51,  3.25it/s]eval:  18%|#8        | 36/200 [00:11<00:50,  3.25it/s]eval:  20%|##        | 40/200 [00:12<00:49,  3.20it/s]eval:  22%|##2       | 44/200 [00:13<00:49,  3.16it/s]eval:  24%|##4       | 48/200 [00:14<00:47,  3.17it/s]eval:  26%|##6       | 52/200 [00:16<00:45,  3.22it/s]eval:  28%|##8       | 56/200 [00:17<00:44,  3.24it/s]eval:  30%|###       | 60/200 [00:18<00:43,  3.25it/s]eval:  32%|###2      | 64/200 [00:19<00:41,  3.24it/s]eval:  34%|###4      | 68/200 [00:21<00:40,  3.25it/s]eval:  36%|###6      | 72/200 [00:22<00:39,  3.24it/s]eval:  38%|###8      | 76/200 [00:23<00:38,  3.24it/s]eval:  40%|####      | 80/200 [00:24<00:36,  3.25it/s]eval:  42%|####2     | 84/200 [00:25<00:35,  3.26it/s]eval:  44%|####4     | 88/200 [00:27<00:34,  3.28it/s]eval:  46%|####6     | 92/200 [00:28<00:34,  3.18it/s]eval:  48%|####8     | 96/200 [00:29<00:33,  3.15it/s]eval:  50%|#####     | 100/200 [00:31<00:31,  3.15it/s]eval:  52%|#####2    | 104/200 [00:32<00:30,  3.18it/s]eval:  54%|#####4    | 108/200 [00:33<00:29,  3.14it/s]eval:  56%|#####6    | 112/200 [00:34<00:27,  3.17it/s]eval:  58%|#####8    | 116/200 [00:36<00:26,  3.20it/s]eval:  60%|######    | 120/200 [00:37<00:25,  3.19it/s]eval:  62%|######2   | 124/200 [00:38<00:23,  3.18it/s]eval:  64%|######4   | 128/200 [00:39<00:22,  3.19it/s]eval:  66%|######6   | 132/200 [00:41<00:21,  3.22it/s]eval:  68%|######8   | 136/200 [00:42<00:19,  3.24it/s]eval:  70%|#######   | 140/200 [00:43<00:18,  3.19it/s]eval:  72%|#######2  | 144/200 [00:44<00:17,  3.21it/s]eval:  74%|#######4  | 148/200 [00:45<00:16,  3.23it/s]eval:  76%|#######6  | 152/200 [00:47<00:14,  3.23it/s]eval:  78%|#######8  | 156/200 [00:48<00:13,  3.22it/s]eval:  80%|########  | 160/200 [00:49<00:12,  3.22it/s]eval:  82%|########2 | 164/200 [00:50<00:11,  3.22it/s]eval:  84%|########4 | 168/200 [00:52<00:09,  3.22it/s]eval:  86%|########6 | 172/200 [00:53<00:08,  3.20it/s]eval:  88%|########8 | 176/200 [00:54<00:07,  3.18it/s]eval:  90%|######### | 180/200 [00:55<00:06,  3.19it/s]eval:  92%|#########2| 184/200 [00:57<00:05,  3.16it/s]eval:  94%|#########3| 188/200 [00:58<00:03,  3.16it/s]eval:  96%|#########6| 192/200 [00:59<00:02,  3.17it/s]eval:  98%|#########8| 196/200 [01:01<00:01,  3.16it/s]eval: 100%|##########| 200/200 [01:02<00:00,  3.15it/s]                                                       EVAL step=4999 val_wp=0.669248 (t0=0.667305 t1=0.671191 rows=374199, subset)
-NEW BEST saved best_001_step4999_val0.669248.pt
-step 5000/39780 lr 1.94e-03 loss 0.675586 grad_norm 0.990 (5635s)
-step 5025/39780 lr 1.94e-03 loss 0.494803 grad_norm 0.372 (5659s)
-step 5050/39780 lr 1.93e-03 loss 0.417151 grad_norm 0.342 (5684s)
-step 5075/39780 lr 1.93e-03 loss 0.409493 grad_norm 0.320 (5710s)
-step 5100/39780 lr 1.93e-03 loss 0.555430 grad_norm 0.466 (5735s)
-step 5125/39780 lr 1.93e-03 loss 0.491595 grad_norm 0.324 (5760s)
-step 5150/39780 lr 1.93e-03 loss 0.521170 grad_norm 0.439 (5786s)
-step 5175/39780 lr 1.93e-03 loss 0.581024 grad_norm 0.598 (5812s)
-step 5200/39780 lr 1.93e-03 loss 0.511136 grad_norm 0.559 (5843s)
-step 5225/39780 lr 1.93e-03 loss 0.466227 grad_norm 0.568 (5876s)
-step 5250/39780 lr 1.93e-03 loss 0.557041 grad_norm 0.557 (5909s)
-step 5275/39780 lr 1.93e-03 loss 0.689293 grad_norm 0.598 (5939s)
-step 5300/39780 lr 1.93e-03 loss 0.520568 grad_norm 0.427 (5969s)
-step 5325/39780 lr 1.93e-03 loss 0.564266 grad_norm 0.448 (5997s)
-step 5350/39780 lr 1.93e-03 loss 0.602233 grad_norm 0.403 (6023s)
-step 5375/39780 lr 1.92e-03 loss 0.609197 grad_norm 0.591 (6050s)
-step 5400/39780 lr 1.92e-03 loss 0.553686 grad_norm 0.268 (6076s)
-step 5425/39780 lr 1.92e-03 loss 0.725293 grad_norm 0.789 (6102s)
-step 5450/39780 lr 1.92e-03 loss 0.575839 grad_norm 0.438 (6126s)
-step 5475/39780 lr 1.92e-03 loss 0.640388 grad_norm 0.525 (6152s)
-step 5500/39780 lr 1.92e-03 loss 0.578783 grad_norm 0.451 (6177s)
-step 5525/39780 lr 1.92e-03 loss 0.456104 grad_norm 0.417 (6202s)
-step 5550/39780 lr 1.92e-03 loss 0.520717 grad_norm 0.310 (6227s)
-step 5575/39780 lr 1.92e-03 loss 0.660009 grad_norm 0.566 (6251s)
-step 5600/39780 lr 1.92e-03 loss 0.676546 grad_norm 0.686 (6276s)
-step 5625/39780 lr 1.92e-03 loss 0.508758 grad_norm 0.590 (6301s)
-step 5650/39780 lr 1.92e-03 loss 0.561477 grad_norm 0.371 (6329s)
-step 5675/39780 lr 1.92e-03 loss 0.511454 grad_norm 0.314 (6355s)
-step 5700/39780 lr 1.91e-03 loss 0.534810 grad_norm 0.358 (6383s)
-step 5725/39780 lr 1.91e-03 loss 0.510547 grad_norm 0.504 (6409s)
-step 5750/39780 lr 1.91e-03 loss 0.477784 grad_norm 0.334 (6433s)
-step 5775/39780 lr 1.91e-03 loss 0.635078 grad_norm 0.481 (6460s)
-step 5800/39780 lr 1.91e-03 loss 0.636182 grad_norm 0.386 (6484s)
-step 5825/39780 lr 1.91e-03 loss 0.618187 grad_norm 0.480 (6510s)
-step 5850/39780 lr 1.91e-03 loss 0.573853 grad_norm 0.464 (6533s)
-step 5875/39780 lr 1.91e-03 loss 0.548509 grad_norm 0.391 (6557s)
-step 5900/39780 lr 1.91e-03 loss 0.542435 grad_norm 0.579 (6579s)
-step 5925/39780 lr 1.91e-03 loss 0.519271 grad_norm 0.468 (6602s)
-step 5950/39780 lr 1.91e-03 loss 0.695523 grad_norm 0.394 (6625s)
-step 5975/39780 lr 1.91e-03 loss 0.658040 grad_norm 0.576 (6649s)
-step 6000/39780 lr 1.90e-03 loss 0.549942 grad_norm 0.484 (6671s)
-step 6025/39780 lr 1.90e-03 loss 0.435405 grad_norm 0.468 (6693s)
-step 6050/39780 lr 1.90e-03 loss 0.675223 grad_norm 0.553 (6716s)
-step 6075/39780 lr 1.90e-03 loss 0.667595 grad_norm 0.548 (6738s)
-step 6100/39780 lr 1.90e-03 loss 0.623090 grad_norm 0.499 (6761s)
-step 6125/39780 lr 1.90e-03 loss 0.659658 grad_norm 0.387 (6784s)
-step 6150/39780 lr 1.90e-03 loss 0.632261 grad_norm 0.689 (6807s)
-step 6175/39780 lr 1.90e-03 loss 0.625463 grad_norm 0.529 (6830s)
-step 6200/39780 lr 1.90e-03 loss 0.667520 grad_norm 0.488 (6852s)
-step 6225/39780 lr 1.90e-03 loss 0.542462 grad_norm 0.537 (6875s)
-step 6250/39780 lr 1.90e-03 loss 0.568770 grad_norm 0.405 (6898s)
-step 6275/39780 lr 1.90e-03 loss 0.692192 grad_norm 0.543 (6921s)
-step 6300/39780 lr 1.89e-03 loss 0.598362 grad_norm 0.359 (6945s)
-step 6325/39780 lr 1.89e-03 loss 0.556119 grad_norm 0.318 (6970s)
-step 6350/39780 lr 1.89e-03 loss 0.648732 grad_norm 0.858 (6992s)
-step 6375/39780 lr 1.89e-03 loss 0.510995 grad_norm 0.501 (7014s)
-step 6400/39780 lr 1.89e-03 loss 0.583442 grad_norm 0.452 (7040s)
-step 6425/39780 lr 1.89e-03 loss 0.648655 grad_norm 0.685 (7065s)
-step 6450/39780 lr 1.89e-03 loss 0.493821 grad_norm 0.351 (7090s)
-step 6475/39780 lr 1.89e-03 loss 0.614471 grad_norm 0.429 (7115s)
-step 6500/39780 lr 1.89e-03 loss 0.561191 grad_norm 0.385 (7138s)
-step 6525/39780 lr 1.89e-03 loss 0.635969 grad_norm 0.412 (7162s)
-step 6550/39780 lr 1.89e-03 loss 0.615246 grad_norm 0.566 (7186s)
-step 6575/39780 lr 1.88e-03 loss 0.683771 grad_norm 0.323 (7209s)
-step 6600/39780 lr 1.88e-03 loss 0.579062 grad_norm 0.400 (7233s)
-step 6625/39780 lr 1.88e-03 loss 0.515339 grad_norm 0.290 (7256s)
-step 6650/39780 lr 1.88e-03 loss 0.539724 grad_norm 0.303 (7279s)
-step 6675/39780 lr 1.88e-03 loss 0.744895 grad_norm 0.680 (7301s)
-step 6700/39780 lr 1.88e-03 loss 0.544411 grad_norm 0.377 (7324s)
-step 6725/39780 lr 1.88e-03 loss 0.575544 grad_norm 0.480 (7348s)
-step 6750/39780 lr 1.88e-03 loss 0.531324 grad_norm 0.277 (7373s)
-step 6775/39780 lr 1.88e-03 loss 0.521564 grad_norm 0.350 (7398s)
-step 6800/39780 lr 1.88e-03 loss 0.567588 grad_norm 0.399 (7422s)
-step 6825/39780 lr 1.87e-03 loss 0.484835 grad_norm 0.504 (7446s)
-step 6850/39780 lr 1.87e-03 loss 0.546874 grad_norm 0.480 (7468s)
-step 6875/39780 lr 1.87e-03 loss 0.410837 grad_norm 0.461 (7492s)
-step 6900/39780 lr 1.87e-03 loss 0.523014 grad_norm 0.562 (7516s)
-step 6925/39780 lr 1.87e-03 loss 0.570197 grad_norm 0.526 (7539s)
-step 6950/39780 lr 1.87e-03 loss 0.742675 grad_norm 1.031 (7561s)
-step 6975/39780 lr 1.87e-03 loss 0.500764 grad_norm 0.424 (7584s)
-step 7000/39780 lr 1.87e-03 loss 0.552017 grad_norm 0.469 (7607s)
-step 7025/39780 lr 1.87e-03 loss 0.531803 grad_norm 0.223 (7630s)
-step 7050/39780 lr 1.87e-03 loss 0.529574 grad_norm 0.603 (7653s)
-step 7075/39780 lr 1.86e-03 loss 0.387529 grad_norm 0.290 (7676s)
-step 7100/39780 lr 1.86e-03 loss 0.420606 grad_norm 0.386 (7699s)
-step 7125/39780 lr 1.86e-03 loss 0.373204 grad_norm 0.315 (7723s)
-step 7150/39780 lr 1.86e-03 loss 0.560268 grad_norm 0.325 (7746s)
-step 7175/39780 lr 1.86e-03 loss 0.549128 grad_norm 0.294 (7769s)
-step 7200/39780 lr 1.86e-03 loss 0.498415 grad_norm 0.494 (7791s)
-step 7225/39780 lr 1.86e-03 loss 0.614634 grad_norm 0.514 (7813s)
-step 7250/39780 lr 1.86e-03 loss 0.564721 grad_norm 0.621 (7835s)
-step 7275/39780 lr 1.86e-03 loss 0.686310 grad_norm 0.713 (7857s)
-step 7300/39780 lr 1.86e-03 loss 0.657492 grad_norm 0.519 (7880s)
-step 7325/39780 lr 1.85e-03 loss 0.606260 grad_norm 0.560 (7902s)
-step 7350/39780 lr 1.85e-03 loss 0.573106 grad_norm 0.590 (7925s)
-step 7375/39780 lr 1.85e-03 loss 0.596660 grad_norm 0.493 (7947s)
-step 7400/39780 lr 1.85e-03 loss 0.705863 grad_norm 0.404 (7971s)
-step 7425/39780 lr 1.85e-03 loss 0.425577 grad_norm 0.312 (7994s)
-step 7450/39780 lr 1.85e-03 loss 0.640037 grad_norm 0.626 (8018s)
-step 7475/39780 lr 1.85e-03 loss 0.543427 grad_norm 0.383 (8042s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<00:58,  3.35it/s]eval:   4%|4         | 8/200 [00:02<00:54,  3.55it/s]eval:   6%|6         | 12/200 [00:03<00:52,  3.59it/s]eval:   8%|8         | 16/200 [00:04<00:51,  3.56it/s]eval:  10%|#         | 20/200 [00:05<00:49,  3.61it/s]eval:  12%|#2        | 24/200 [00:06<00:49,  3.56it/s]eval:  14%|#4        | 28/200 [00:07<00:47,  3.60it/s]eval:  16%|#6        | 32/200 [00:08<00:47,  3.56it/s]eval:  18%|#8        | 36/200 [00:10<00:45,  3.62it/s]eval:  20%|##        | 40/200 [00:11<00:43,  3.68it/s]eval:  22%|##2       | 44/200 [00:12<00:42,  3.63it/s]eval:  24%|##4       | 48/200 [00:13<00:41,  3.69it/s]eval:  26%|##6       | 52/200 [00:14<00:39,  3.70it/s]eval:  28%|##8       | 56/200 [00:15<00:39,  3.69it/s]eval:  30%|###       | 60/200 [00:16<00:37,  3.69it/s]eval:  32%|###2      | 64/200 [00:17<00:37,  3.65it/s]eval:  34%|###4      | 68/200 [00:18<00:36,  3.57it/s]eval:  36%|###6      | 72/200 [00:20<00:36,  3.47it/s]eval:  38%|###8      | 76/200 [00:21<00:36,  3.42it/s]eval:  40%|####      | 80/200 [00:22<00:34,  3.44it/s]eval:  42%|####2     | 84/200 [00:23<00:33,  3.44it/s]eval:  44%|####4     | 88/200 [00:24<00:32,  3.47it/s]eval:  46%|####6     | 92/200 [00:25<00:31,  3.40it/s]eval:  48%|####8     | 96/200 [00:27<00:31,  3.35it/s]eval:  50%|#####     | 100/200 [00:28<00:29,  3.41it/s]eval:  52%|#####2    | 104/200 [00:29<00:27,  3.45it/s]eval:  54%|#####4    | 108/200 [00:30<00:26,  3.42it/s]eval:  56%|#####6    | 112/200 [00:31<00:25,  3.45it/s]eval:  58%|#####8    | 116/200 [00:32<00:24,  3.42it/s]eval:  60%|######    | 120/200 [00:34<00:23,  3.42it/s]eval:  62%|######2   | 124/200 [00:35<00:21,  3.46it/s]eval:  64%|######4   | 128/200 [00:36<00:21,  3.41it/s]eval:  66%|######6   | 132/200 [00:37<00:19,  3.44it/s]eval:  68%|######8   | 136/200 [00:38<00:18,  3.47it/s]eval:  70%|#######   | 140/200 [00:39<00:17,  3.51it/s]eval:  72%|#######2  | 144/200 [00:40<00:15,  3.53it/s]eval:  74%|#######4  | 148/200 [00:42<00:14,  3.53it/s]eval:  76%|#######6  | 152/200 [00:43<00:13,  3.57it/s]eval:  78%|#######8  | 156/200 [00:44<00:12,  3.56it/s]eval:  80%|########  | 160/200 [00:45<00:11,  3.54it/s]eval:  82%|########2 | 164/200 [00:46<00:10,  3.55it/s]eval:  84%|########4 | 168/200 [00:47<00:09,  3.54it/s]eval:  86%|########6 | 172/200 [00:48<00:07,  3.51it/s]eval:  88%|########8 | 176/200 [00:50<00:06,  3.48it/s]eval:  90%|######### | 180/200 [00:51<00:05,  3.50it/s]eval:  92%|#########2| 184/200 [00:52<00:04,  3.51it/s]eval:  94%|#########3| 188/200 [00:53<00:03,  3.55it/s]eval:  96%|#########6| 192/200 [00:54<00:02,  3.53it/s]eval:  98%|#########8| 196/200 [00:55<00:01,  3.52it/s]eval: 100%|##########| 200/200 [00:56<00:00,  3.42it/s]                                                       EVAL step=7499 val_wp=0.675419 (t0=0.671315 t1=0.679523 rows=374199, subset)
-NEW BEST saved best_001_step7499_val0.675419.pt
-step 7500/39780 lr 1.85e-03 loss 0.598880 grad_norm 0.609 (8121s)
-step 7525/39780 lr 1.85e-03 loss 0.443716 grad_norm 0.389 (8143s)
-step 7550/39780 lr 1.85e-03 loss 0.503891 grad_norm 0.276 (8164s)
-step 7575/39780 lr 1.84e-03 loss 0.604132 grad_norm 0.404 (8187s)
-step 7600/39780 lr 1.84e-03 loss 0.613226 grad_norm 0.417 (8208s)
-step 7625/39780 lr 1.84e-03 loss 0.724588 grad_norm 0.331 (8230s)
-step 7650/39780 lr 1.84e-03 loss 0.665820 grad_norm 0.411 (8250s)
-step 7675/39780 lr 1.84e-03 loss 0.468513 grad_norm 0.266 (8272s)
-step 7700/39780 lr 1.84e-03 loss 0.617354 grad_norm 0.642 (8294s)
-step 7725/39780 lr 1.84e-03 loss 0.491709 grad_norm 0.341 (8315s)
-step 7750/39780 lr 1.84e-03 loss 0.560736 grad_norm 0.350 (8336s)
-step 7775/39780 lr 1.84e-03 loss 0.710333 grad_norm 0.787 (8357s)
-step 7800/39780 lr 1.83e-03 loss 0.737118 grad_norm 0.598 (8377s)
-step 7825/39780 lr 1.83e-03 loss 0.580820 grad_norm 0.440 (8398s)
-step 7850/39780 lr 1.83e-03 loss 0.605717 grad_norm 0.480 (8419s)
-step 7875/39780 lr 1.83e-03 loss 0.557320 grad_norm 0.311 (8440s)
-step 7900/39780 lr 1.83e-03 loss 0.609417 grad_norm 0.651 (8462s)
-step 7925/39780 lr 1.83e-03 loss 0.467903 grad_norm 0.360 (8483s)
-step 7950/39780 lr 1.83e-03 loss 0.671969 grad_norm 0.839 (8505s)
-step 7975/39780 lr 1.83e-03 loss 0.565872 grad_norm 0.332 (8525s)
-step 8000/39780 lr 1.83e-03 loss 0.628732 grad_norm 0.582 (8547s)
-step 8025/39780 lr 1.82e-03 loss 0.498809 grad_norm 0.474 (8568s)
-step 8050/39780 lr 1.82e-03 loss 0.560859 grad_norm 0.496 (8589s)
-step 8075/39780 lr 1.82e-03 loss 0.506956 grad_norm 0.670 (8612s)
-step 8100/39780 lr 1.82e-03 loss 0.610065 grad_norm 0.408 (8634s)
-step 8125/39780 lr 1.82e-03 loss 0.515280 grad_norm 0.461 (8654s)
-step 8150/39780 lr 1.82e-03 loss 0.473723 grad_norm 0.286 (8674s)
-step 8175/39780 lr 1.82e-03 loss 0.480128 grad_norm 0.431 (8695s)
-step 8200/39780 lr 1.82e-03 loss 0.620905 grad_norm 0.442 (8715s)
-step 8225/39780 lr 1.82e-03 loss 0.676634 grad_norm 0.647 (8736s)
-step 8250/39780 lr 1.81e-03 loss 0.439638 grad_norm 0.420 (8756s)
-step 8275/39780 lr 1.81e-03 loss 0.646826 grad_norm 0.391 (8777s)
-step 8300/39780 lr 1.81e-03 loss 0.501158 grad_norm 0.434 (8798s)
-step 8325/39780 lr 1.81e-03 loss 0.597162 grad_norm 0.432 (8819s)
-step 8350/39780 lr 1.81e-03 loss 0.657208 grad_norm 0.510 (8840s)
-step 8375/39780 lr 1.81e-03 loss 0.549486 grad_norm 0.486 (8862s)
-step 8400/39780 lr 1.81e-03 loss 0.530261 grad_norm 0.699 (8884s)
-step 8425/39780 lr 1.81e-03 loss 0.536613 grad_norm 0.436 (8906s)
-step 8450/39780 lr 1.80e-03 loss 0.538969 grad_norm 0.483 (8928s)
-step 8475/39780 lr 1.80e-03 loss 0.623538 grad_norm 0.387 (8951s)
-step 8500/39780 lr 1.80e-03 loss 0.511676 grad_norm 0.541 (8973s)
-step 8525/39780 lr 1.80e-03 loss 0.584521 grad_norm 0.238 (8996s)
-step 8550/39780 lr 1.80e-03 loss 0.645547 grad_norm 0.619 (9019s)
-step 8575/39780 lr 1.80e-03 loss 0.543743 grad_norm 0.379 (9042s)
-step 8600/39780 lr 1.80e-03 loss 0.581500 grad_norm 0.486 (9065s)
-step 8625/39780 lr 1.80e-03 loss 0.556538 grad_norm 0.393 (9088s)
-step 8650/39780 lr 1.79e-03 loss 0.566971 grad_norm 0.343 (9110s)
-step 8675/39780 lr 1.79e-03 loss 0.480423 grad_norm 0.395 (9133s)
-step 8700/39780 lr 1.79e-03 loss 0.659335 grad_norm 0.420 (9157s)
-step 8725/39780 lr 1.79e-03 loss 0.623126 grad_norm 0.521 (9180s)
-step 8750/39780 lr 1.79e-03 loss 0.479344 grad_norm 0.357 (9204s)
-step 8775/39780 lr 1.79e-03 loss 0.608867 grad_norm 0.603 (9228s)
-step 8800/39780 lr 1.79e-03 loss 0.571252 grad_norm 0.542 (9252s)
-step 8825/39780 lr 1.79e-03 loss 0.454488 grad_norm 0.420 (9275s)
-step 8850/39780 lr 1.79e-03 loss 0.510068 grad_norm 0.401 (9299s)
-step 8875/39780 lr 1.78e-03 loss 0.744865 grad_norm 0.629 (9323s)
-step 8900/39780 lr 1.78e-03 loss 0.748602 grad_norm 0.547 (9347s)
-step 8925/39780 lr 1.78e-03 loss 0.551566 grad_norm 0.357 (9371s)
-step 8950/39780 lr 1.78e-03 loss 0.654309 grad_norm 0.519 (9395s)
-step 8975/39780 lr 1.78e-03 loss 0.488734 grad_norm 0.365 (9419s)
-step 9000/39780 lr 1.78e-03 loss 0.562721 grad_norm 0.414 (9442s)
-step 9025/39780 lr 1.78e-03 loss 0.514071 grad_norm 0.351 (9466s)
-step 9050/39780 lr 1.78e-03 loss 0.616868 grad_norm 0.371 (9490s)
-step 9075/39780 lr 1.77e-03 loss 0.565872 grad_norm 0.404 (9514s)
-step 9100/39780 lr 1.77e-03 loss 0.485164 grad_norm 0.448 (9538s)
-step 9125/39780 lr 1.77e-03 loss 0.502022 grad_norm 0.768 (9562s)
-step 9150/39780 lr 1.77e-03 loss 0.632661 grad_norm 0.426 (9587s)
-step 9175/39780 lr 1.77e-03 loss 0.407123 grad_norm 0.236 (9611s)
-step 9200/39780 lr 1.77e-03 loss 0.561361 grad_norm 0.439 (9636s)
-step 9225/39780 lr 1.77e-03 loss 0.591031 grad_norm 0.580 (9665s)
-step 9250/39780 lr 1.76e-03 loss 0.573436 grad_norm 0.428 (9689s)
-step 9275/39780 lr 1.76e-03 loss 0.613245 grad_norm 0.427 (9712s)
-step 9300/39780 lr 1.76e-03 loss 0.511557 grad_norm 0.324 (9735s)
-step 9325/39780 lr 1.76e-03 loss 0.760026 grad_norm 0.967 (9757s)
-step 9350/39780 lr 1.76e-03 loss 0.543955 grad_norm 0.479 (9779s)
-step 9375/39780 lr 1.76e-03 loss 0.470589 grad_norm 0.452 (9802s)
-step 9400/39780 lr 1.76e-03 loss 0.382153 grad_norm 0.402 (9826s)
-step 9425/39780 lr 1.76e-03 loss 0.622763 grad_norm 0.489 (9853s)
-step 9450/39780 lr 1.75e-03 loss 0.621577 grad_norm 0.513 (9877s)
-step 9475/39780 lr 1.75e-03 loss 0.588010 grad_norm 0.463 (9901s)
-step 9500/39780 lr 1.75e-03 loss 0.627484 grad_norm 0.315 (9923s)
-step 9525/39780 lr 1.75e-03 loss 0.645065 grad_norm 0.374 (9945s)
-step 9550/39780 lr 1.75e-03 loss 0.562061 grad_norm 0.447 (9967s)
-step 9575/39780 lr 1.75e-03 loss 0.660511 grad_norm 0.834 (9990s)
-step 9600/39780 lr 1.75e-03 loss 0.515710 grad_norm 0.457 (10013s)
-step 9625/39780 lr 1.75e-03 loss 0.542378 grad_norm 0.707 (10037s)
-step 9650/39780 lr 1.74e-03 loss 0.459014 grad_norm 0.412 (10059s)
-step 9675/39780 lr 1.74e-03 loss 0.610949 grad_norm 0.430 (10082s)
-step 9700/39780 lr 1.74e-03 loss 0.594839 grad_norm 0.402 (10104s)
-step 9725/39780 lr 1.74e-03 loss 0.625798 grad_norm 0.528 (10127s)
-step 9750/39780 lr 1.74e-03 loss 0.595587 grad_norm 0.379 (10152s)
-step 9775/39780 lr 1.74e-03 loss 0.569067 grad_norm 0.427 (10176s)
-step 9800/39780 lr 1.74e-03 loss 0.513473 grad_norm 0.483 (10199s)
-step 9825/39780 lr 1.73e-03 loss 0.475349 grad_norm 0.353 (10222s)
-step 9850/39780 lr 1.73e-03 loss 0.543843 grad_norm 0.427 (10244s)
-step 9875/39780 lr 1.73e-03 loss 0.577849 grad_norm 0.368 (10266s)
-step 9900/39780 lr 1.73e-03 loss 0.585054 grad_norm 0.575 (10288s)
-step 9925/39780 lr 1.73e-03 loss 0.598821 grad_norm 0.762 (10311s)
-step 9950/39780 lr 1.73e-03 loss 0.563678 grad_norm 0.337 (10333s)
-step 9975/39780 lr 1.73e-03 loss 0.710201 grad_norm 0.554 (10354s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<00:51,  3.77it/s]eval:   4%|4         | 8/200 [00:02<00:51,  3.73it/s]eval:   6%|6         | 12/200 [00:03<00:49,  3.78it/s]eval:   8%|8         | 16/200 [00:04<00:49,  3.75it/s]eval:  10%|#         | 20/200 [00:05<00:47,  3.75it/s]eval:  12%|#2        | 24/200 [00:06<00:47,  3.74it/s]eval:  14%|#4        | 28/200 [00:07<00:45,  3.79it/s]eval:  16%|#6        | 32/200 [00:08<00:44,  3.80it/s]eval:  18%|#8        | 36/200 [00:09<00:43,  3.77it/s]eval:  20%|##        | 40/200 [00:10<00:42,  3.76it/s]eval:  22%|##2       | 44/200 [00:11<00:41,  3.78it/s]eval:  24%|##4       | 48/200 [00:12<00:40,  3.77it/s]eval:  26%|##6       | 52/200 [00:13<00:39,  3.78it/s]eval:  28%|##8       | 56/200 [00:14<00:37,  3.79it/s]eval:  30%|###       | 60/200 [00:15<00:36,  3.81it/s]eval:  32%|###2      | 64/200 [00:16<00:35,  3.80it/s]eval:  34%|###4      | 68/200 [00:18<00:35,  3.77it/s]eval:  36%|###6      | 72/200 [00:19<00:34,  3.76it/s]eval:  38%|###8      | 76/200 [00:20<00:33,  3.75it/s]eval:  40%|####      | 80/200 [00:21<00:31,  3.75it/s]eval:  42%|####2     | 84/200 [00:22<00:30,  3.77it/s]eval:  44%|####4     | 88/200 [00:23<00:29,  3.75it/s]eval:  46%|####6     | 92/200 [00:24<00:29,  3.69it/s]eval:  48%|####8     | 96/200 [00:25<00:28,  3.70it/s]eval:  50%|#####     | 100/200 [00:26<00:27,  3.65it/s]eval:  52%|#####2    | 104/200 [00:27<00:25,  3.69it/s]eval:  54%|#####4    | 108/200 [00:28<00:25,  3.65it/s]eval:  56%|#####6    | 112/200 [00:29<00:23,  3.70it/s]eval:  58%|#####8    | 116/200 [00:30<00:22,  3.75it/s]eval:  60%|######    | 120/200 [00:32<00:21,  3.75it/s]eval:  62%|######2   | 124/200 [00:33<00:20,  3.74it/s]eval:  64%|######4   | 128/200 [00:34<00:19,  3.75it/s]eval:  66%|######6   | 132/200 [00:35<00:18,  3.71it/s]eval:  68%|######8   | 136/200 [00:36<00:17,  3.73it/s]eval:  70%|#######   | 140/200 [00:37<00:16,  3.73it/s]eval:  72%|#######2  | 144/200 [00:38<00:14,  3.74it/s]eval:  74%|#######4  | 148/200 [00:39<00:13,  3.72it/s]eval:  76%|#######6  | 152/200 [00:40<00:12,  3.73it/s]eval:  78%|#######8  | 156/200 [00:41<00:11,  3.73it/s]eval:  80%|########  | 160/200 [00:42<00:10,  3.74it/s]eval:  82%|########2 | 164/200 [00:43<00:09,  3.76it/s]eval:  84%|########4 | 168/200 [00:44<00:08,  3.77it/s]eval:  86%|########6 | 172/200 [00:45<00:07,  3.76it/s]eval:  88%|########8 | 176/200 [00:46<00:06,  3.77it/s]eval:  90%|######### | 180/200 [00:48<00:05,  3.77it/s]eval:  92%|#########2| 184/200 [00:49<00:04,  3.78it/s]eval:  94%|#########3| 188/200 [00:50<00:03,  3.78it/s]eval:  96%|#########6| 192/200 [00:51<00:02,  3.77it/s]eval:  98%|#########8| 196/200 [00:52<00:01,  3.79it/s]eval: 100%|##########| 200/200 [00:53<00:00,  3.81it/s]                                                       EVAL step=9999 val_wp=0.672549 (t0=0.667954 t1=0.677143 rows=374199, subset)
-step 10000/39780 lr 1.72e-03 loss 0.568339 grad_norm 0.310 (10429s)
-step 10025/39780 lr 1.72e-03 loss 0.749355 grad_norm 0.654 (10450s)
-step 10050/39780 lr 1.72e-03 loss 0.712385 grad_norm 0.704 (10472s)
-step 10075/39780 lr 1.72e-03 loss 0.668182 grad_norm 0.480 (10494s)
-step 10100/39780 lr 1.72e-03 loss 0.469996 grad_norm 0.349 (10516s)
-step 10125/39780 lr 1.72e-03 loss 0.542370 grad_norm 0.578 (10538s)
-step 10150/39780 lr 1.72e-03 loss 0.523586 grad_norm 0.365 (10561s)
-step 10175/39780 lr 1.72e-03 loss 0.606675 grad_norm 0.320 (10582s)
-step 10200/39780 lr 1.71e-03 loss 0.584315 grad_norm 0.402 (10604s)
-step 10225/39780 lr 1.71e-03 loss 0.557778 grad_norm 0.423 (10625s)
-step 10250/39780 lr 1.71e-03 loss 0.618096 grad_norm 0.544 (10648s)
-step 10275/39780 lr 1.71e-03 loss 0.549850 grad_norm 0.549 (10669s)
-step 10300/39780 lr 1.71e-03 loss 0.587360 grad_norm 0.491 (10690s)
-step 10325/39780 lr 1.71e-03 loss 0.468274 grad_norm 0.475 (10711s)
-step 10350/39780 lr 1.71e-03 loss 0.497592 grad_norm 0.327 (10732s)
-step 10375/39780 lr 1.70e-03 loss 0.649665 grad_norm 0.451 (10753s)
-step 10400/39780 lr 1.70e-03 loss 0.675112 grad_norm 0.807 (10774s)
-step 10425/39780 lr 1.70e-03 loss 0.527586 grad_norm 0.253 (10796s)
-step 10450/39780 lr 1.70e-03 loss 0.656356 grad_norm 0.653 (10817s)
-step 10475/39780 lr 1.70e-03 loss 0.525327 grad_norm 0.502 (10838s)
-step 10500/39780 lr 1.70e-03 loss 0.668187 grad_norm 0.488 (10859s)
-step 10525/39780 lr 1.70e-03 loss 0.546174 grad_norm 0.443 (10880s)
-step 10550/39780 lr 1.69e-03 loss 0.543432 grad_norm 0.462 (10901s)
-step 10575/39780 lr 1.69e-03 loss 0.599064 grad_norm 0.283 (10922s)
-step 10600/39780 lr 1.69e-03 loss 0.499365 grad_norm 0.387 (10944s)
-step 10625/39780 lr 1.69e-03 loss 0.553206 grad_norm 0.440 (10965s)
-step 10650/39780 lr 1.69e-03 loss 0.535984 grad_norm 0.382 (10988s)
-step 10675/39780 lr 1.69e-03 loss 0.579257 grad_norm 0.601 (11011s)
-step 10700/39780 lr 1.69e-03 loss 0.510810 grad_norm 0.422 (11033s)
-step 10725/39780 lr 1.68e-03 loss 0.665177 grad_norm 0.523 (11055s)
-step 10750/39780 lr 1.68e-03 loss 0.514500 grad_norm 0.270 (11077s)
-step 10775/39780 lr 1.68e-03 loss 0.593140 grad_norm 0.388 (11099s)
-step 10800/39780 lr 1.68e-03 loss 0.521156 grad_norm 0.354 (11122s)
-step 10825/39780 lr 1.68e-03 loss 0.623714 grad_norm 0.444 (11144s)
-step 10850/39780 lr 1.68e-03 loss 0.632535 grad_norm 0.395 (11167s)
-step 10875/39780 lr 1.68e-03 loss 0.650766 grad_norm 0.654 (11189s)
-step 10900/39780 lr 1.67e-03 loss 0.519878 grad_norm 0.325 (11211s)
-step 10925/39780 lr 1.67e-03 loss 0.548057 grad_norm 0.391 (11234s)
-step 10950/39780 lr 1.67e-03 loss 0.704464 grad_norm 0.502 (11256s)
-step 10975/39780 lr 1.67e-03 loss 0.512508 grad_norm 0.530 (11277s)
-step 11000/39780 lr 1.67e-03 loss 0.523393 grad_norm 0.593 (11299s)
-step 11025/39780 lr 1.67e-03 loss 0.547489 grad_norm 0.483 (11320s)
-step 11050/39780 lr 1.66e-03 loss 0.464146 grad_norm 0.241 (11342s)
-step 11075/39780 lr 1.66e-03 loss 0.366993 grad_norm 0.223 (11364s)
-step 11100/39780 lr 1.66e-03 loss 0.504915 grad_norm 0.352 (11386s)
-step 11125/39780 lr 1.66e-03 loss 0.580369 grad_norm 0.405 (11408s)
-step 11150/39780 lr 1.66e-03 loss 0.590986 grad_norm 0.329 (11429s)
-step 11175/39780 lr 1.66e-03 loss 0.453860 grad_norm 0.382 (11450s)
-step 11200/39780 lr 1.66e-03 loss 0.549772 grad_norm 0.572 (11471s)
-step 11225/39780 lr 1.65e-03 loss 0.603282 grad_norm 0.605 (11493s)
-step 11250/39780 lr 1.65e-03 loss 0.464358 grad_norm 0.471 (11515s)
-step 11275/39780 lr 1.65e-03 loss 0.544716 grad_norm 0.443 (11536s)
-step 11300/39780 lr 1.65e-03 loss 0.558209 grad_norm 0.359 (11557s)
-step 11325/39780 lr 1.65e-03 loss 0.517221 grad_norm 0.345 (11579s)
-step 11350/39780 lr 1.65e-03 loss 0.617425 grad_norm 0.599 (11601s)
-step 11375/39780 lr 1.64e-03 loss 0.628990 grad_norm 0.431 (11623s)
-step 11400/39780 lr 1.64e-03 loss 0.502999 grad_norm 0.404 (11645s)
-step 11425/39780 lr 1.64e-03 loss 0.480790 grad_norm 0.360 (11666s)
-step 11450/39780 lr 1.64e-03 loss 0.410391 grad_norm 0.329 (11686s)
-step 11475/39780 lr 1.64e-03 loss 0.418701 grad_norm 0.247 (11707s)
-step 11500/39780 lr 1.64e-03 loss 0.593083 grad_norm 0.544 (11728s)
-step 11525/39780 lr 1.64e-03 loss 0.506317 grad_norm 0.631 (11748s)
-step 11550/39780 lr 1.63e-03 loss 0.580274 grad_norm 0.565 (11769s)
-step 11575/39780 lr 1.63e-03 loss 0.563490 grad_norm 0.439 (11790s)
-step 11600/39780 lr 1.63e-03 loss 0.538753 grad_norm 0.438 (11811s)
-step 11625/39780 lr 1.63e-03 loss 0.472491 grad_norm 0.282 (11832s)
-step 11650/39780 lr 1.63e-03 loss 0.625767 grad_norm 0.543 (11852s)
-step 11675/39780 lr 1.63e-03 loss 0.442000 grad_norm 0.414 (11873s)
-step 11700/39780 lr 1.62e-03 loss 0.658933 grad_norm 0.452 (11894s)
-step 11725/39780 lr 1.62e-03 loss 0.590249 grad_norm 0.385 (11915s)
-step 11750/39780 lr 1.62e-03 loss 0.498604 grad_norm 0.374 (11936s)
-step 11775/39780 lr 1.62e-03 loss 0.526233 grad_norm 0.258 (11957s)
-step 11800/39780 lr 1.62e-03 loss 0.554525 grad_norm 0.372 (11978s)
-step 11825/39780 lr 1.62e-03 loss 0.726555 grad_norm 0.755 (11998s)
-step 11850/39780 lr 1.62e-03 loss 0.697485 grad_norm 0.801 (12019s)
-step 11875/39780 lr 1.61e-03 loss 0.627524 grad_norm 0.511 (12040s)
-step 11900/39780 lr 1.61e-03 loss 0.679498 grad_norm 0.448 (12061s)
-step 11925/39780 lr 1.61e-03 loss 0.502558 grad_norm 0.327 (12083s)
-step 11950/39780 lr 1.61e-03 loss 0.664794 grad_norm 0.349 (12104s)
-step 11975/39780 lr 1.61e-03 loss 0.618212 grad_norm 0.692 (12125s)
-step 12000/39780 lr 1.61e-03 loss 0.482679 grad_norm 0.376 (12145s)
-step 12025/39780 lr 1.60e-03 loss 0.578855 grad_norm 0.461 (12166s)
-step 12050/39780 lr 1.60e-03 loss 0.689154 grad_norm 0.630 (12187s)
-step 12075/39780 lr 1.60e-03 loss 0.468165 grad_norm 0.308 (12208s)
-step 12100/39780 lr 1.60e-03 loss 0.582556 grad_norm 0.665 (12229s)
-step 12125/39780 lr 1.60e-03 loss 0.616396 grad_norm 0.627 (12250s)
-step 12150/39780 lr 1.60e-03 loss 0.576081 grad_norm 0.432 (12271s)
-step 12175/39780 lr 1.59e-03 loss 0.516915 grad_norm 0.317 (12293s)
-step 12200/39780 lr 1.59e-03 loss 0.609814 grad_norm 0.364 (12314s)
-step 12225/39780 lr 1.59e-03 loss 0.494069 grad_norm 0.441 (12335s)
-step 12250/39780 lr 1.59e-03 loss 0.595228 grad_norm 0.497 (12356s)
-step 12275/39780 lr 1.59e-03 loss 0.560657 grad_norm 0.336 (12377s)
-step 12300/39780 lr 1.59e-03 loss 0.620486 grad_norm 0.418 (12399s)
-step 12325/39780 lr 1.59e-03 loss 0.656836 grad_norm 0.478 (12420s)
-step 12350/39780 lr 1.58e-03 loss 0.681798 grad_norm 0.540 (12441s)
-step 12375/39780 lr 1.58e-03 loss 0.481032 grad_norm 0.499 (12462s)
-step 12400/39780 lr 1.58e-03 loss 0.548651 grad_norm 0.335 (12484s)
-step 12425/39780 lr 1.58e-03 loss 0.495593 grad_norm 0.403 (12505s)
-step 12450/39780 lr 1.58e-03 loss 0.589986 grad_norm 0.617 (12526s)
-step 12475/39780 lr 1.58e-03 loss 0.807675 grad_norm 0.681 (12547s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<00:53,  3.67it/s]eval:   4%|4         | 8/200 [00:02<00:51,  3.76it/s]eval:   6%|6         | 12/200 [00:03<00:50,  3.76it/s]eval:   8%|8         | 16/200 [00:04<00:47,  3.87it/s]eval:  10%|#         | 20/200 [00:05<00:46,  3.84it/s]eval:  12%|#2        | 24/200 [00:06<00:45,  3.88it/s]eval:  14%|#4        | 28/200 [00:07<00:44,  3.89it/s]eval:  16%|#6        | 32/200 [00:08<00:43,  3.91it/s]eval:  18%|#8        | 36/200 [00:09<00:42,  3.85it/s]eval:  20%|##        | 40/200 [00:10<00:41,  3.87it/s]eval:  22%|##2       | 44/200 [00:11<00:40,  3.86it/s]eval:  24%|##4       | 48/200 [00:12<00:39,  3.85it/s]eval:  26%|##6       | 52/200 [00:13<00:38,  3.89it/s]eval:  28%|##8       | 56/200 [00:14<00:37,  3.80it/s]eval:  30%|###       | 60/200 [00:15<00:36,  3.84it/s]eval:  32%|###2      | 64/200 [00:16<00:35,  3.81it/s]eval:  34%|###4      | 68/200 [00:17<00:34,  3.87it/s]eval:  36%|###6      | 72/200 [00:18<00:32,  3.89it/s]eval:  38%|###8      | 76/200 [00:19<00:31,  3.88it/s]eval:  40%|####      | 80/200 [00:20<00:30,  3.88it/s]eval:  42%|####2     | 84/200 [00:21<00:29,  3.88it/s]eval:  44%|####4     | 88/200 [00:22<00:28,  3.87it/s]eval:  46%|####6     | 92/200 [00:23<00:27,  3.87it/s]eval:  48%|####8     | 96/200 [00:24<00:26,  3.88it/s]eval:  50%|#####     | 100/200 [00:25<00:25,  3.91it/s]eval:  52%|#####2    | 104/200 [00:26<00:24,  3.87it/s]eval:  54%|#####4    | 108/200 [00:27<00:23,  3.90it/s]eval:  56%|#####6    | 112/200 [00:28<00:22,  3.90it/s]eval:  58%|#####8    | 116/200 [00:30<00:21,  3.86it/s]eval:  60%|######    | 120/200 [00:31<00:20,  3.89it/s]eval:  62%|######2   | 124/200 [00:32<00:19,  3.90it/s]eval:  64%|######4   | 128/200 [00:33<00:18,  3.89it/s]eval:  66%|######6   | 132/200 [00:34<00:17,  3.86it/s]eval:  68%|######8   | 136/200 [00:35<00:16,  3.88it/s]eval:  70%|#######   | 140/200 [00:36<00:15,  3.90it/s]eval:  72%|#######2  | 144/200 [00:37<00:14,  3.90it/s]eval:  74%|#######4  | 148/200 [00:38<00:13,  3.86it/s]eval:  76%|#######6  | 152/200 [00:39<00:12,  3.87it/s]eval:  78%|#######8  | 156/200 [00:40<00:11,  3.90it/s]eval:  80%|########  | 160/200 [00:41<00:10,  3.91it/s]eval:  82%|########2 | 164/200 [00:42<00:09,  3.84it/s]eval:  84%|########4 | 168/200 [00:43<00:08,  3.80it/s]eval:  86%|########6 | 172/200 [00:44<00:07,  3.80it/s]eval:  88%|########8 | 176/200 [00:45<00:06,  3.78it/s]eval:  90%|######### | 180/200 [00:46<00:05,  3.77it/s]eval:  92%|#########2| 184/200 [00:47<00:04,  3.80it/s]eval:  94%|#########3| 188/200 [00:48<00:03,  3.85it/s]eval:  96%|#########6| 192/200 [00:49<00:02,  3.84it/s]eval:  98%|#########8| 196/200 [00:50<00:01,  3.88it/s]eval: 100%|##########| 200/200 [00:51<00:00,  3.87it/s]                                                       EVAL step=12499 val_wp=0.672501 (t0=0.670780 t1=0.674221 rows=374199, subset)
-step 12500/39780 lr 1.57e-03 loss 0.420810 grad_norm 0.213 (12620s)
-step 12525/39780 lr 1.57e-03 loss 0.604578 grad_norm 0.866 (12641s)
-step 12550/39780 lr 1.57e-03 loss 0.652191 grad_norm 0.535 (12662s)
-step 12575/39780 lr 1.57e-03 loss 0.525231 grad_norm 0.515 (12683s)
-step 12600/39780 lr 1.57e-03 loss 0.587165 grad_norm 0.303 (12704s)
-step 12625/39780 lr 1.57e-03 loss 0.586362 grad_norm 0.277 (12725s)
-step 12650/39780 lr 1.56e-03 loss 0.487826 grad_norm 0.669 (12746s)
-step 12675/39780 lr 1.56e-03 loss 0.582891 grad_norm 0.387 (12768s)
-step 12700/39780 lr 1.56e-03 loss 0.451371 grad_norm 0.321 (12789s)
-step 12725/39780 lr 1.56e-03 loss 0.698086 grad_norm 0.510 (12811s)
-step 12750/39780 lr 1.56e-03 loss 0.567385 grad_norm 0.336 (12833s)
-step 12775/39780 lr 1.56e-03 loss 0.521767 grad_norm 0.304 (12855s)
-step 12800/39780 lr 1.55e-03 loss 0.578079 grad_norm 0.402 (12876s)
-step 12825/39780 lr 1.55e-03 loss 0.609375 grad_norm 0.638 (12897s)
-step 12850/39780 lr 1.55e-03 loss 0.644569 grad_norm 0.551 (12917s)
-step 12875/39780 lr 1.55e-03 loss 0.526812 grad_norm 0.495 (12938s)
-step 12900/39780 lr 1.55e-03 loss 0.492249 grad_norm 0.285 (12959s)
-step 12925/39780 lr 1.55e-03 loss 0.618430 grad_norm 0.468 (12980s)
-step 12950/39780 lr 1.54e-03 loss 0.529067 grad_norm 0.411 (13001s)
-step 12975/39780 lr 1.54e-03 loss 0.658687 grad_norm 0.817 (13022s)
-step 13000/39780 lr 1.54e-03 loss 0.616719 grad_norm 0.590 (13042s)
-step 13025/39780 lr 1.54e-03 loss 0.437775 grad_norm 0.352 (13065s)
-step 13050/39780 lr 1.54e-03 loss 0.532726 grad_norm 0.352 (13086s)
-step 13075/39780 lr 1.54e-03 loss 0.617161 grad_norm 0.552 (13106s)
-step 13100/39780 lr 1.53e-03 loss 0.602105 grad_norm 0.604 (13127s)
-step 13125/39780 lr 1.53e-03 loss 0.610794 grad_norm 0.694 (13147s)
-step 13150/39780 lr 1.53e-03 loss 0.562528 grad_norm 0.472 (13168s)
-step 13175/39780 lr 1.53e-03 loss 0.687939 grad_norm 0.434 (13189s)
-step 13200/39780 lr 1.53e-03 loss 0.535664 grad_norm 0.290 (13210s)
-step 13225/39780 lr 1.53e-03 loss 0.536384 grad_norm 0.448 (13230s)
-step 13250/39780 lr 1.52e-03 loss 0.523274 grad_norm 0.817 (13251s)
-step 13275/39780 lr 1.52e-03 loss 0.548637 grad_norm 0.327 (13272s)
-step 13300/39780 lr 1.52e-03 loss 0.490224 grad_norm 0.358 (13294s)
-step 13325/39780 lr 1.52e-03 loss 0.614802 grad_norm 0.503 (13316s)
-step 13350/39780 lr 1.52e-03 loss 0.553024 grad_norm 0.365 (13337s)
-step 13375/39780 lr 1.52e-03 loss 0.645372 grad_norm 0.499 (13357s)
-step 13400/39780 lr 1.51e-03 loss 0.480193 grad_norm 0.273 (13377s)
-step 13425/39780 lr 1.51e-03 loss 0.579033 grad_norm 0.477 (13398s)
-step 13450/39780 lr 1.51e-03 loss 0.526342 grad_norm 0.452 (13418s)
-step 13475/39780 lr 1.51e-03 loss 0.445922 grad_norm 0.753 (13439s)
-step 13500/39780 lr 1.51e-03 loss 0.491313 grad_norm 0.458 (13460s)
-step 13525/39780 lr 1.50e-03 loss 0.452692 grad_norm 0.492 (13481s)
-step 13550/39780 lr 1.50e-03 loss 0.512912 grad_norm 0.605 (13502s)
-step 13575/39780 lr 1.50e-03 loss 0.498524 grad_norm 0.445 (13523s)
-step 13600/39780 lr 1.50e-03 loss 0.509032 grad_norm 0.578 (13544s)
-step 13625/39780 lr 1.50e-03 loss 0.538201 grad_norm 0.515 (13564s)
-step 13650/39780 lr 1.50e-03 loss 0.652992 grad_norm 0.384 (13586s)
-step 13675/39780 lr 1.49e-03 loss 0.517918 grad_norm 0.373 (13607s)
-step 13700/39780 lr 1.49e-03 loss 0.435369 grad_norm 0.450 (13627s)
-step 13725/39780 lr 1.49e-03 loss 0.570882 grad_norm 0.396 (13648s)
-step 13750/39780 lr 1.49e-03 loss 0.485682 grad_norm 0.278 (13669s)
-step 13775/39780 lr 1.49e-03 loss 0.589468 grad_norm 0.392 (13690s)
-step 13800/39780 lr 1.49e-03 loss 0.677529 grad_norm 0.345 (13710s)
-step 13825/39780 lr 1.48e-03 loss 0.511463 grad_norm 0.487 (13731s)
-step 13850/39780 lr 1.48e-03 loss 0.493187 grad_norm 0.454 (13752s)
-step 13875/39780 lr 1.48e-03 loss 0.472234 grad_norm 0.508 (13772s)
-step 13900/39780 lr 1.48e-03 loss 0.547300 grad_norm 0.586 (13792s)
-step 13925/39780 lr 1.48e-03 loss 0.518044 grad_norm 0.343 (13813s)
-step 13950/39780 lr 1.48e-03 loss 0.642005 grad_norm 0.432 (13834s)
-step 13975/39780 lr 1.47e-03 loss 0.434237 grad_norm 0.264 (13854s)
-step 14000/39780 lr 1.47e-03 loss 0.611951 grad_norm 0.684 (13876s)
-step 14025/39780 lr 1.47e-03 loss 0.564436 grad_norm 0.324 (13896s)
-step 14050/39780 lr 1.47e-03 loss 0.526125 grad_norm 0.410 (13917s)
-step 14075/39780 lr 1.47e-03 loss 0.649285 grad_norm 0.673 (13938s)
-step 14100/39780 lr 1.46e-03 loss 0.660131 grad_norm 0.409 (13960s)
-step 14125/39780 lr 1.46e-03 loss 0.570408 grad_norm 0.343 (13982s)
-step 14150/39780 lr 1.46e-03 loss 0.682569 grad_norm 0.893 (14005s)
-step 14175/39780 lr 1.46e-03 loss 0.503230 grad_norm 0.368 (14027s)
-step 14200/39780 lr 1.46e-03 loss 0.660705 grad_norm 0.409 (14051s)
-step 14225/39780 lr 1.46e-03 loss 0.488853 grad_norm 0.363 (14073s)
-step 14250/39780 lr 1.45e-03 loss 0.685336 grad_norm 0.286 (14094s)
-step 14275/39780 lr 1.45e-03 loss 0.697997 grad_norm 0.559 (14116s)
-step 14300/39780 lr 1.45e-03 loss 0.529894 grad_norm 0.404 (14138s)
-step 14325/39780 lr 1.45e-03 loss 0.529805 grad_norm 0.498 (14161s)
-step 14350/39780 lr 1.45e-03 loss 0.495173 grad_norm 0.585 (14185s)
-step 14375/39780 lr 1.44e-03 loss 0.465925 grad_norm 0.387 (14208s)
-step 14400/39780 lr 1.44e-03 loss 0.611869 grad_norm 0.474 (14230s)
-step 14425/39780 lr 1.44e-03 loss 0.580359 grad_norm 0.426 (14252s)
-step 14450/39780 lr 1.44e-03 loss 0.615470 grad_norm 0.414 (14274s)
-step 14475/39780 lr 1.44e-03 loss 0.620562 grad_norm 0.798 (14296s)
-step 14500/39780 lr 1.44e-03 loss 0.609600 grad_norm 0.454 (14317s)
-step 14525/39780 lr 1.43e-03 loss 0.646664 grad_norm 0.512 (14339s)
-step 14550/39780 lr 1.43e-03 loss 0.522400 grad_norm 0.300 (14360s)
-step 14575/39780 lr 1.43e-03 loss 0.458954 grad_norm 0.389 (14382s)
-step 14600/39780 lr 1.43e-03 loss 0.674733 grad_norm 0.514 (14404s)
-step 14625/39780 lr 1.43e-03 loss 0.699948 grad_norm 0.491 (14425s)
-step 14650/39780 lr 1.43e-03 loss 0.441891 grad_norm 0.302 (14447s)
-step 14675/39780 lr 1.42e-03 loss 0.626430 grad_norm 0.341 (14469s)
-step 14700/39780 lr 1.42e-03 loss 0.548046 grad_norm 0.418 (14491s)
-step 14725/39780 lr 1.42e-03 loss 0.712377 grad_norm 0.396 (14513s)
-step 14750/39780 lr 1.42e-03 loss 0.860757 grad_norm 0.770 (14535s)
-step 14775/39780 lr 1.42e-03 loss 0.675657 grad_norm 0.525 (14556s)
-step 14800/39780 lr 1.41e-03 loss 0.499274 grad_norm 0.330 (14577s)
-step 14825/39780 lr 1.41e-03 loss 0.684427 grad_norm 0.615 (14599s)
-step 14850/39780 lr 1.41e-03 loss 0.604523 grad_norm 0.380 (14621s)
-step 14875/39780 lr 1.41e-03 loss 0.622667 grad_norm 0.505 (14644s)
-step 14900/39780 lr 1.41e-03 loss 0.787101 grad_norm 0.595 (14667s)
-step 14925/39780 lr 1.41e-03 loss 0.557576 grad_norm 0.462 (14690s)
-step 14950/39780 lr 1.40e-03 loss 0.487282 grad_norm 0.339 (14713s)
-step 14975/39780 lr 1.40e-03 loss 0.581385 grad_norm 0.609 (14735s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<01:00,  3.23it/s]eval:   4%|4         | 8/200 [00:02<00:57,  3.32it/s]eval:   6%|6         | 12/200 [00:03<00:58,  3.24it/s]eval:   8%|8         | 16/200 [00:04<00:56,  3.27it/s]eval:  10%|#         | 20/200 [00:06<00:53,  3.36it/s]eval:  12%|#2        | 24/200 [00:07<00:51,  3.40it/s]eval:  14%|#4        | 28/200 [00:08<00:49,  3.48it/s]eval:  16%|#6        | 32/200 [00:09<00:49,  3.42it/s]eval:  18%|#8        | 36/200 [00:10<00:48,  3.35it/s]eval:  20%|##        | 40/200 [00:12<00:49,  3.24it/s]eval:  22%|##2       | 44/200 [00:13<00:49,  3.14it/s]eval:  24%|##4       | 48/200 [00:14<00:49,  3.10it/s]eval:  26%|##6       | 52/200 [00:16<00:47,  3.13it/s]eval:  28%|##8       | 56/200 [00:17<00:43,  3.27it/s]eval:  30%|###       | 60/200 [00:18<00:42,  3.32it/s]eval:  32%|###2      | 64/200 [00:19<00:41,  3.27it/s]eval:  34%|###4      | 68/200 [00:20<00:42,  3.09it/s]eval:  36%|###6      | 72/200 [00:22<00:40,  3.18it/s]eval:  38%|###8      | 76/200 [00:23<00:38,  3.26it/s]eval:  40%|####      | 80/200 [00:24<00:35,  3.35it/s]eval:  42%|####2     | 84/200 [00:25<00:34,  3.36it/s]eval:  44%|####4     | 88/200 [00:26<00:33,  3.39it/s]eval:  46%|####6     | 92/200 [00:27<00:32,  3.36it/s]eval:  48%|####8     | 96/200 [00:29<00:30,  3.40it/s]eval:  50%|#####     | 100/200 [00:30<00:29,  3.44it/s]eval:  52%|#####2    | 104/200 [00:31<00:28,  3.40it/s]eval:  54%|#####4    | 108/200 [00:32<00:27,  3.36it/s]eval:  56%|#####6    | 112/200 [00:33<00:25,  3.43it/s]eval:  58%|#####8    | 116/200 [00:34<00:24,  3.49it/s]eval:  60%|######    | 120/200 [00:36<00:23,  3.47it/s]eval:  62%|######2   | 124/200 [00:37<00:22,  3.38it/s]eval:  64%|######4   | 128/200 [00:38<00:21,  3.36it/s]eval:  66%|######6   | 132/200 [00:39<00:19,  3.42it/s]eval:  68%|######8   | 136/200 [00:40<00:18,  3.39it/s]eval:  70%|#######   | 140/200 [00:42<00:17,  3.38it/s]eval:  72%|#######2  | 144/200 [00:43<00:16,  3.43it/s]eval:  74%|#######4  | 148/200 [00:44<00:15,  3.44it/s]eval:  76%|#######6  | 152/200 [00:45<00:14,  3.42it/s]eval:  78%|#######8  | 156/200 [00:46<00:12,  3.43it/s]eval:  80%|########  | 160/200 [00:47<00:11,  3.47it/s]eval:  82%|########2 | 164/200 [00:48<00:10,  3.51it/s]eval:  84%|########4 | 168/200 [00:50<00:09,  3.53it/s]eval:  86%|########6 | 172/200 [00:51<00:07,  3.56it/s]eval:  88%|########8 | 176/200 [00:52<00:06,  3.60it/s]eval:  90%|######### | 180/200 [00:53<00:05,  3.60it/s]eval:  92%|#########2| 184/200 [00:54<00:04,  3.59it/s]eval:  94%|#########3| 188/200 [00:55<00:03,  3.68it/s]eval:  96%|#########6| 192/200 [00:56<00:02,  3.70it/s]eval:  98%|#########8| 196/200 [00:57<00:01,  3.68it/s]eval: 100%|##########| 200/200 [00:58<00:00,  3.72it/s]                                                       EVAL step=14999 val_wp=0.676435 (t0=0.673845 t1=0.679024 rows=374199, subset)
-NEW BEST saved best_001_step14999_val0.676435.pt
-step 15000/39780 lr 1.40e-03 loss 0.558083 grad_norm 0.749 (14818s)
-step 15025/39780 lr 1.40e-03 loss 0.474225 grad_norm 0.297 (14840s)
-step 15050/39780 lr 1.40e-03 loss 0.651823 grad_norm 0.638 (14862s)
-step 15075/39780 lr 1.39e-03 loss 0.818418 grad_norm 0.659 (14883s)
-step 15100/39780 lr 1.39e-03 loss 0.494711 grad_norm 0.271 (14904s)
-step 15125/39780 lr 1.39e-03 loss 0.704135 grad_norm 0.590 (14925s)
-step 15150/39780 lr 1.39e-03 loss 0.582866 grad_norm 0.611 (14948s)
-step 15175/39780 lr 1.39e-03 loss 0.579866 grad_norm 0.625 (14970s)
-step 15200/39780 lr 1.38e-03 loss 0.631375 grad_norm 0.477 (14992s)
-step 15225/39780 lr 1.38e-03 loss 0.572027 grad_norm 0.377 (15013s)
-step 15250/39780 lr 1.38e-03 loss 0.610195 grad_norm 0.497 (15035s)
-step 15275/39780 lr 1.38e-03 loss 0.698747 grad_norm 0.385 (15056s)
-step 15300/39780 lr 1.38e-03 loss 0.519689 grad_norm 0.413 (15077s)
-step 15325/39780 lr 1.38e-03 loss 0.547915 grad_norm 0.395 (15098s)
-step 15350/39780 lr 1.37e-03 loss 0.545870 grad_norm 0.338 (15119s)
-step 15375/39780 lr 1.37e-03 loss 0.587278 grad_norm 0.477 (15141s)
-step 15400/39780 lr 1.37e-03 loss 0.651440 grad_norm 0.511 (15163s)
-step 15425/39780 lr 1.37e-03 loss 0.656278 grad_norm 0.469 (15208s)
-step 15450/39780 lr 1.37e-03 loss 0.464548 grad_norm 0.539 (15229s)
-step 15475/39780 lr 1.36e-03 loss 0.522413 grad_norm 0.376 (15252s)
-step 15500/39780 lr 1.36e-03 loss 0.519502 grad_norm 0.239 (15274s)
-step 15525/39780 lr 1.36e-03 loss 0.642243 grad_norm 0.537 (15295s)
-step 15550/39780 lr 1.36e-03 loss 0.522347 grad_norm 0.316 (15316s)
-step 15575/39780 lr 1.36e-03 loss 0.501974 grad_norm 0.425 (15336s)
-step 15600/39780 lr 1.36e-03 loss 0.763191 grad_norm 0.899 (15358s)
-step 15625/39780 lr 1.35e-03 loss 0.440603 grad_norm 0.293 (15380s)
-step 15650/39780 lr 1.35e-03 loss 0.539565 grad_norm 0.458 (15402s)
-step 15675/39780 lr 1.35e-03 loss 0.550359 grad_norm 0.484 (15424s)
-step 15700/39780 lr 1.35e-03 loss 0.568818 grad_norm 0.520 (15446s)
-step 15725/39780 lr 1.35e-03 loss 0.507531 grad_norm 0.442 (15467s)
-step 15750/39780 lr 1.34e-03 loss 0.679694 grad_norm 0.414 (15489s)
-step 15775/39780 lr 1.34e-03 loss 0.564953 grad_norm 0.512 (15511s)
-step 15800/39780 lr 1.34e-03 loss 0.705272 grad_norm 0.832 (15532s)
-step 15825/39780 lr 1.34e-03 loss 0.613800 grad_norm 0.383 (15554s)
-step 15850/39780 lr 1.34e-03 loss 0.592791 grad_norm 0.464 (15575s)
-step 15875/39780 lr 1.33e-03 loss 0.525325 grad_norm 0.333 (15595s)
-step 15900/39780 lr 1.33e-03 loss 0.650246 grad_norm 0.603 (15617s)
-step 15925/39780 lr 1.33e-03 loss 0.630634 grad_norm 0.290 (15638s)
-step 15950/39780 lr 1.33e-03 loss 0.501097 grad_norm 0.478 (15660s)
-step 15975/39780 lr 1.33e-03 loss 0.582427 grad_norm 0.470 (15682s)
-step 16000/39780 lr 1.33e-03 loss 0.582392 grad_norm 0.325 (15704s)
-step 16025/39780 lr 1.32e-03 loss 0.636786 grad_norm 0.594 (15726s)
-step 16050/39780 lr 1.32e-03 loss 0.579099 grad_norm 0.474 (15749s)
-step 16075/39780 lr 1.32e-03 loss 0.529231 grad_norm 0.415 (15773s)
-step 16100/39780 lr 1.32e-03 loss 0.507714 grad_norm 0.377 (15795s)
-step 16125/39780 lr 1.32e-03 loss 0.637922 grad_norm 0.342 (15817s)
-step 16150/39780 lr 1.31e-03 loss 0.565321 grad_norm 0.341 (15839s)
-step 16175/39780 lr 1.31e-03 loss 0.543082 grad_norm 0.535 (15861s)
-step 16200/39780 lr 1.31e-03 loss 0.587811 grad_norm 0.566 (15886s)
-step 16225/39780 lr 1.31e-03 loss 0.684292 grad_norm 0.632 (15909s)
-step 16250/39780 lr 1.31e-03 loss 0.589753 grad_norm 0.593 (15931s)
-step 16275/39780 lr 1.30e-03 loss 0.607543 grad_norm 0.712 (15954s)
-step 16300/39780 lr 1.30e-03 loss 0.655695 grad_norm 0.594 (15976s)
-step 16325/39780 lr 1.30e-03 loss 0.567961 grad_norm 0.322 (16000s)
-step 16350/39780 lr 1.30e-03 loss 0.601258 grad_norm 0.342 (16021s)
-step 16375/39780 lr 1.30e-03 loss 0.627473 grad_norm 0.458 (16044s)
-step 16400/39780 lr 1.29e-03 loss 0.558400 grad_norm 0.383 (16067s)
-step 16425/39780 lr 1.29e-03 loss 0.557526 grad_norm 0.400 (16089s)
-step 16450/39780 lr 1.29e-03 loss 0.501469 grad_norm 0.388 (16111s)
-step 16475/39780 lr 1.29e-03 loss 0.551902 grad_norm 0.442 (16133s)
-step 16500/39780 lr 1.29e-03 loss 0.596278 grad_norm 0.599 (16154s)
-step 16525/39780 lr 1.29e-03 loss 0.667898 grad_norm 0.607 (16174s)
-step 16550/39780 lr 1.28e-03 loss 0.533533 grad_norm 0.414 (16194s)
-step 16575/39780 lr 1.28e-03 loss 0.508224 grad_norm 0.408 (16214s)
-step 16600/39780 lr 1.28e-03 loss 0.537063 grad_norm 0.385 (16235s)
-step 16625/39780 lr 1.28e-03 loss 0.498008 grad_norm 0.496 (16255s)
-step 16650/39780 lr 1.28e-03 loss 0.614663 grad_norm 0.750 (16277s)
-step 16675/39780 lr 1.27e-03 loss 0.463148 grad_norm 0.242 (16299s)
-step 16700/39780 lr 1.27e-03 loss 0.527347 grad_norm 0.395 (16320s)
-step 16725/39780 lr 1.27e-03 loss 0.539770 grad_norm 0.426 (16342s)
-step 16750/39780 lr 1.27e-03 loss 0.618186 grad_norm 0.514 (16363s)
-step 16775/39780 lr 1.27e-03 loss 0.467427 grad_norm 0.339 (16384s)
-step 16800/39780 lr 1.26e-03 loss 0.649105 grad_norm 0.766 (16405s)
-step 16825/39780 lr 1.26e-03 loss 0.739931 grad_norm 0.695 (16426s)
-step 16850/39780 lr 1.26e-03 loss 0.614998 grad_norm 0.474 (16448s)
-step 16875/39780 lr 1.26e-03 loss 0.513646 grad_norm 0.324 (16470s)
-step 16900/39780 lr 1.26e-03 loss 0.512465 grad_norm 0.339 (16493s)
-step 16925/39780 lr 1.25e-03 loss 0.617432 grad_norm 0.777 (16515s)
-step 16950/39780 lr 1.25e-03 loss 0.727656 grad_norm 0.412 (16537s)
-step 16975/39780 lr 1.25e-03 loss 0.647968 grad_norm 0.564 (16558s)
-step 17000/39780 lr 1.25e-03 loss 0.537944 grad_norm 0.444 (16578s)
-step 17025/39780 lr 1.25e-03 loss 0.530674 grad_norm 0.439 (16599s)
-step 17050/39780 lr 1.24e-03 loss 0.474208 grad_norm 0.408 (16620s)
-step 17075/39780 lr 1.24e-03 loss 0.536557 grad_norm 0.374 (16640s)
-step 17100/39780 lr 1.24e-03 loss 0.592934 grad_norm 0.576 (16661s)
-step 17125/39780 lr 1.24e-03 loss 0.542588 grad_norm 0.379 (16682s)
-step 17150/39780 lr 1.24e-03 loss 0.556305 grad_norm 0.624 (16704s)
-step 17175/39780 lr 1.23e-03 loss 0.422325 grad_norm 0.302 (16725s)
-step 17200/39780 lr 1.23e-03 loss 0.569499 grad_norm 0.505 (16747s)
-step 17225/39780 lr 1.23e-03 loss 0.559484 grad_norm 0.267 (16770s)
-step 17250/39780 lr 1.23e-03 loss 0.650038 grad_norm 0.580 (16793s)
-step 17275/39780 lr 1.23e-03 loss 0.577350 grad_norm 0.451 (16817s)
-step 17300/39780 lr 1.23e-03 loss 0.489042 grad_norm 0.371 (16842s)
-step 17325/39780 lr 1.22e-03 loss 0.480121 grad_norm 0.282 (16869s)
-step 17350/39780 lr 1.22e-03 loss 0.648625 grad_norm 0.773 (16894s)
-step 17375/39780 lr 1.22e-03 loss 0.626038 grad_norm 0.394 (16921s)
-step 17400/39780 lr 1.22e-03 loss 0.654795 grad_norm 0.596 (16948s)
-step 17425/39780 lr 1.22e-03 loss 0.563962 grad_norm 0.330 (16975s)
-step 17450/39780 lr 1.21e-03 loss 0.487982 grad_norm 0.406 (17004s)
-step 17475/39780 lr 1.21e-03 loss 0.676672 grad_norm 0.597 (17033s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<01:13,  2.68it/s]eval:   4%|4         | 8/200 [00:02<01:11,  2.70it/s]eval:   6%|6         | 12/200 [00:04<01:09,  2.71it/s]eval:   8%|8         | 16/200 [00:05<01:08,  2.69it/s]eval:  10%|#         | 20/200 [00:07<01:06,  2.72it/s]eval:  12%|#2        | 24/200 [00:08<01:04,  2.72it/s]eval:  14%|#4        | 28/200 [00:10<01:04,  2.68it/s]eval:  16%|#6        | 32/200 [00:11<01:04,  2.62it/s]eval:  18%|#8        | 36/200 [00:13<01:03,  2.59it/s]eval:  20%|##        | 40/200 [00:15<01:02,  2.58it/s]eval:  22%|##2       | 44/200 [00:16<01:01,  2.54it/s]eval:  24%|##4       | 48/200 [00:18<01:00,  2.52it/s]eval:  26%|##6       | 52/200 [00:19<00:58,  2.51it/s]eval:  28%|##8       | 56/200 [00:21<00:56,  2.56it/s]eval:  30%|###       | 60/200 [00:23<00:54,  2.58it/s]eval:  32%|###2      | 64/200 [00:24<00:50,  2.68it/s]eval:  34%|###4      | 68/200 [00:25<00:47,  2.77it/s]eval:  36%|###6      | 72/200 [00:27<00:45,  2.81it/s]eval:  38%|###8      | 76/200 [00:28<00:42,  2.90it/s]eval:  40%|####      | 80/200 [00:29<00:40,  2.94it/s]eval:  42%|####2     | 84/200 [00:31<00:39,  2.92it/s]eval:  44%|####4     | 88/200 [00:32<00:37,  2.96it/s]eval:  46%|####6     | 92/200 [00:33<00:36,  3.00it/s]eval:  48%|####8     | 96/200 [00:34<00:34,  3.01it/s]eval:  50%|#####     | 100/200 [00:36<00:33,  2.98it/s]eval:  52%|#####2    | 104/200 [00:37<00:31,  3.01it/s]eval:  54%|#####4    | 108/200 [00:38<00:30,  3.00it/s]eval:  56%|#####6    | 112/200 [00:40<00:29,  2.98it/s]eval:  58%|#####8    | 116/200 [00:41<00:28,  2.96it/s]eval:  60%|######    | 120/200 [00:43<00:27,  2.87it/s]eval:  62%|######2   | 124/200 [00:44<00:27,  2.80it/s]eval:  64%|######4   | 128/200 [00:46<00:25,  2.77it/s]eval:  66%|######6   | 132/200 [00:47<00:25,  2.64it/s]eval:  68%|######8   | 136/200 [00:49<00:24,  2.62it/s]eval:  70%|#######   | 140/200 [00:50<00:22,  2.63it/s]eval:  72%|#######2  | 144/200 [00:52<00:21,  2.63it/s]eval:  74%|#######4  | 148/200 [00:53<00:19,  2.65it/s]eval:  76%|#######6  | 152/200 [00:55<00:17,  2.68it/s]eval:  78%|#######8  | 156/200 [00:56<00:16,  2.74it/s]eval:  80%|########  | 160/200 [00:58<00:14,  2.78it/s]eval:  82%|########2 | 164/200 [00:59<00:12,  2.79it/s]eval:  84%|########4 | 168/200 [01:01<00:11,  2.79it/s]eval:  86%|########6 | 172/200 [01:02<00:10,  2.74it/s]eval:  88%|########8 | 176/200 [01:04<00:09,  2.41it/s]eval:  90%|######### | 180/200 [01:06<00:07,  2.50it/s]eval:  92%|#########2| 184/200 [01:07<00:06,  2.60it/s]eval:  94%|#########3| 188/200 [01:08<00:04,  2.64it/s]eval:  96%|#########6| 192/200 [01:11<00:03,  2.37it/s]eval:  98%|#########8| 196/200 [01:12<00:01,  2.40it/s]eval: 100%|##########| 200/200 [01:14<00:00,  2.51it/s]                                                       EVAL step=17499 val_wp=0.679984 (t0=0.675794 t1=0.684174 rows=374199, subset)
-NEW BEST saved best_001_step17499_val0.679984.pt
-step 17500/39780 lr 1.21e-03 loss 0.628838 grad_norm 0.359 (17136s)
-step 17525/39780 lr 1.21e-03 loss 0.604250 grad_norm 0.410 (17168s)
-step 17550/39780 lr 1.21e-03 loss 0.586898 grad_norm 0.603 (17200s)
-step 17575/39780 lr 1.20e-03 loss 0.481476 grad_norm 0.463 (17234s)
-step 17600/39780 lr 1.20e-03 loss 0.473261 grad_norm 0.421 (17269s)
-step 17625/39780 lr 1.20e-03 loss 0.468855 grad_norm 0.387 (17305s)
-step 17650/39780 lr 1.20e-03 loss 0.522255 grad_norm 0.329 (17341s)
-step 17675/39780 lr 1.20e-03 loss 0.520703 grad_norm 0.347 (17382s)
-step 17700/39780 lr 1.19e-03 loss 0.523874 grad_norm 0.314 (17424s)
-step 17725/39780 lr 1.19e-03 loss 0.568845 grad_norm 0.638 (17466s)
-step 17750/39780 lr 1.19e-03 loss 0.418920 grad_norm 0.450 (17506s)
-step 17775/39780 lr 1.19e-03 loss 0.468725 grad_norm 0.370 (17548s)
-step 17800/39780 lr 1.19e-03 loss 0.667416 grad_norm 0.616 (17584s)
-step 17825/39780 lr 1.18e-03 loss 0.479418 grad_norm 0.375 (17619s)
-step 17850/39780 lr 1.18e-03 loss 0.491464 grad_norm 0.394 (17654s)
-step 17875/39780 lr 1.18e-03 loss 0.562756 grad_norm 0.394 (17688s)
-step 17900/39780 lr 1.18e-03 loss 0.426223 grad_norm 0.222 (17720s)
-step 17925/39780 lr 1.18e-03 loss 0.596419 grad_norm 0.485 (17753s)
-step 17950/39780 lr 1.17e-03 loss 0.519062 grad_norm 0.521 (17786s)
-step 17975/39780 lr 1.17e-03 loss 0.503158 grad_norm 1.118 (17819s)
-step 18000/39780 lr 1.17e-03 loss 0.655081 grad_norm 0.610 (17851s)
-step 18025/39780 lr 1.17e-03 loss 0.642908 grad_norm 0.484 (17882s)
-step 18050/39780 lr 1.17e-03 loss 0.438709 grad_norm 0.336 (17913s)
-step 18075/39780 lr 1.16e-03 loss 0.699602 grad_norm 0.753 (17943s)
-step 18100/39780 lr 1.16e-03 loss 0.590217 grad_norm 0.461 (17973s)
-step 18125/39780 lr 1.16e-03 loss 0.576957 grad_norm 0.396 (18003s)
-step 18150/39780 lr 1.16e-03 loss 0.510143 grad_norm 0.455 (18033s)
-step 18175/39780 lr 1.16e-03 loss 0.492499 grad_norm 0.462 (18063s)
-step 18200/39780 lr 1.15e-03 loss 0.536061 grad_norm 0.504 (18092s)
-step 18225/39780 lr 1.15e-03 loss 0.643908 grad_norm 0.574 (18124s)
-step 18250/39780 lr 1.15e-03 loss 0.497420 grad_norm 0.390 (18157s)
-step 18275/39780 lr 1.15e-03 loss 0.734709 grad_norm 0.567 (18184s)
-step 18300/39780 lr 1.15e-03 loss 0.526688 grad_norm 0.296 (18213s)
-step 18325/39780 lr 1.14e-03 loss 0.458522 grad_norm 0.296 (18241s)
-step 18350/39780 lr 1.14e-03 loss 0.721508 grad_norm 0.823 (18269s)
-step 18375/39780 lr 1.14e-03 loss 0.440444 grad_norm 0.334 (18299s)
-step 18400/39780 lr 1.14e-03 loss 0.743321 grad_norm 0.867 (18328s)
-step 18425/39780 lr 1.14e-03 loss 0.573055 grad_norm 0.742 (18357s)
-step 18450/39780 lr 1.13e-03 loss 0.625991 grad_norm 0.420 (18387s)
-step 18475/39780 lr 1.13e-03 loss 0.592958 grad_norm 0.551 (18418s)
-step 18500/39780 lr 1.13e-03 loss 0.457630 grad_norm 0.409 (18448s)
-step 18525/39780 lr 1.13e-03 loss 0.650609 grad_norm 0.579 (18483s)
-step 18550/39780 lr 1.13e-03 loss 0.499280 grad_norm 0.440 (18518s)
-step 18575/39780 lr 1.12e-03 loss 0.692668 grad_norm 0.667 (18552s)
-step 18600/39780 lr 1.12e-03 loss 0.547231 grad_norm 0.500 (18585s)
-step 18625/39780 lr 1.12e-03 loss 0.651786 grad_norm 0.679 (18618s)
-step 18650/39780 lr 1.12e-03 loss 0.535926 grad_norm 0.747 (18651s)
-step 18675/39780 lr 1.12e-03 loss 0.555915 grad_norm 0.448 (18684s)
-step 18700/39780 lr 1.11e-03 loss 0.744094 grad_norm 0.789 (18718s)
-step 18725/39780 lr 1.11e-03 loss 0.639566 grad_norm 0.536 (18750s)
-step 18750/39780 lr 1.11e-03 loss 0.398391 grad_norm 0.475 (18788s)
-step 18775/39780 lr 1.11e-03 loss 0.479152 grad_norm 0.499 (18826s)
-step 18800/39780 lr 1.11e-03 loss 0.503631 grad_norm 0.313 (18863s)
-step 18825/39780 lr 1.10e-03 loss 0.504696 grad_norm 0.545 (18899s)
-step 18850/39780 lr 1.10e-03 loss 0.613362 grad_norm 0.395 (18936s)
-step 18875/39780 lr 1.10e-03 loss 0.428754 grad_norm 0.302 (18971s)
-step 18900/39780 lr 1.10e-03 loss 0.484624 grad_norm 0.360 (19006s)
-step 18925/39780 lr 1.10e-03 loss 0.586952 grad_norm 0.475 (19043s)
-step 18950/39780 lr 1.10e-03 loss 0.577565 grad_norm 0.620 (19079s)
-step 18975/39780 lr 1.09e-03 loss 0.551426 grad_norm 0.403 (19115s)
-step 19000/39780 lr 1.09e-03 loss 0.595677 grad_norm 0.512 (19150s)
-step 19025/39780 lr 1.09e-03 loss 0.632487 grad_norm 0.500 (19185s)
-step 19050/39780 lr 1.09e-03 loss 0.556251 grad_norm 0.569 (19220s)
-step 19075/39780 lr 1.09e-03 loss 0.672921 grad_norm 0.721 (19256s)
-step 19100/39780 lr 1.08e-03 loss 0.473080 grad_norm 0.307 (19289s)
-step 19125/39780 lr 1.08e-03 loss 0.505546 grad_norm 0.521 (19322s)
-step 19150/39780 lr 1.08e-03 loss 0.578384 grad_norm 0.591 (19355s)
-step 19175/39780 lr 1.08e-03 loss 0.526713 grad_norm 0.588 (19389s)
-step 19200/39780 lr 1.08e-03 loss 0.459245 grad_norm 0.292 (19422s)
-step 19225/39780 lr 1.07e-03 loss 0.631062 grad_norm 0.479 (19456s)
-step 19250/39780 lr 1.07e-03 loss 0.610716 grad_norm 0.495 (19488s)
-step 19275/39780 lr 1.07e-03 loss 0.557527 grad_norm 0.445 (19521s)
-step 19300/39780 lr 1.07e-03 loss 0.558238 grad_norm 0.829 (19555s)
-step 19325/39780 lr 1.07e-03 loss 0.553476 grad_norm 0.363 (19588s)
-step 19350/39780 lr 1.06e-03 loss 0.514906 grad_norm 0.664 (19621s)
-step 19375/39780 lr 1.06e-03 loss 0.552751 grad_norm 0.557 (19658s)
-step 19400/39780 lr 1.06e-03 loss 0.500291 grad_norm 0.333 (19689s)
-step 19425/39780 lr 1.06e-03 loss 0.558598 grad_norm 0.401 (19723s)
-step 19450/39780 lr 1.06e-03 loss 0.516842 grad_norm 0.474 (19755s)
-step 19475/39780 lr 1.05e-03 loss 0.546591 grad_norm 0.600 (19794s)
-step 19500/39780 lr 1.05e-03 loss 0.498700 grad_norm 0.377 (19826s)
-step 19525/39780 lr 1.05e-03 loss 0.684295 grad_norm 0.527 (19856s)
-step 19550/39780 lr 1.05e-03 loss 0.604801 grad_norm 0.401 (19887s)
-step 19575/39780 lr 1.05e-03 loss 0.594690 grad_norm 0.565 (19920s)
-step 19600/39780 lr 1.04e-03 loss 0.673578 grad_norm 0.592 (19952s)
-step 19625/39780 lr 1.04e-03 loss 0.590047 grad_norm 0.363 (19985s)
-step 19650/39780 lr 1.04e-03 loss 0.489572 grad_norm 0.395 (20018s)
-step 19675/39780 lr 1.04e-03 loss 0.639612 grad_norm 0.456 (20058s)
-step 19700/39780 lr 1.04e-03 loss 0.691197 grad_norm 0.662 (20095s)
-step 19725/39780 lr 1.03e-03 loss 0.553424 grad_norm 0.341 (20127s)
-step 19750/39780 lr 1.03e-03 loss 0.608387 grad_norm 0.376 (20154s)
-step 19775/39780 lr 1.03e-03 loss 0.575096 grad_norm 0.537 (20180s)
-step 19800/39780 lr 1.03e-03 loss 0.729171 grad_norm 0.690 (20205s)
-step 19825/39780 lr 1.03e-03 loss 0.528484 grad_norm 0.636 (20230s)
-step 19850/39780 lr 1.02e-03 loss 0.646976 grad_norm 0.468 (20254s)
-step 19875/39780 lr 1.02e-03 loss 0.557188 grad_norm 0.547 (20279s)
-step 19900/39780 lr 1.02e-03 loss 0.445546 grad_norm 0.558 (20305s)
-step 19925/39780 lr 1.02e-03 loss 0.465499 grad_norm 0.569 (20332s)
-step 19950/39780 lr 1.02e-03 loss 0.577222 grad_norm 0.764 (20357s)
-step 19975/39780 lr 1.01e-03 loss 0.513618 grad_norm 0.356 (20383s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<01:09,  2.83it/s]eval:   4%|4         | 8/200 [00:02<01:08,  2.82it/s]eval:   6%|6         | 12/200 [00:04<01:07,  2.78it/s]eval:   8%|8         | 16/200 [00:05<01:05,  2.83it/s]eval:  10%|#         | 20/200 [00:07<01:02,  2.87it/s]eval:  12%|#2        | 24/200 [00:08<01:00,  2.89it/s]eval:  14%|#4        | 28/200 [00:09<01:00,  2.87it/s]eval:  16%|#6        | 32/200 [00:11<00:58,  2.88it/s]eval:  18%|#8        | 36/200 [00:12<00:56,  2.89it/s]eval:  20%|##        | 40/200 [00:14<00:57,  2.81it/s]eval:  22%|##2       | 44/200 [00:15<00:55,  2.83it/s]eval:  24%|##4       | 48/200 [00:16<00:53,  2.82it/s]eval:  26%|##6       | 52/200 [00:18<00:52,  2.80it/s]eval:  28%|##8       | 56/200 [00:19<00:53,  2.68it/s]eval:  30%|###       | 60/200 [00:21<00:53,  2.62it/s]eval:  32%|###2      | 64/200 [00:23<00:53,  2.52it/s]eval:  34%|###4      | 68/200 [00:24<00:52,  2.49it/s]eval:  36%|###6      | 72/200 [00:26<00:51,  2.48it/s]eval:  38%|###8      | 76/200 [00:28<00:48,  2.55it/s]eval:  40%|####      | 80/200 [00:29<00:45,  2.61it/s]eval:  42%|####2     | 84/200 [00:30<00:43,  2.67it/s]eval:  44%|####4     | 88/200 [00:32<00:40,  2.74it/s]eval:  46%|####6     | 92/200 [00:33<00:39,  2.75it/s]eval:  48%|####8     | 96/200 [00:35<00:37,  2.78it/s]eval:  50%|#####     | 100/200 [00:36<00:36,  2.75it/s]eval:  52%|#####2    | 104/200 [00:38<00:34,  2.79it/s]eval:  54%|#####4    | 108/200 [00:39<00:32,  2.83it/s]eval:  56%|#####6    | 112/200 [00:40<00:30,  2.86it/s]eval:  58%|#####8    | 116/200 [00:42<00:29,  2.88it/s]eval:  60%|######    | 120/200 [00:43<00:27,  2.88it/s]eval:  62%|######2   | 124/200 [00:44<00:26,  2.87it/s]eval:  64%|######4   | 128/200 [00:46<00:25,  2.86it/s]eval:  66%|######6   | 132/200 [00:47<00:24,  2.77it/s]eval:  68%|######8   | 136/200 [00:49<00:23,  2.71it/s]eval:  70%|#######   | 140/200 [00:50<00:21,  2.76it/s]eval:  72%|#######2  | 144/200 [00:52<00:20,  2.77it/s]eval:  74%|#######4  | 148/200 [00:53<00:18,  2.79it/s]eval:  76%|#######6  | 152/200 [00:55<00:16,  2.83it/s]eval:  78%|#######8  | 156/200 [00:56<00:15,  2.91it/s]eval:  80%|########  | 160/200 [00:57<00:13,  2.96it/s]eval:  82%|########2 | 164/200 [00:58<00:12,  2.98it/s]eval:  84%|########4 | 168/200 [01:00<00:10,  2.99it/s]eval:  86%|########6 | 172/200 [01:01<00:09,  2.98it/s]eval:  88%|########8 | 176/200 [01:02<00:07,  3.04it/s]eval:  90%|######### | 180/200 [01:04<00:06,  3.06it/s]eval:  92%|#########2| 184/200 [01:05<00:05,  3.07it/s]eval:  94%|#########3| 188/200 [01:06<00:03,  3.04it/s]eval:  96%|#########6| 192/200 [01:08<00:02,  3.09it/s]eval:  98%|#########8| 196/200 [01:09<00:01,  3.15it/s]eval: 100%|##########| 200/200 [01:10<00:00,  3.16it/s]                                                       EVAL step=19999 val_wp=0.680563 (t0=0.675988 t1=0.685139 rows=374199, subset)
-NEW BEST saved best_001_step19999_val0.680563.pt
-step 20000/39780 lr 1.01e-03 loss 0.549065 grad_norm 0.389 (20478s)
-step 20025/39780 lr 1.01e-03 loss 0.470944 grad_norm 0.481 (20504s)
-step 20050/39780 lr 1.01e-03 loss 0.639554 grad_norm 0.798 (20530s)
-step 20075/39780 lr 1.01e-03 loss 0.551601 grad_norm 0.410 (20555s)
-step 20100/39780 lr 1.00e-03 loss 0.582388 grad_norm 0.430 (20579s)
-step 20125/39780 lr 1.00e-03 loss 0.620014 grad_norm 0.660 (20607s)
-step 20150/39780 lr 9.99e-04 loss 0.488072 grad_norm 0.394 (20633s)
-step 20175/39780 lr 9.97e-04 loss 0.383840 grad_norm 0.515 (20657s)
-step 20200/39780 lr 9.95e-04 loss 0.368196 grad_norm 0.284 (20682s)
-step 20225/39780 lr 9.93e-04 loss 0.519745 grad_norm 0.443 (20706s)
-step 20250/39780 lr 9.91e-04 loss 0.577346 grad_norm 0.351 (20731s)
-step 20275/39780 lr 9.89e-04 loss 0.549781 grad_norm 0.569 (20755s)
-step 20300/39780 lr 9.87e-04 loss 0.538261 grad_norm 0.557 (20780s)
-step 20325/39780 lr 9.85e-04 loss 0.550937 grad_norm 0.609 (20804s)
-step 20350/39780 lr 9.83e-04 loss 0.549147 grad_norm 0.658 (20830s)
-step 20375/39780 lr 9.81e-04 loss 0.611561 grad_norm 0.474 (20854s)
-step 20400/39780 lr 9.79e-04 loss 0.437539 grad_norm 0.363 (20877s)
-step 20425/39780 lr 9.77e-04 loss 0.454497 grad_norm 0.418 (20901s)
-step 20450/39780 lr 9.75e-04 loss 0.436880 grad_norm 0.401 (20924s)
-step 20475/39780 lr 9.73e-04 loss 0.461659 grad_norm 0.510 (20948s)
-step 20500/39780 lr 9.71e-04 loss 0.589837 grad_norm 0.652 (20973s)
-step 20525/39780 lr 9.69e-04 loss 0.505346 grad_norm 0.305 (20997s)
-step 20550/39780 lr 9.67e-04 loss 0.531640 grad_norm 0.817 (21019s)
-step 20575/39780 lr 9.65e-04 loss 0.717251 grad_norm 0.695 (21042s)
-step 20600/39780 lr 9.63e-04 loss 0.627219 grad_norm 0.622 (21064s)
-step 20625/39780 lr 9.61e-04 loss 0.493545 grad_norm 0.430 (21085s)
-step 20650/39780 lr 9.59e-04 loss 0.728375 grad_norm 0.606 (21103s)
-step 20675/39780 lr 9.57e-04 loss 0.378695 grad_norm 0.467 (21121s)
-step 20700/39780 lr 9.55e-04 loss 0.575638 grad_norm 0.586 (21139s)
-step 20725/39780 lr 9.53e-04 loss 0.516830 grad_norm 0.333 (21157s)
-step 20750/39780 lr 9.51e-04 loss 0.556902 grad_norm 0.360 (21175s)
-step 20775/39780 lr 9.49e-04 loss 0.669369 grad_norm 0.550 (21192s)
-step 20800/39780 lr 9.47e-04 loss 0.450075 grad_norm 0.431 (21210s)
-step 20825/39780 lr 9.45e-04 loss 0.641554 grad_norm 0.482 (21228s)
-step 20850/39780 lr 9.43e-04 loss 0.433735 grad_norm 0.479 (21246s)
-step 20875/39780 lr 9.41e-04 loss 0.582230 grad_norm 0.670 (21264s)
-step 20900/39780 lr 9.39e-04 loss 0.501971 grad_norm 0.609 (21281s)
-step 20925/39780 lr 9.37e-04 loss 0.573362 grad_norm 0.605 (21299s)
-step 20950/39780 lr 9.35e-04 loss 0.473953 grad_norm 0.283 (21317s)
-step 20975/39780 lr 9.33e-04 loss 0.663903 grad_norm 0.660 (21335s)
-step 21000/39780 lr 9.31e-04 loss 0.607720 grad_norm 0.364 (21353s)
-step 21025/39780 lr 9.29e-04 loss 0.491125 grad_norm 0.562 (21371s)
-step 21050/39780 lr 9.27e-04 loss 0.548892 grad_norm 0.706 (21389s)
-step 21075/39780 lr 9.25e-04 loss 0.459799 grad_norm 0.285 (21406s)
-step 21100/39780 lr 9.23e-04 loss 0.509990 grad_norm 0.444 (21424s)
-step 21125/39780 lr 9.21e-04 loss 0.552031 grad_norm 0.488 (21442s)
-step 21150/39780 lr 9.19e-04 loss 0.477841 grad_norm 0.451 (21460s)
-step 21175/39780 lr 9.17e-04 loss 0.532657 grad_norm 0.326 (21477s)
-step 21200/39780 lr 9.15e-04 loss 0.622546 grad_norm 0.705 (21495s)
-step 21225/39780 lr 9.13e-04 loss 0.501984 grad_norm 0.357 (21513s)
-step 21250/39780 lr 9.11e-04 loss 0.729618 grad_norm 0.487 (21530s)
-step 21275/39780 lr 9.09e-04 loss 0.550039 grad_norm 0.744 (21548s)
-step 21300/39780 lr 9.07e-04 loss 0.539726 grad_norm 0.440 (21566s)
-step 21325/39780 lr 9.05e-04 loss 0.573456 grad_norm 0.585 (21584s)
-step 21350/39780 lr 9.03e-04 loss 0.559464 grad_norm 0.437 (21602s)
-step 21375/39780 lr 9.01e-04 loss 0.538556 grad_norm 0.343 (21619s)
-step 21400/39780 lr 8.99e-04 loss 0.577754 grad_norm 0.277 (21637s)
-step 21425/39780 lr 8.97e-04 loss 0.531226 grad_norm 0.424 (21655s)
-step 21450/39780 lr 8.95e-04 loss 0.489518 grad_norm 0.339 (21673s)
-step 21475/39780 lr 8.93e-04 loss 0.685679 grad_norm 0.563 (21691s)
-step 21500/39780 lr 8.91e-04 loss 0.587565 grad_norm 0.452 (21709s)
-step 21525/39780 lr 8.89e-04 loss 0.649364 grad_norm 0.689 (21727s)
-step 21550/39780 lr 8.87e-04 loss 0.500263 grad_norm 0.751 (21743s)
-step 21575/39780 lr 8.85e-04 loss 0.496337 grad_norm 0.334 (21757s)
-step 21600/39780 lr 8.83e-04 loss 0.599431 grad_norm 0.655 (21771s)
-step 21625/39780 lr 8.82e-04 loss 0.524315 grad_norm 0.499 (21785s)
-step 21650/39780 lr 8.80e-04 loss 0.611715 grad_norm 0.532 (21799s)
-step 21675/39780 lr 8.78e-04 loss 0.481734 grad_norm 0.404 (21813s)
-step 21700/39780 lr 8.76e-04 loss 0.490939 grad_norm 0.564 (21827s)
-step 21725/39780 lr 8.74e-04 loss 0.704602 grad_norm 0.628 (21840s)
-step 21750/39780 lr 8.72e-04 loss 0.715534 grad_norm 0.894 (21854s)
-step 21775/39780 lr 8.70e-04 loss 0.666924 grad_norm 0.535 (21869s)
-step 21800/39780 lr 8.68e-04 loss 0.545926 grad_norm 0.374 (21883s)
-step 21825/39780 lr 8.66e-04 loss 0.442138 grad_norm 0.359 (21897s)
-step 21850/39780 lr 8.64e-04 loss 0.623225 grad_norm 0.491 (21911s)
-step 21875/39780 lr 8.62e-04 loss 0.437663 grad_norm 0.291 (21925s)
-step 21900/39780 lr 8.60e-04 loss 0.700981 grad_norm 0.697 (21939s)
-step 21925/39780 lr 8.58e-04 loss 0.589319 grad_norm 0.466 (21954s)
-step 21950/39780 lr 8.56e-04 loss 0.558193 grad_norm 0.467 (21968s)
-step 21975/39780 lr 8.54e-04 loss 0.451090 grad_norm 0.330 (21982s)
-step 22000/39780 lr 8.52e-04 loss 0.512505 grad_norm 0.362 (21996s)
-step 22025/39780 lr 8.50e-04 loss 0.545688 grad_norm 0.826 (22010s)
-step 22050/39780 lr 8.48e-04 loss 0.591806 grad_norm 0.650 (22025s)
-step 22075/39780 lr 8.46e-04 loss 0.526584 grad_norm 0.365 (22039s)
-step 22100/39780 lr 8.44e-04 loss 0.506373 grad_norm 0.453 (22053s)
-step 22125/39780 lr 8.42e-04 loss 0.512895 grad_norm 0.478 (22067s)
-step 22150/39780 lr 8.40e-04 loss 0.527095 grad_norm 0.450 (22082s)
-step 22175/39780 lr 8.38e-04 loss 0.436141 grad_norm 0.340 (22096s)
-step 22200/39780 lr 8.36e-04 loss 0.626026 grad_norm 0.443 (22110s)
-step 22225/39780 lr 8.34e-04 loss 0.617638 grad_norm 0.911 (22125s)
-step 22250/39780 lr 8.32e-04 loss 0.455189 grad_norm 0.306 (22140s)
-step 22275/39780 lr 8.30e-04 loss 0.497629 grad_norm 0.383 (22155s)
-step 22300/39780 lr 8.28e-04 loss 0.512093 grad_norm 0.417 (22169s)
-step 22325/39780 lr 8.26e-04 loss 0.540387 grad_norm 0.403 (22184s)
-step 22350/39780 lr 8.24e-04 loss 0.493235 grad_norm 0.398 (22199s)
-step 22375/39780 lr 8.22e-04 loss 0.444269 grad_norm 0.288 (22214s)
-step 22400/39780 lr 8.20e-04 loss 0.601256 grad_norm 0.635 (22228s)
-step 22425/39780 lr 8.18e-04 loss 0.521713 grad_norm 0.382 (22243s)
-step 22450/39780 lr 8.16e-04 loss 0.536559 grad_norm 0.453 (22257s)
-step 22475/39780 lr 8.14e-04 loss 0.528081 grad_norm 0.656 (22271s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:00<00:37,  5.24it/s]eval:   4%|4         | 8/200 [00:01<00:36,  5.23it/s]eval:   6%|6         | 12/200 [00:02<00:35,  5.25it/s]eval:   8%|8         | 16/200 [00:03<00:34,  5.28it/s]eval:  10%|#         | 20/200 [00:03<00:33,  5.32it/s]eval:  12%|#2        | 24/200 [00:04<00:33,  5.33it/s]eval:  14%|#4        | 28/200 [00:05<00:32,  5.33it/s]eval:  16%|#6        | 32/200 [00:06<00:31,  5.34it/s]eval:  18%|#8        | 36/200 [00:06<00:30,  5.35it/s]eval:  20%|##        | 40/200 [00:07<00:30,  5.33it/s]eval:  22%|##2       | 44/200 [00:08<00:29,  5.34it/s]eval:  24%|##4       | 48/200 [00:09<00:28,  5.33it/s]eval:  26%|##6       | 52/200 [00:09<00:27,  5.34it/s]eval:  28%|##8       | 56/200 [00:10<00:27,  5.32it/s]eval:  30%|###       | 60/200 [00:11<00:26,  5.31it/s]eval:  32%|###2      | 64/200 [00:12<00:25,  5.32it/s]eval:  34%|###4      | 68/200 [00:12<00:24,  5.33it/s]eval:  36%|###6      | 72/200 [00:13<00:24,  5.33it/s]eval:  38%|###8      | 76/200 [00:14<00:23,  5.37it/s]eval:  40%|####      | 80/200 [00:15<00:22,  5.35it/s]eval:  42%|####2     | 84/200 [00:15<00:21,  5.35it/s]eval:  44%|####4     | 88/200 [00:16<00:21,  5.33it/s]eval:  46%|####6     | 92/200 [00:17<00:20,  5.35it/s]eval:  48%|####8     | 96/200 [00:18<00:19,  5.35it/s]eval:  50%|#####     | 100/200 [00:18<00:18,  5.35it/s]eval:  52%|#####2    | 104/200 [00:19<00:17,  5.36it/s]eval:  54%|#####4    | 108/200 [00:20<00:17,  5.39it/s]eval:  56%|#####6    | 112/200 [00:20<00:16,  5.37it/s]eval:  58%|#####8    | 116/200 [00:21<00:15,  5.36it/s]eval:  60%|######    | 120/200 [00:22<00:14,  5.38it/s]eval:  62%|######2   | 124/200 [00:23<00:14,  5.36it/s]eval:  64%|######4   | 128/200 [00:23<00:13,  5.36it/s]eval:  66%|######6   | 132/200 [00:24<00:12,  5.36it/s]eval:  68%|######8   | 136/200 [00:25<00:11,  5.38it/s]eval:  70%|#######   | 140/200 [00:26<00:11,  5.36it/s]eval:  72%|#######2  | 144/200 [00:26<00:10,  5.36it/s]eval:  74%|#######4  | 148/200 [00:27<00:09,  5.33it/s]eval:  76%|#######6  | 152/200 [00:28<00:09,  5.22it/s]eval:  78%|#######8  | 156/200 [00:29<00:08,  5.19it/s]eval:  80%|########  | 160/200 [00:30<00:08,  4.82it/s]eval:  82%|########2 | 164/200 [00:31<00:07,  4.73it/s]eval:  84%|########4 | 168/200 [00:32<00:06,  4.70it/s]eval:  86%|########6 | 172/200 [00:32<00:05,  4.80it/s]eval:  88%|########8 | 176/200 [00:33<00:04,  4.91it/s]eval:  90%|######### | 180/200 [00:34<00:04,  4.99it/s]eval:  92%|#########2| 184/200 [00:35<00:03,  4.88it/s]eval:  94%|#########3| 188/200 [00:36<00:02,  4.85it/s]eval:  96%|#########6| 192/200 [00:36<00:01,  4.83it/s]eval:  98%|#########8| 196/200 [00:37<00:00,  4.85it/s]eval: 100%|##########| 200/200 [00:38<00:00,  4.89it/s]                                                       EVAL step=22499 val_wp=0.681145 (t0=0.680650 t1=0.681641 rows=374199, subset)
-NEW BEST saved best_001_step22499_val0.681145.pt
-step 22500/39780 lr 8.12e-04 loss 0.543674 grad_norm 0.512 (22324s)
-step 22525/39780 lr 8.10e-04 loss 0.505685 grad_norm 0.498 (22339s)
-step 22550/39780 lr 8.08e-04 loss 0.555586 grad_norm 0.413 (22355s)
-step 22575/39780 lr 8.06e-04 loss 0.435355 grad_norm 0.327 (22371s)
-step 22600/39780 lr 8.05e-04 loss 0.865839 grad_norm 1.129 (22387s)
-step 22625/39780 lr 8.03e-04 loss 0.407168 grad_norm 0.448 (22402s)
-step 22650/39780 lr 8.01e-04 loss 0.500469 grad_norm 0.482 (22417s)
-step 22675/39780 lr 7.99e-04 loss 0.481800 grad_norm 0.417 (22431s)
-step 22700/39780 lr 7.97e-04 loss 0.539447 grad_norm 0.360 (22446s)
-step 22725/39780 lr 7.95e-04 loss 0.449113 grad_norm 0.358 (22461s)
-step 22750/39780 lr 7.93e-04 loss 0.570018 grad_norm 0.719 (22479s)
-step 22775/39780 lr 7.91e-04 loss 0.440402 grad_norm 0.364 (22495s)
-step 22800/39780 lr 7.89e-04 loss 0.560178 grad_norm 0.599 (22509s)
-step 22825/39780 lr 7.87e-04 loss 0.518481 grad_norm 0.694 (22524s)
-step 22850/39780 lr 7.85e-04 loss 0.440563 grad_norm 0.545 (22540s)
-step 22875/39780 lr 7.83e-04 loss 0.601525 grad_norm 0.345 (22555s)
-step 22900/39780 lr 7.81e-04 loss 0.573567 grad_norm 0.455 (22570s)
-step 22925/39780 lr 7.79e-04 loss 0.494092 grad_norm 0.483 (22584s)
-step 22950/39780 lr 7.77e-04 loss 0.594287 grad_norm 0.511 (22598s)
-step 22975/39780 lr 7.75e-04 loss 0.650507 grad_norm 0.713 (22612s)
-step 23000/39780 lr 7.73e-04 loss 0.493811 grad_norm 0.526 (22626s)
-step 23025/39780 lr 7.71e-04 loss 0.518002 grad_norm 0.383 (22640s)
-step 23050/39780 lr 7.69e-04 loss 0.599749 grad_norm 0.671 (22654s)
-step 23075/39780 lr 7.67e-04 loss 0.651308 grad_norm 0.532 (22668s)
-step 23100/39780 lr 7.65e-04 loss 0.586079 grad_norm 0.502 (22682s)
-step 23125/39780 lr 7.64e-04 loss 0.538845 grad_norm 0.563 (22696s)
-step 23150/39780 lr 7.62e-04 loss 0.517627 grad_norm 0.381 (22711s)
-step 23175/39780 lr 7.60e-04 loss 0.755149 grad_norm 0.444 (22726s)
-step 23200/39780 lr 7.58e-04 loss 0.427772 grad_norm 0.380 (22740s)
-step 23225/39780 lr 7.56e-04 loss 0.664216 grad_norm 0.551 (22755s)
-step 23250/39780 lr 7.54e-04 loss 0.636840 grad_norm 0.731 (22770s)
-step 23275/39780 lr 7.52e-04 loss 0.458855 grad_norm 0.425 (22785s)
-step 23300/39780 lr 7.50e-04 loss 0.505154 grad_norm 0.386 (22800s)
-step 23325/39780 lr 7.48e-04 loss 0.608713 grad_norm 0.494 (22814s)
-step 23350/39780 lr 7.46e-04 loss 0.598740 grad_norm 0.432 (22828s)
-step 23375/39780 lr 7.44e-04 loss 0.442623 grad_norm 0.421 (22842s)
-step 23400/39780 lr 7.42e-04 loss 0.785831 grad_norm 0.725 (22856s)
-step 23425/39780 lr 7.40e-04 loss 0.512105 grad_norm 0.357 (22870s)
-step 23450/39780 lr 7.38e-04 loss 0.598435 grad_norm 0.351 (22884s)
-step 23475/39780 lr 7.36e-04 loss 0.499558 grad_norm 0.408 (22898s)
-step 23500/39780 lr 7.34e-04 loss 0.426579 grad_norm 0.679 (22912s)
-step 23525/39780 lr 7.33e-04 loss 0.453489 grad_norm 0.489 (22926s)
-step 23550/39780 lr 7.31e-04 loss 0.532590 grad_norm 0.305 (22940s)
-step 23575/39780 lr 7.29e-04 loss 0.685183 grad_norm 0.763 (22955s)
-step 23600/39780 lr 7.27e-04 loss 0.600129 grad_norm 0.616 (22969s)
-step 23625/39780 lr 7.25e-04 loss 0.516447 grad_norm 0.635 (22984s)
-step 23650/39780 lr 7.23e-04 loss 0.636891 grad_norm 0.558 (22998s)
-step 23675/39780 lr 7.21e-04 loss 0.502147 grad_norm 0.378 (23012s)
-step 23700/39780 lr 7.19e-04 loss 0.530248 grad_norm 0.411 (23027s)
-step 23725/39780 lr 7.17e-04 loss 0.472573 grad_norm 0.357 (23043s)
-step 23750/39780 lr 7.15e-04 loss 0.471231 grad_norm 0.475 (23057s)
-step 23775/39780 lr 7.13e-04 loss 0.591656 grad_norm 0.612 (23072s)
-step 23800/39780 lr 7.11e-04 loss 0.634780 grad_norm 0.750 (23087s)
-step 23825/39780 lr 7.10e-04 loss 0.554443 grad_norm 0.533 (23105s)
-step 23850/39780 lr 7.08e-04 loss 0.668458 grad_norm 0.565 (23122s)
-step 23875/39780 lr 7.06e-04 loss 0.557955 grad_norm 0.439 (23137s)
-step 23900/39780 lr 7.04e-04 loss 0.493600 grad_norm 0.633 (23152s)
-step 23925/39780 lr 7.02e-04 loss 0.595982 grad_norm 0.529 (23166s)
-step 23950/39780 lr 7.00e-04 loss 0.546708 grad_norm 0.455 (23179s)
-step 23975/39780 lr 6.98e-04 loss 0.579893 grad_norm 0.449 (23193s)
-step 24000/39780 lr 6.96e-04 loss 0.662882 grad_norm 0.543 (23207s)
-step 24025/39780 lr 6.94e-04 loss 0.570516 grad_norm 0.409 (23221s)
-step 24050/39780 lr 6.92e-04 loss 0.510034 grad_norm 0.416 (23234s)
-step 24075/39780 lr 6.90e-04 loss 0.575561 grad_norm 0.514 (23248s)
-step 24100/39780 lr 6.89e-04 loss 0.558033 grad_norm 0.550 (23262s)
-step 24125/39780 lr 6.87e-04 loss 0.493602 grad_norm 0.403 (23276s)
-step 24150/39780 lr 6.85e-04 loss 0.563634 grad_norm 0.397 (23290s)
-step 24175/39780 lr 6.83e-04 loss 0.376090 grad_norm 0.416 (23303s)
-step 24200/39780 lr 6.81e-04 loss 0.611281 grad_norm 0.516 (23317s)
-step 24225/39780 lr 6.79e-04 loss 0.562440 grad_norm 0.568 (23331s)
-step 24250/39780 lr 6.77e-04 loss 0.538474 grad_norm 0.677 (23344s)
-step 24275/39780 lr 6.75e-04 loss 0.523634 grad_norm 0.604 (23358s)
-step 24300/39780 lr 6.73e-04 loss 0.750245 grad_norm 0.610 (23372s)
-step 24325/39780 lr 6.72e-04 loss 0.530586 grad_norm 0.531 (23386s)
-step 24350/39780 lr 6.70e-04 loss 0.546182 grad_norm 0.621 (23400s)
-step 24375/39780 lr 6.68e-04 loss 0.605601 grad_norm 0.651 (23414s)
-step 24400/39780 lr 6.66e-04 loss 0.563885 grad_norm 0.450 (23428s)
-step 24425/39780 lr 6.64e-04 loss 0.386923 grad_norm 0.337 (23442s)
-step 24450/39780 lr 6.62e-04 loss 0.682944 grad_norm 0.516 (23456s)
-step 24475/39780 lr 6.60e-04 loss 0.466570 grad_norm 0.325 (23469s)
-step 24500/39780 lr 6.58e-04 loss 0.559956 grad_norm 0.442 (23483s)
-step 24525/39780 lr 6.56e-04 loss 0.534767 grad_norm 0.448 (23497s)
-step 24550/39780 lr 6.55e-04 loss 0.474088 grad_norm 0.893 (23514s)
-step 24575/39780 lr 6.53e-04 loss 0.595412 grad_norm 0.659 (23529s)
-step 24600/39780 lr 6.51e-04 loss 0.548296 grad_norm 0.418 (23544s)
-step 24625/39780 lr 6.49e-04 loss 0.575946 grad_norm 0.418 (23558s)
-step 24650/39780 lr 6.47e-04 loss 0.553685 grad_norm 0.586 (23572s)
-step 24675/39780 lr 6.45e-04 loss 0.640858 grad_norm 0.733 (23586s)
-step 24700/39780 lr 6.43e-04 loss 0.462419 grad_norm 0.500 (23600s)
-step 24725/39780 lr 6.41e-04 loss 0.485329 grad_norm 0.465 (23614s)
-step 24750/39780 lr 6.40e-04 loss 0.496407 grad_norm 0.532 (23628s)
-step 24775/39780 lr 6.38e-04 loss 0.488341 grad_norm 0.514 (23642s)
-step 24800/39780 lr 6.36e-04 loss 0.461099 grad_norm 0.364 (23656s)
-step 24825/39780 lr 6.34e-04 loss 0.473731 grad_norm 0.385 (23671s)
-step 24850/39780 lr 6.32e-04 loss 0.698437 grad_norm 0.596 (23685s)
-step 24875/39780 lr 6.30e-04 loss 0.694107 grad_norm 0.675 (23702s)
-step 24900/39780 lr 6.28e-04 loss 0.527829 grad_norm 0.449 (23718s)
-step 24925/39780 lr 6.27e-04 loss 0.638377 grad_norm 0.726 (23733s)
-step 24950/39780 lr 6.25e-04 loss 0.547616 grad_norm 0.451 (23747s)
-step 24975/39780 lr 6.23e-04 loss 0.660982 grad_norm 0.443 (23761s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:00<00:39,  4.96it/s]eval:   4%|4         | 8/200 [00:01<00:38,  4.99it/s]eval:   6%|6         | 12/200 [00:02<00:37,  5.04it/s]eval:   8%|8         | 16/200 [00:03<00:36,  5.06it/s]eval:  10%|#         | 20/200 [00:03<00:35,  5.10it/s]eval:  12%|#2        | 24/200 [00:04<00:34,  5.13it/s]eval:  14%|#4        | 28/200 [00:05<00:33,  5.09it/s]eval:  16%|#6        | 32/200 [00:06<00:33,  4.95it/s]eval:  18%|#8        | 36/200 [00:07<00:33,  4.86it/s]eval:  20%|##        | 40/200 [00:08<00:33,  4.83it/s]eval:  22%|##2       | 44/200 [00:08<00:32,  4.80it/s]eval:  24%|##4       | 48/200 [00:09<00:32,  4.73it/s]eval:  26%|##6       | 52/200 [00:10<00:31,  4.73it/s]eval:  28%|##8       | 56/200 [00:11<00:30,  4.71it/s]eval:  30%|###       | 60/200 [00:12<00:29,  4.72it/s]eval:  32%|###2      | 64/200 [00:13<00:28,  4.72it/s]eval:  34%|###4      | 68/200 [00:14<00:27,  4.72it/s]eval:  36%|###6      | 72/200 [00:14<00:27,  4.71it/s]eval:  38%|###8      | 76/200 [00:15<00:26,  4.71it/s]eval:  40%|####      | 80/200 [00:16<00:25,  4.72it/s]eval:  42%|####2     | 84/200 [00:17<00:24,  4.74it/s]eval:  44%|####4     | 88/200 [00:18<00:23,  4.75it/s]eval:  46%|####6     | 92/200 [00:19<00:22,  4.74it/s]eval:  48%|####8     | 96/200 [00:19<00:22,  4.72it/s]eval:  50%|#####     | 100/200 [00:20<00:21,  4.68it/s]eval:  52%|#####2    | 104/200 [00:21<00:20,  4.69it/s]eval:  54%|#####4    | 108/200 [00:22<00:19,  4.60it/s]eval:  56%|#####6    | 112/200 [00:23<00:19,  4.62it/s]eval:  58%|#####8    | 116/200 [00:24<00:18,  4.64it/s]eval:  60%|######    | 120/200 [00:25<00:17,  4.70it/s]eval:  62%|######2   | 124/200 [00:25<00:15,  4.77it/s]eval:  64%|######4   | 128/200 [00:26<00:14,  4.81it/s]eval:  66%|######6   | 132/200 [00:27<00:14,  4.79it/s]eval:  68%|######8   | 136/200 [00:28<00:13,  4.70it/s]eval:  70%|#######   | 140/200 [00:29<00:12,  4.63it/s]eval:  72%|#######2  | 144/200 [00:30<00:12,  4.60it/s]eval:  74%|#######4  | 148/200 [00:31<00:11,  4.57it/s]eval:  76%|#######6  | 152/200 [00:31<00:10,  4.64it/s]eval:  78%|#######8  | 156/200 [00:32<00:09,  4.72it/s]eval:  80%|########  | 160/200 [00:33<00:08,  4.75it/s]eval:  82%|########2 | 164/200 [00:34<00:07,  4.83it/s]eval:  84%|########4 | 168/200 [00:35<00:06,  4.89it/s]eval:  86%|########6 | 172/200 [00:35<00:05,  4.96it/s]eval:  88%|########8 | 176/200 [00:36<00:04,  5.01it/s]eval:  90%|######### | 180/200 [00:37<00:03,  5.04it/s]eval:  92%|#########2| 184/200 [00:38<00:03,  5.06it/s]eval:  94%|#########3| 188/200 [00:39<00:02,  5.08it/s]eval:  96%|#########6| 192/200 [00:39<00:01,  5.10it/s]eval:  98%|#########8| 196/200 [00:40<00:00,  5.10it/s]eval: 100%|##########| 200/200 [00:41<00:00,  5.12it/s]                                                       EVAL step=24999 val_wp=0.684870 (t0=0.683502 t1=0.686239 rows=374199, subset)
-NEW BEST saved best_001_step24999_val0.684870.pt
-step 25000/39780 lr 6.21e-04 loss 0.554269 grad_norm 0.529 (23817s)
-step 25025/39780 lr 6.19e-04 loss 0.528989 grad_norm 0.479 (23832s)
-step 25050/39780 lr 6.17e-04 loss 0.421946 grad_norm 0.311 (23847s)
-step 25075/39780 lr 6.15e-04 loss 0.447374 grad_norm 0.505 (23862s)
-step 25100/39780 lr 6.14e-04 loss 0.546473 grad_norm 0.618 (23876s)
-step 25125/39780 lr 6.12e-04 loss 0.517818 grad_norm 0.466 (23892s)
-step 25150/39780 lr 6.10e-04 loss 0.502579 grad_norm 0.395 (23908s)
-step 25175/39780 lr 6.08e-04 loss 0.379447 grad_norm 0.410 (23922s)
-step 25200/39780 lr 6.06e-04 loss 0.555091 grad_norm 0.435 (23937s)
-step 25225/39780 lr 6.04e-04 loss 0.564664 grad_norm 0.573 (23951s)
-step 25250/39780 lr 6.03e-04 loss 0.598006 grad_norm 0.467 (23966s)
-step 25275/39780 lr 6.01e-04 loss 0.433392 grad_norm 0.353 (23981s)
-step 25300/39780 lr 5.99e-04 loss 0.506203 grad_norm 0.317 (23995s)
-step 25325/39780 lr 5.97e-04 loss 0.457594 grad_norm 0.279 (24011s)
-step 25350/39780 lr 5.95e-04 loss 0.693370 grad_norm 0.748 (24026s)
-step 25375/39780 lr 5.93e-04 loss 0.476637 grad_norm 0.385 (24042s)
-step 25400/39780 lr 5.92e-04 loss 0.586127 grad_norm 0.673 (24057s)
-step 25425/39780 lr 5.90e-04 loss 0.568052 grad_norm 0.517 (24072s)
-step 25450/39780 lr 5.88e-04 loss 0.487866 grad_norm 0.305 (24087s)
-step 25475/39780 lr 5.86e-04 loss 0.433989 grad_norm 0.347 (24102s)
-step 25500/39780 lr 5.84e-04 loss 0.459550 grad_norm 0.408 (24116s)
-step 25525/39780 lr 5.83e-04 loss 0.492155 grad_norm 0.301 (24131s)
-step 25550/39780 lr 5.81e-04 loss 0.535731 grad_norm 0.433 (24146s)
-step 25575/39780 lr 5.79e-04 loss 0.530746 grad_norm 0.536 (24161s)
-step 25600/39780 lr 5.77e-04 loss 0.529317 grad_norm 0.605 (24176s)
-step 25625/39780 lr 5.75e-04 loss 0.788591 grad_norm 0.729 (24190s)
-step 25650/39780 lr 5.73e-04 loss 0.596696 grad_norm 0.366 (24205s)
-step 25675/39780 lr 5.72e-04 loss 0.547568 grad_norm 0.441 (24223s)
-step 25700/39780 lr 5.70e-04 loss 0.467304 grad_norm 0.589 (24245s)
-step 25725/39780 lr 5.68e-04 loss 0.583534 grad_norm 0.447 (24261s)
-step 25750/39780 lr 5.66e-04 loss 0.593958 grad_norm 0.724 (24277s)
-step 25775/39780 lr 5.64e-04 loss 0.415428 grad_norm 0.525 (24291s)
-step 25800/39780 lr 5.63e-04 loss 0.554137 grad_norm 0.781 (24307s)
-step 25825/39780 lr 5.61e-04 loss 0.646473 grad_norm 0.500 (24323s)
-step 25850/39780 lr 5.59e-04 loss 0.467946 grad_norm 0.777 (24338s)
-step 25875/39780 lr 5.57e-04 loss 0.492945 grad_norm 0.535 (24353s)
-step 25900/39780 lr 5.55e-04 loss 0.554272 grad_norm 0.503 (24368s)
-step 25925/39780 lr 5.54e-04 loss 0.565895 grad_norm 0.547 (24383s)
-step 25950/39780 lr 5.52e-04 loss 0.500598 grad_norm 0.640 (24398s)
-step 25975/39780 lr 5.50e-04 loss 0.495143 grad_norm 0.739 (24413s)
-step 26000/39780 lr 5.48e-04 loss 0.569911 grad_norm 0.601 (24428s)
-step 26025/39780 lr 5.47e-04 loss 0.579044 grad_norm 0.369 (24443s)
-step 26050/39780 lr 5.45e-04 loss 0.503735 grad_norm 0.547 (24458s)
-step 26075/39780 lr 5.43e-04 loss 0.670737 grad_norm 0.579 (24473s)
-step 26100/39780 lr 5.41e-04 loss 0.613082 grad_norm 0.495 (24487s)
-step 26125/39780 lr 5.39e-04 loss 0.514493 grad_norm 0.344 (24502s)
-step 26150/39780 lr 5.38e-04 loss 0.564340 grad_norm 0.472 (24516s)
-step 26175/39780 lr 5.36e-04 loss 0.734363 grad_norm 0.687 (24531s)
-step 26200/39780 lr 5.34e-04 loss 0.467461 grad_norm 0.386 (24546s)
-step 26225/39780 lr 5.32e-04 loss 0.537548 grad_norm 0.838 (24562s)
-step 26250/39780 lr 5.31e-04 loss 0.596516 grad_norm 0.572 (24579s)
-step 26275/39780 lr 5.29e-04 loss 0.432538 grad_norm 0.401 (24595s)
-step 26300/39780 lr 5.27e-04 loss 0.570423 grad_norm 0.569 (24611s)
-step 26325/39780 lr 5.25e-04 loss 0.351583 grad_norm 0.391 (24627s)
-step 26350/39780 lr 5.23e-04 loss 0.621715 grad_norm 0.616 (24641s)
-step 26375/39780 lr 5.22e-04 loss 0.496295 grad_norm 0.741 (24655s)
-step 26400/39780 lr 5.20e-04 loss 0.478184 grad_norm 0.521 (24671s)
-step 26425/39780 lr 5.18e-04 loss 0.492383 grad_norm 0.622 (24685s)
-step 26450/39780 lr 5.16e-04 loss 0.623642 grad_norm 0.619 (24700s)
-step 26475/39780 lr 5.15e-04 loss 0.418315 grad_norm 0.326 (24715s)
-step 26500/39780 lr 5.13e-04 loss 0.518185 grad_norm 0.392 (24732s)
-step 26525/39780 lr 5.11e-04 loss 0.397672 grad_norm 0.383 (24750s)
-step 26550/39780 lr 5.09e-04 loss 0.542534 grad_norm 0.540 (24767s)
-step 26575/39780 lr 5.08e-04 loss 0.409875 grad_norm 0.504 (24783s)
-step 26600/39780 lr 5.06e-04 loss 0.416264 grad_norm 0.352 (24798s)
-step 26625/39780 lr 5.04e-04 loss 0.561926 grad_norm 0.739 (24814s)
-step 26650/39780 lr 5.03e-04 loss 0.626540 grad_norm 0.674 (24829s)
-step 26675/39780 lr 5.01e-04 loss 0.519428 grad_norm 0.404 (24845s)
-step 26700/39780 lr 4.99e-04 loss 0.551952 grad_norm 0.709 (24860s)
-step 26725/39780 lr 4.97e-04 loss 0.571858 grad_norm 0.483 (24876s)
-step 26750/39780 lr 4.96e-04 loss 0.495920 grad_norm 0.630 (24892s)
-step 26775/39780 lr 4.94e-04 loss 0.521957 grad_norm 0.632 (24907s)
-step 26800/39780 lr 4.92e-04 loss 0.478133 grad_norm 0.539 (24923s)
-step 26825/39780 lr 4.90e-04 loss 0.384604 grad_norm 0.378 (24939s)
-step 26850/39780 lr 4.89e-04 loss 0.590332 grad_norm 0.547 (24954s)
-step 26875/39780 lr 4.87e-04 loss 0.473551 grad_norm 0.404 (24969s)
-step 26900/39780 lr 4.85e-04 loss 0.540643 grad_norm 0.606 (24984s)
-step 26925/39780 lr 4.84e-04 loss 0.498758 grad_norm 0.844 (24998s)
-step 26950/39780 lr 4.82e-04 loss 0.351371 grad_norm 0.385 (25013s)
-step 26975/39780 lr 4.80e-04 loss 0.578555 grad_norm 0.465 (25029s)
-step 27000/39780 lr 4.78e-04 loss 0.609873 grad_norm 0.746 (25045s)
-step 27025/39780 lr 4.77e-04 loss 0.589030 grad_norm 0.484 (25059s)
-step 27050/39780 lr 4.75e-04 loss 0.582193 grad_norm 0.973 (25074s)
-step 27075/39780 lr 4.73e-04 loss 0.613350 grad_norm 0.361 (25089s)
-step 27100/39780 lr 4.72e-04 loss 0.564496 grad_norm 0.658 (25105s)
-step 27125/39780 lr 4.70e-04 loss 0.492825 grad_norm 0.483 (25121s)
-step 27150/39780 lr 4.68e-04 loss 0.572295 grad_norm 0.616 (25136s)
-step 27175/39780 lr 4.67e-04 loss 0.558090 grad_norm 0.752 (25150s)
-step 27200/39780 lr 4.65e-04 loss 0.510051 grad_norm 0.480 (25165s)
-step 27225/39780 lr 4.63e-04 loss 0.634353 grad_norm 0.609 (25180s)
-step 27250/39780 lr 4.62e-04 loss 0.545957 grad_norm 0.382 (25196s)
-step 27275/39780 lr 4.60e-04 loss 0.541056 grad_norm 0.457 (25213s)
-step 27300/39780 lr 4.58e-04 loss 0.574751 grad_norm 0.482 (25231s)
-step 27325/39780 lr 4.56e-04 loss 0.512954 grad_norm 0.319 (25250s)
-step 27350/39780 lr 4.55e-04 loss 0.563643 grad_norm 1.069 (25268s)
-step 27375/39780 lr 4.53e-04 loss 0.486831 grad_norm 0.656 (25285s)
-step 27400/39780 lr 4.51e-04 loss 0.517677 grad_norm 0.349 (25302s)
-step 27425/39780 lr 4.50e-04 loss 0.602012 grad_norm 0.769 (25318s)
-step 27450/39780 lr 4.48e-04 loss 0.601785 grad_norm 0.481 (25334s)
-step 27475/39780 lr 4.46e-04 loss 0.473421 grad_norm 0.809 (25351s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:01<00:54,  3.59it/s]eval:   4%|4         | 8/200 [00:02<01:06,  2.90it/s]eval:   6%|6         | 12/200 [00:04<01:03,  2.96it/s]eval:   8%|8         | 16/200 [00:05<00:59,  3.08it/s]eval:  10%|#         | 20/200 [00:06<00:55,  3.23it/s]eval:  12%|#2        | 24/200 [00:07<00:53,  3.30it/s]eval:  14%|#4        | 28/200 [00:08<00:51,  3.35it/s]eval:  16%|#6        | 32/200 [00:09<00:49,  3.39it/s]eval:  18%|#8        | 36/200 [00:10<00:47,  3.46it/s]eval:  20%|##        | 40/200 [00:11<00:44,  3.57it/s]eval:  22%|##2       | 44/200 [00:12<00:42,  3.68it/s]eval:  24%|##4       | 48/200 [00:13<00:39,  3.80it/s]eval:  26%|##6       | 52/200 [00:14<00:38,  3.88it/s]eval:  28%|##8       | 56/200 [00:15<00:36,  3.91it/s]eval:  30%|###       | 60/200 [00:16<00:35,  3.99it/s]eval:  32%|###2      | 64/200 [00:17<00:33,  4.01it/s]eval:  34%|###4      | 68/200 [00:18<00:32,  4.04it/s]eval:  36%|###6      | 72/200 [00:19<00:32,  3.95it/s]eval:  38%|###8      | 76/200 [00:20<00:31,  3.99it/s]eval:  40%|####      | 80/200 [00:21<00:30,  3.98it/s]eval:  42%|####2     | 84/200 [00:23<00:30,  3.82it/s]eval:  44%|####4     | 88/200 [00:24<00:31,  3.51it/s]eval:  46%|####6     | 92/200 [00:25<00:31,  3.45it/s]eval:  48%|####8     | 96/200 [00:26<00:29,  3.50it/s]eval:  50%|#####     | 100/200 [00:27<00:27,  3.60it/s]eval:  52%|#####2    | 104/200 [00:28<00:26,  3.63it/s]eval:  54%|#####4    | 108/200 [00:29<00:25,  3.64it/s]eval:  56%|#####6    | 112/200 [00:31<00:24,  3.61it/s]eval:  58%|#####8    | 116/200 [00:32<00:23,  3.63it/s]eval:  60%|######    | 120/200 [00:33<00:22,  3.55it/s]eval:  62%|######2   | 124/200 [00:34<00:21,  3.47it/s]eval:  64%|######4   | 128/200 [00:35<00:20,  3.51it/s]eval:  66%|######6   | 132/200 [00:36<00:18,  3.65it/s]eval:  68%|######8   | 136/200 [00:37<00:16,  3.79it/s]eval:  70%|#######   | 140/200 [00:38<00:15,  3.89it/s]eval:  72%|#######2  | 144/200 [00:39<00:14,  3.94it/s]eval:  74%|#######4  | 148/200 [00:40<00:13,  3.98it/s]eval:  76%|#######6  | 152/200 [00:41<00:11,  4.02it/s]eval:  78%|#######8  | 156/200 [00:42<00:10,  4.06it/s]eval:  80%|########  | 160/200 [00:43<00:09,  4.06it/s]eval:  82%|########2 | 164/200 [00:44<00:08,  4.07it/s]eval:  84%|########4 | 168/200 [00:45<00:07,  4.09it/s]eval:  86%|########6 | 172/200 [00:46<00:06,  4.11it/s]eval:  88%|########8 | 176/200 [00:47<00:05,  4.08it/s]eval:  90%|######### | 180/200 [00:48<00:05,  3.99it/s]eval:  92%|#########2| 184/200 [00:49<00:03,  4.03it/s]eval:  94%|#########3| 188/200 [00:50<00:03,  3.97it/s]eval:  96%|#########6| 192/200 [00:51<00:01,  4.00it/s]eval:  98%|#########8| 196/200 [00:52<00:00,  4.01it/s]eval: 100%|##########| 200/200 [00:53<00:00,  4.05it/s]                                                       EVAL step=27499 val_wp=0.682757 (t0=0.680886 t1=0.684629 rows=374199, subset)
-step 27500/39780 lr 4.45e-04 loss 0.349423 grad_norm 0.360 (25425s)
-step 27525/39780 lr 4.43e-04 loss 0.549783 grad_norm 0.371 (25442s)
-step 27550/39780 lr 4.41e-04 loss 0.476437 grad_norm 0.436 (25460s)
-step 27575/39780 lr 4.40e-04 loss 0.395681 grad_norm 0.464 (25476s)
-step 27600/39780 lr 4.38e-04 loss 0.445270 grad_norm 0.425 (25493s)
-step 27625/39780 lr 4.36e-04 loss 0.442845 grad_norm 0.419 (25508s)
-step 27650/39780 lr 4.35e-04 loss 0.532819 grad_norm 0.389 (25522s)
-step 27675/39780 lr 4.33e-04 loss 0.468307 grad_norm 0.538 (25537s)
-step 27700/39780 lr 4.32e-04 loss 0.468178 grad_norm 0.429 (25551s)
-step 27725/39780 lr 4.30e-04 loss 0.527774 grad_norm 0.799 (25566s)
-step 27750/39780 lr 4.28e-04 loss 0.497787 grad_norm 0.453 (25586s)
-step 27775/39780 lr 4.27e-04 loss 0.401993 grad_norm 0.783 (25617s)
-step 27800/39780 lr 4.25e-04 loss 0.493523 grad_norm 0.357 (25632s)
-step 27825/39780 lr 4.23e-04 loss 0.529978 grad_norm 0.478 (25645s)
-step 27850/39780 lr 4.22e-04 loss 0.562368 grad_norm 0.452 (25659s)
-step 27875/39780 lr 4.20e-04 loss 0.573652 grad_norm 0.712 (25673s)
-step 27900/39780 lr 4.18e-04 loss 0.528447 grad_norm 1.014 (25687s)
-step 27925/39780 lr 4.17e-04 loss 0.548067 grad_norm 0.491 (25701s)
-step 27950/39780 lr 4.15e-04 loss 0.659369 grad_norm 0.585 (25715s)
-step 27975/39780 lr 4.14e-04 loss 0.676373 grad_norm 0.756 (25728s)
-step 28000/39780 lr 4.12e-04 loss 0.659847 grad_norm 0.747 (25742s)
-step 28025/39780 lr 4.10e-04 loss 0.794668 grad_norm 0.875 (25756s)
-step 28050/39780 lr 4.09e-04 loss 0.610645 grad_norm 1.122 (25770s)
-step 28075/39780 lr 4.07e-04 loss 0.612138 grad_norm 0.573 (25783s)
-step 28100/39780 lr 4.06e-04 loss 0.538030 grad_norm 0.623 (25797s)
-step 28125/39780 lr 4.04e-04 loss 0.578973 grad_norm 0.389 (25810s)
-step 28150/39780 lr 4.02e-04 loss 0.580711 grad_norm 0.527 (25824s)
-step 28175/39780 lr 4.01e-04 loss 0.597876 grad_norm 0.640 (25837s)
-step 28200/39780 lr 3.99e-04 loss 0.444492 grad_norm 0.494 (25851s)
-step 28225/39780 lr 3.97e-04 loss 0.630715 grad_norm 0.913 (25864s)
-step 28250/39780 lr 3.96e-04 loss 0.445235 grad_norm 0.498 (25877s)
-step 28275/39780 lr 3.94e-04 loss 0.360512 grad_norm 0.477 (25891s)
-step 28300/39780 lr 3.93e-04 loss 0.577730 grad_norm 0.564 (25904s)
-step 28325/39780 lr 3.91e-04 loss 0.482686 grad_norm 0.653 (25918s)
-step 28350/39780 lr 3.90e-04 loss 0.463440 grad_norm 0.440 (25931s)
-step 28375/39780 lr 3.88e-04 loss 0.424451 grad_norm 0.546 (25945s)
-step 28400/39780 lr 3.86e-04 loss 0.461745 grad_norm 0.504 (25958s)
-step 28425/39780 lr 3.85e-04 loss 0.530824 grad_norm 0.534 (25971s)
-step 28450/39780 lr 3.83e-04 loss 0.717450 grad_norm 1.161 (25985s)
-step 28475/39780 lr 3.82e-04 loss 0.548649 grad_norm 0.500 (25998s)
-step 28500/39780 lr 3.80e-04 loss 0.507352 grad_norm 0.350 (26011s)
-step 28525/39780 lr 3.79e-04 loss 0.468533 grad_norm 0.469 (26025s)
-step 28550/39780 lr 3.77e-04 loss 0.451320 grad_norm 0.418 (26038s)
-step 28575/39780 lr 3.75e-04 loss 0.550564 grad_norm 0.553 (26052s)
-step 28600/39780 lr 3.74e-04 loss 0.474572 grad_norm 0.686 (26065s)
-step 28625/39780 lr 3.72e-04 loss 0.513257 grad_norm 0.450 (26079s)
-step 28650/39780 lr 3.71e-04 loss 0.523942 grad_norm 0.401 (26092s)
-step 28675/39780 lr 3.69e-04 loss 0.520293 grad_norm 0.461 (26105s)
-step 28700/39780 lr 3.68e-04 loss 0.542853 grad_norm 0.806 (26118s)
-step 28725/39780 lr 3.66e-04 loss 0.464016 grad_norm 0.411 (26132s)
-step 28750/39780 lr 3.65e-04 loss 0.449253 grad_norm 0.531 (26145s)
-step 28775/39780 lr 3.63e-04 loss 0.469954 grad_norm 0.451 (26159s)
-step 28800/39780 lr 3.61e-04 loss 0.564404 grad_norm 0.648 (26172s)
-step 28825/39780 lr 3.60e-04 loss 0.683552 grad_norm 0.646 (26185s)
-step 28850/39780 lr 3.58e-04 loss 0.518172 grad_norm 0.405 (26199s)
-step 28875/39780 lr 3.57e-04 loss 0.612916 grad_norm 0.526 (26212s)
-step 28900/39780 lr 3.55e-04 loss 0.497198 grad_norm 0.662 (26225s)
-step 28925/39780 lr 3.54e-04 loss 0.578499 grad_norm 0.438 (26239s)
-step 28950/39780 lr 3.52e-04 loss 0.468436 grad_norm 0.556 (26252s)
-step 28975/39780 lr 3.51e-04 loss 0.632355 grad_norm 0.830 (26265s)
-step 29000/39780 lr 3.49e-04 loss 0.477703 grad_norm 0.511 (26279s)
-step 29025/39780 lr 3.48e-04 loss 0.532148 grad_norm 0.526 (26292s)
-step 29050/39780 lr 3.46e-04 loss 0.535607 grad_norm 0.734 (26306s)
-step 29075/39780 lr 3.45e-04 loss 0.502767 grad_norm 0.372 (26320s)
-step 29100/39780 lr 3.43e-04 loss 0.546627 grad_norm 0.581 (26333s)
-step 29125/39780 lr 3.42e-04 loss 0.544208 grad_norm 0.438 (26346s)
-step 29150/39780 lr 3.40e-04 loss 0.577464 grad_norm 0.414 (26359s)
-step 29175/39780 lr 3.39e-04 loss 0.529569 grad_norm 0.519 (26372s)
-step 29200/39780 lr 3.37e-04 loss 0.463728 grad_norm 0.531 (26385s)
-step 29225/39780 lr 3.36e-04 loss 0.613624 grad_norm 0.756 (26398s)
-step 29250/39780 lr 3.34e-04 loss 0.531821 grad_norm 0.494 (26411s)
-step 29275/39780 lr 3.33e-04 loss 0.510881 grad_norm 0.579 (26424s)
-step 29300/39780 lr 3.31e-04 loss 0.667370 grad_norm 1.067 (26437s)
-step 29325/39780 lr 3.30e-04 loss 0.558039 grad_norm 0.743 (26450s)
-step 29350/39780 lr 3.28e-04 loss 0.472475 grad_norm 0.348 (26463s)
-step 29375/39780 lr 3.27e-04 loss 0.593086 grad_norm 0.714 (26476s)
-step 29400/39780 lr 3.25e-04 loss 0.544694 grad_norm 0.697 (26489s)
-step 29425/39780 lr 3.24e-04 loss 0.491227 grad_norm 0.390 (26502s)
-step 29450/39780 lr 3.22e-04 loss 0.449336 grad_norm 0.542 (26515s)
-step 29475/39780 lr 3.21e-04 loss 0.520918 grad_norm 0.749 (26528s)
-step 29500/39780 lr 3.19e-04 loss 0.575250 grad_norm 0.557 (26541s)
-step 29525/39780 lr 3.18e-04 loss 0.481351 grad_norm 0.393 (26555s)
-step 29550/39780 lr 3.16e-04 loss 0.472793 grad_norm 0.446 (26568s)
-step 29575/39780 lr 3.15e-04 loss 0.613940 grad_norm 0.867 (26581s)
-step 29600/39780 lr 3.14e-04 loss 0.420386 grad_norm 0.572 (26594s)
-step 29625/39780 lr 3.12e-04 loss 0.418664 grad_norm 0.314 (26608s)
-step 29650/39780 lr 3.11e-04 loss 0.631683 grad_norm 0.627 (26621s)
-step 29675/39780 lr 3.09e-04 loss 0.537384 grad_norm 0.727 (26634s)
-step 29700/39780 lr 3.08e-04 loss 0.722756 grad_norm 0.748 (26648s)
-step 29725/39780 lr 3.06e-04 loss 0.545696 grad_norm 0.356 (26661s)
-step 29750/39780 lr 3.05e-04 loss 0.648344 grad_norm 0.727 (26675s)
-step 29775/39780 lr 3.03e-04 loss 0.627694 grad_norm 0.842 (26689s)
-step 29800/39780 lr 3.02e-04 loss 0.485204 grad_norm 0.533 (26703s)
-step 29825/39780 lr 3.01e-04 loss 0.520353 grad_norm 0.585 (26717s)
-step 29850/39780 lr 2.99e-04 loss 0.584271 grad_norm 0.586 (26731s)
-step 29875/39780 lr 2.98e-04 loss 0.543496 grad_norm 0.625 (26745s)
-step 29900/39780 lr 2.96e-04 loss 0.502498 grad_norm 0.507 (26759s)
-step 29925/39780 lr 2.95e-04 loss 0.505640 grad_norm 0.407 (26773s)
-step 29950/39780 lr 2.93e-04 loss 0.511854 grad_norm 0.519 (26788s)
-step 29975/39780 lr 2.92e-04 loss 0.552575 grad_norm 0.503 (26802s)
-eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:00<00:39,  4.94it/s]eval:   4%|4         | 8/200 [00:01<00:39,  4.85it/s]eval:   6%|6         | 12/200 [00:02<00:38,  4.90it/s]eval:   8%|8         | 16/200 [00:03<00:37,  4.96it/s]eval:  10%|#         | 20/200 [00:03<00:35,  5.08it/s]eval:  12%|#2        | 24/200 [00:04<00:34,  5.16it/s]eval:  14%|#4        | 28/200 [00:05<00:33,  5.16it/s]eval:  16%|#6        | 32/200 [00:06<00:32,  5.24it/s]eval:  18%|#8        | 36/200 [00:07<00:31,  5.27it/s]eval:  20%|##        | 40/200 [00:07<00:30,  5.29it/s]eval:  22%|##2       | 44/200 [00:08<00:30,  5.19it/s]eval:  24%|##4       | 48/200 [00:09<00:29,  5.21it/s]eval:  26%|##6       | 52/200 [00:10<00:28,  5.22it/s]eval:  28%|##8       | 56/200 [00:10<00:27,  5.23it/s]eval:  30%|###       | 60/200 [00:11<00:26,  5.25it/s]eval:  32%|###2      | 64/200 [00:12<00:25,  5.27it/s]eval:  34%|###4      | 68/200 [00:13<00:25,  5.23it/s]eval:  36%|###6      | 72/200 [00:13<00:24,  5.24it/s]eval:  38%|###8      | 76/200 [00:14<00:23,  5.25it/s]eval:  40%|####      | 80/200 [00:15<00:22,  5.27it/s]eval:  42%|####2     | 84/200 [00:16<00:22,  5.27it/s]eval:  44%|####4     | 88/200 [00:16<00:21,  5.22it/s]eval:  46%|####6     | 92/200 [00:17<00:20,  5.25it/s]eval:  48%|####8     | 96/200 [00:18<00:19,  5.25it/s]eval:  50%|#####     | 100/200 [00:19<00:19,  5.21it/s]eval:  52%|#####2    | 104/200 [00:20<00:18,  5.22it/s]eval:  54%|#####4    | 108/200 [00:20<00:17,  5.19it/s]eval:  56%|#####6    | 112/200 [00:21<00:16,  5.23it/s]eval:  58%|#####8    | 116/200 [00:22<00:16,  5.23it/s]eval:  60%|######    | 120/200 [00:23<00:15,  5.23it/s]eval:  62%|######2   | 124/200 [00:23<00:14,  5.24it/s]eval:  64%|######4   | 128/200 [00:24<00:13,  5.26it/s]eval:  66%|######6   | 132/200 [00:25<00:12,  5.26it/s]eval:  68%|######8   | 136/200 [00:26<00:12,  5.26it/s]eval:  70%|#######   | 140/200 [00:26<00:11,  5.26it/s]eval:  72%|#######2  | 144/200 [00:27<00:10,  5.23it/s]eval:  74%|#######4  | 148/200 [00:28<00:09,  5.22it/s]eval:  76%|#######6  | 152/200 [00:29<00:09,  5.22it/s]eval:  78%|#######8  | 156/200 [00:29<00:08,  5.22it/s]eval:  80%|########  | 160/200 [00:30<00:07,  5.23it/s]eval:  82%|########2 | 164/200 [00:31<00:06,  5.26it/s]eval:  84%|########4 | 168/200 [00:32<00:06,  5.12it/s]eval:  86%|########6 | 172/200 [00:33<00:05,  5.17it/s]eval:  88%|########8 | 176/200 [00:33<00:04,  5.22it/s]eval:  90%|######### | 180/200 [00:34<00:03,  5.25it/s]eval:  92%|#########2| 184/200 [00:35<00:03,  5.14it/s]eval:  94%|#########3| 188/200 [00:36<00:02,  5.19it/s]eval:  96%|#########6| 192/200 [00:36<00:01,  5.22it/s]eval:  98%|#########8| 196/200 [00:37<00:00,  5.26it/s]eval: 100%|##########| 200/200 [00:38<00:00,  5.29it/s]                                                       EVAL step=29999 val_wp=0.681506 (t0=0.679777 t1=0.683236 rows=374199, subset)
-step 30000/39780 lr 2.91e-04 loss 0.437351 grad_norm 0.430 (26854s)
-step 30025/39780 lr 2.89e-04 loss 0.518634 grad_norm 0.410 (26868s)
-step 30050/39780 lr 2.88e-04 loss 0.634657 grad_norm 0.797 (26882s)
-step 30075/39780 lr 2.86e-04 loss 0.430907 grad_norm 0.626 (26896s)
-step 30100/39780 lr 2.85e-04 loss 0.693274 grad_norm 0.851 (26910s)
-step 30125/39780 lr 2.84e-04 loss 0.684082 grad_norm 0.912 (26924s)
-step 30150/39780 lr 2.82e-04 loss 0.615052 grad_norm 0.669 (26938s)
-step 30175/39780 lr 2.81e-04 loss 0.419033 grad_norm 0.667 (26952s)
-step 30200/39780 lr 2.79e-04 loss 0.529222 grad_norm 0.608 (26966s)
-step 30225/39780 lr 2.78e-04 loss 0.525568 grad_norm 0.554 (26981s)
-step 30250/39780 lr 2.77e-04 loss 0.576025 grad_norm 0.990 (26994s)
-step 30275/39780 lr 2.75e-04 loss 0.558545 grad_norm 0.505 (27008s)
-step 30300/39780 lr 2.74e-04 loss 0.501798 grad_norm 0.343 (27021s)
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v010.py:525: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 1.460e-06
+exported inference artifacts from best_001_step24999_val0.684870.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v010
