@@ -958,17 +958,23 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
         model.load_state_dict(st['model'])
         model.eval()
         t0 = time.time()
+        # A non-smoke run always rescores the COMPLETE validation set: n_sequences
+        # below is None, which means "every sequence". Judge the scope by what is
+        # actually passed in, NOT by n_valid_seq -- that is the subset used for the
+        # periodic EVAL calls, and conflating the two made a genuine full-validation
+        # score get discarded and mislabelled "subset over 200 sequences"
+        # (measured 2026-09-29 on gru_v001..v004).
+        rescore_n = n_valid_seq if smoke else None
         res_full = evaluate(model, transform, valid_store, batch_sequences=4,
-                            n_sequences=n_valid_seq if smoke else None, device=device)
-        scope = 'subset' if (smoke or n_valid_seq < len(valid_store)) else 'FULL validation'
+                            n_sequences=rescore_n, device=device)
+        is_full = not smoke
+        scope = 'FULL validation' if is_full else f'subset of {n_valid_seq} sequences'
+        n_seq_scored = len(valid_store) if is_full else n_valid_seq
         print(f'final rescore, {scope} ({res_full["selected_rows"]} scored rows over '
-              f'{n_valid_seq if scope != "FULL validation" else len(valid_store)} sequences, '
-              f'{time.time()-t0:.0f}s): t0={res_full["t0"]:.6f} t1={res_full["t1"]:.6f} '
+              f'{n_seq_scored} sequences, {time.time()-t0:.0f}s): '
+              f't0={res_full["t0"]:.6f} t1={res_full["t1"]:.6f} '
               f'mean={res_full["weighted_pearson"]:.6f}', flush=True)
         full_wp = res_full['weighted_pearson']
-        # results.full_valid_wp is reserved for a rescore over EVERY validation
-        # sequence; a smoke/subset number would silently overstate the model
-        is_full = not (smoke or n_valid_seq < len(valid_store))
         if not is_full:
             full_wp = None
             print('NOTE: this rescore covered only a subset of validation, so '
