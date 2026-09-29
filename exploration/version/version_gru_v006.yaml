@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v006
   parent: gru_v002
-  status: running
+  status: finished
 description: SEED REPLICATE of the gru_v002 recipe, seed 1339. A control, not a candidate.
 hypothesis: As v005, and together with v002 and v005 it gives a three-point sample
   whose standard deviation is the noise floor.
@@ -66,15 +66,15 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
+  best_step: 17499
+  best_val_wp: 0.6854350292217444
+  best_val_t0: 0.6825940448325499
+  best_val_t1: 0.6882760136109387
   full_valid_wp: null
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.9366
+  finished_utc: '2026-09-29T15:12:58Z'
 artifacts:
   log: exploration/logs/log_gru_v006.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v006
