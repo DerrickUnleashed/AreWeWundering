@@ -1,0 +1,236 @@
+{
+ "key": "gru_v005",
+ "packaged_utc": "2026-09-29T16:42:16Z",
+ "git_commit": "c23e78649760479f835edb288f6d7420de6abf45",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v005",
+   "parent": "gru_v002",
+   "status": "finished"
+  },
+  "description": "SEED REPLICATE of the gru_v002 recipe, seed 1338. A control, not a candidate.",
+  "hypothesis": "Changing nothing but the seed reproduces gru_v002's 0.674350 to within a small tolerance. The spread across the three seeds IS the noise floor that decides whether any of the v001-v004 differences are real.",
+  "change_vs_parent": "training.seed 1337->1338. NOTHING else changes.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "robust_zscore",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 8
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 192258
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.0,
+   "target_clip": 2.0
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.0,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1338,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5
+  },
+  "results": {
+   "best_step": 17499,
+   "best_val_wp": 0.685775545192201,
+   "best_val_t0": 0.6830219915076959,
+   "best_val_t1": 0.6885290988767061,
+   "full_valid_wp": 0.674037,
+   "latency_us_p50": null,
+   "latency_us_p99": null,
+   "train_hours": 5.9372,
+   "finished_utc": "2026-09-29T15:13:00Z",
+   "full_valid_note": "backfilled from the run's own log on 2026-09-29: that rescore covered 3,528,273 scored rows over all 1873 validation sequences, identical to the full-validation count; only the printed scope label was wrong (a bug fixed in later scripts). No re-run was needed."
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v005.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v005",
+   "submission_dir": null
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step17499_val0.685776.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v005/best_001_step17499_val0.685776.pt",
+  "step": 17499,
+  "sha256": "47bad5c0274bc4a161564af940089cf2934b5d09eb6a102390c30e3848325cae",
+  "train_time_metrics": {
+   "t0": 0.6830219915076959,
+   "t1": 0.6885290988767061,
+   "weighted_pearson": 0.685775545192201,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.7111907613650689,
+  "t1": 0.761683269077217,
+  "weighted_pearson": 0.7364370152211429,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 60.6,
+  "call_us_p50": 49.71,
+  "call_us_p99": 80.33,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 52.25,
+  "us_p99": 86.08,
+  "projected_min_p50": 34.3,
+  "projected_min_p99": 56.5,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": false,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 84.65,
+  "grader_us_p99": 139.45,
+  "grader_min_p50": 55.6,
+  "grader_min_p99": 91.6,
+  "grader_pct_budget_p50": 92.6,
+  "grader_target_us_local": 42.3,
+  "grader_safe": false
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 4.405e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.736437 vs offline 0.736437, |diff| = 3.220e-07 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.7111907613650689,
+   "t1": 0.761683269077217,
+   "weighted_pearson": 0.7364370152211429,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 60.6,
+   "call_us_p50": 49.71,
+   "call_us_p99": 80.33,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 52.25,
+   "us_p99": 86.08,
+   "projected_min_p50": 34.3,
+   "projected_min_p99": 56.5,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": false,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 84.65,
+   "grader_us_p99": 139.45,
+   "grader_min_p50": 55.6,
+   "grader_min_p99": 91.6,
+   "grader_pct_budget_p50": 92.6,
+   "grader_target_us_local": 42.3,
+   "grader_safe": false
+  },
+  "size": {
+   "zip_bytes": 1439626,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": false
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "57820074215820654fee0d8455dccccfc0ef60ff4e48f13df772c434561492f8",
+  "solution_py": "89b0cb1aef220389274e174b318d4e6c70edaf4d1c135b6419c5bde861345430",
+  "model_onnx": "e6f1e7c167aef631dcf7599ba0a8c8cdaa0b56a95fd9da874dfa83c30f886073",
+  "feature_stats_npz": "a15c7eb16e5d3a8e1a961ba4729bb5bcabc6331ea5425825ff9f2c14d341b902"
+ },
+ "zip": {
+  "file": "submission_gru_v005.zip",
+  "bytes": 1439626,
+  "root_entries": [
+   "best_001_step17499_val0.685776.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 0.8 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [
+  "latency gate FAILED against the grader: 52.25 us/row local x 1.62 = 55.6 min at p50 (92.6% of the 60 min budget) and 91.6 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
+ ],
+ "status": "NOT-READY"
+}
