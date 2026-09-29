@@ -71,8 +71,8 @@ results:
   best_val_t0: 0.6825940448325499
   best_val_t1: 0.6882760136109387
   full_valid_wp: 0.674149
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 48.75
+  latency_us_p99: 67.5
   train_hours: 5.9366
   finished_utc: '2026-09-29T15:12:58Z'
   full_valid_note: 'backfilled from the run''s own log on 2026-09-29: that rescore
@@ -82,4 +82,4 @@ results:
 artifacts:
   log: exploration/logs/log_gru_v006.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v006
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v006
