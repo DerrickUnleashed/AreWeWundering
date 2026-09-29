@@ -154,7 +154,20 @@ def main():
     cks = sorted(ck_dir.glob('best_*.pt'))
     if not cks:
         raise SystemExit(f'no best_*.pt in {ck_dir}')
-    ck = Path(args.checkpoint) if args.checkpoint else cks[-1]
+    # Pick the checkpoint with the highest val, NOT the lexicographically last one.
+    # Filenames are best_<NNN>_step<S>_val<WP>.pt, so sorted()[-1] compares 'step9999'
+    # against 'step17499' as TEXT and picks step9999 -- the earliest and worst
+    # checkpoint. That silently shipped 0.675976 instead of 0.684581 for v009, a
+    # 0.0086 regression, because 9 sorts after 1. Parse the val and take the max.
+    def _val_of(p):
+        try:
+            return float(p.stem.split('val')[-1])
+        except ValueError:
+            return -1.0
+    ck = Path(args.checkpoint) if args.checkpoint else max(cks, key=_val_of)
+    if not args.checkpoint and ck != cks[-1]:
+        print(f'note: {len(cks)} best_*.pt found; chose {ck.name} (highest val) '
+              f'over lexicographically-last {cks[-1].name}')
     if not ck.is_absolute():
         ck = ck_dir / ck
     if not ck.exists():
