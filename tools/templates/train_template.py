@@ -219,7 +219,13 @@ class FeatureTransform:
         # ---- preallocated: the hot path must not allocate
         self._buf = _np.zeros(self.n_out, dtype=_np.float32)
         self._base = _np.zeros(self.n_base, dtype=_np.float32)
-        self._prev = _np.zeros(self.n_in, dtype=_np.float32)
+        # holds the previous row's base block AFTER normalisation, because both
+        # .step() and .batch() difference the normalised block. Storing the RAW row
+        # here made .step() differ from .batch() by up to 7.2 absolute whenever
+        # first_differences and a non-'none' normalisation were combined
+        # (measured 2026-09-29) -- and .batch() is what trains while .step() is
+        # what serves, i.e. a silent train/serve skew (AGENTS.md §2.2).
+        self._prev = _np.zeros(self.n_base, dtype=_np.float32)
         self._diff_idx = self.diff.astype(_np.int32) if self.n_diff else self.diff
         self._step_i = 0
         self._have_prev = False
@@ -235,6 +241,7 @@ class FeatureTransform:
     def reset(self):
         self._step_i = 0
         self._have_prev = False
+        self._prev.fill(0.0)
 
     def _base_rows(self, X):
         """Raw (un-normalised) base block for a (n, n_in) array."""
@@ -255,16 +262,31 @@ class FeatureTransform:
             _np.clip(Y, -self.clip_sigma, self.clip_sigma, out=Y)
         return Y
 
-    def _diffs_from(self, Z, prev, have_prev):
-        """Z: (n, n_base) already normalised; prev: (n_in,) or None."""
-        D = _np.zeros((Z.shape[0], self.n_diff), dtype=_np.float32)
-        if self.n_diff == 0:
+    def _diffs_from(self, Z, prev=None, have_prev=False):
+        """First differences of the normalised base block.
+
+        Z    : (n, n_base) already normalised, rows of ONE sequence in order
+        prev : (n_base,) the previous row's normalised base block, or None
+        Row 0 has no predecessor inside the sequence and yields 0, which is what
+        `.step()` does on the first row after a reset -- that is what makes the two
+        paths agree.
+
+        NOTE: the within-sequence differences (rows 1..n-1) must ALWAYS be computed.
+        An earlier version returned early when `have_prev` was False, and since
+        `.batch()` passes have_prev=False, the whole first-difference block came out
+        as zeros during training while `.step()` produced real differences at serve
+        time -- a silent train/serve skew of up to 4.4 absolute (measured
+        2026-09-29). See AGENTS.md §2.2.
+        """
+        n = Z.shape[0]
+        D = _np.zeros((n, self.n_diff), dtype=_np.float32)
+        if self.n_diff == 0 or n == 0:
             return D
-        if not have_prev:
-            return D                      # first row of a sequence has no predecessor
-        D[0] = Z[0, self._diff_idx] - prev[self._diff_idx]
-        if Z.shape[0] > 1:
-            _np.subtract(Z[1:][:, self._diff_idx], Z[:-1][:, self._diff_idx], out=D[1:])
+        idx = self._diff_idx
+        if n > 1:
+            _np.subtract(Z[1:][:, idx], Z[:-1][:, idx], out=D[1:])
+        if have_prev and prev is not None:
+            D[0] = Z[0, idx] - prev[idx]
         return D
 
     def _step_rows(self, n):
@@ -277,11 +299,11 @@ class FeatureTransform:
         """Vectorised transform of a whole (n, 112) block of ONE sequence."""
         X = _np.asarray(X, dtype=_np.float32)
         Z = self._normalise(self._base_rows(X))
-        D = self._diffs_from(Z, None, False)
+        D = self._diffs_from(Z)
         self._step_i = len(X)
         self._have_prev = bool(len(X))
         if self._have_prev:
-            self._prev[:] = X[-1]
+            self._prev[:] = Z[-1]
         pieces = [Z, D]
         s = self._step_rows(len(X))
         if s is not None:
@@ -321,7 +343,7 @@ class FeatureTransform:
             o += self.n_diff
         if self.step_feature:
             buf[o] = self._step_i / _np.float32(SEQ_LEN - 1)
-        self._prev[:] = x
+        self._prev[:] = Z
         self._have_prev = True
         self._step_i += 1
         return buf
