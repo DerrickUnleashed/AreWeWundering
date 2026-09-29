@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v003
   parent: gru_v000
-  status: running
+  status: finished
 description: 'TRAINING STABILITY: add a 0.05 |t|-weighted auxiliary MSE term and enable
   EMA weights.'
 hypothesis: The weighted-Pearson gradient vanishes where the target variance collapses,
@@ -72,16 +72,16 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 14999
+  best_val_wp: 0.6862242511630261
+  best_val_t0: 0.6825057719137231
+  best_val_t1: 0.6899427304123292
+  full_valid_wp: 0.673711
+  latency_us_p50: 27.87
+  latency_us_p99: 43.0
+  train_hours: 3.7638
+  finished_utc: '2026-09-28T23:38:33Z'
 artifacts:
   log: exploration/logs/log_gru_v003.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v003
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v003
