@@ -1,0 +1,107 @@
+### new run, log opened 2026-09-29T15:07:50+0530
+==============================================================================
+command            : python exploration/models/train_gru_v010.py --config exploration/version/version_gru_v010.yaml --device cpu
+timestamp          : 2026-09-29T15:07:50+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : e5daf9a88513d2aa1f33fefcaba83b4c96602027
+seed               : 1337
+log                : exploration/logs/log_gru_v010.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v010
+  parent: gru_v002
+  status: planned
+description: 'SCHEDULE: the gru_v002 recipe trained for 6 epochs instead of 3.'
+hypothesis: Every finished run plateaued by ~step 15,000 of 19,890, which is weak
+  evidence that 3 epochs is enough. This is the direct test of the one scheduling
+  question left, at double the rows.
+change_vs_parent: training.epochs 3 -> 6. No feature or architecture change.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 8
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 6
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v010.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v010
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+max_steps derived: 6,630 steps/epoch x 6 epoch(s) = 39,780 steps over all 10,607 training sequences
+train sequences=10607  valid sequences=200  steps=39780
+step 0/39780 lr 4.00e-06 loss 1.057388 grad_norm 2.269 (2s)
+step 25/39780 lr 1.04e-04 loss 0.976030 grad_norm 3.942 (26s)
+step 50/39780 lr 2.04e-04 loss 0.757682 grad_norm 1.124 (53s)
+step 75/39780 lr 3.04e-04 loss 0.693642 grad_norm 1.537 (80s)
+step 100/39780 lr 4.04e-04 loss 0.549580 grad_norm 0.747 (107s)
+step 125/39780 lr 5.04e-04 loss 0.559178 grad_norm 0.576 (136s)
+step 150/39780 lr 6.04e-04 loss 0.666604 grad_norm 0.953 (162s)
+step 175/39780 lr 7.04e-04 loss 0.733536 grad_norm 0.780 (189s)
