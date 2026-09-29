@@ -10,6 +10,9 @@
 # no-op and v011 would silently become a state-reset-only run -- i.e. a different
 # experiment from the one its yaml claims. Better to not run it at all.
 set -u
+# unbuffered: without this the chain log stays empty for minutes because
+# stdout is block-buffered when redirected to a file, which looks like a hang
+export PYTHONUNBUFFERED=1
 cd /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack
 
 LOGDIR=/tmp/wnn_mask
