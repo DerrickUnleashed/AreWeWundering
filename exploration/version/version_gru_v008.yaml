@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v008
   parent: gru_v002
-  status: running
+  status: finished
 description: 'INPUTS: cross-instrument spreads and imbalances between i0 and i1.'
 hypothesis: The organisers supply i1 as a second instrument with no target, so it
   is there to be related to i0. Cross-instrument differences and volume imbalances
@@ -101,15 +101,15 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 19889
+  best_val_wp: 0.6832246813674021
+  best_val_t0: 0.6796370838840728
+  best_val_t1: 0.6868122788507313
+  full_valid_wp: 0.6744445165495536
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.85
+  finished_utc: '2026-09-29T15:28:52Z'
 artifacts:
   log: exploration/logs/log_gru_v008.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v008
