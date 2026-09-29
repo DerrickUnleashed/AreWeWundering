@@ -4,19 +4,50 @@ All scores are `full_valid_wp`: global weighted Pearson over every one of the
 1,873 validation sequences (3,528,273 scored rows), computed with the
 reference metric in `tools/metric_ref.py`.
 
-| Rank | Ver | What it changed | full_valid_wp | sigma vs seed mean | Verdict | Status | Public score |
-|---:|---|---|---:|---:|---|---|---:|
-| 1 | **v009** | signed-log volumes | 0.674456 | +1.8 | within noise | Yet to package | -- |
-| 2 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | +1.7 | within noise | Yet to package | -- |
-| 3 | **v002** | baseline config, seed 1337 | 0.674350 | +1.1 | within noise | Submitted | 0.6435 |
-| 4 | **v001** | 1x256 wider GRU | 0.674315 | +0.9 | within noise | Submitted | 0.6416 |
-| 5 | **v007** | first differences | 0.674258 | +0.5 | within noise | Yet to package | -- |
-| 6 | **v006** | baseline config, seed 1339 | 0.674149 | -0.2 | within noise | Yet to package | -- |
-| 7 | **v005** | baseline config, seed 1338 | 0.674037 | -0.9 | within noise | Yet to package | -- |
-| 8 | **v003** | aux MSE + EMA | 0.673711 | **-2.9** | **worse, real** | Submitted | 0.6457 |
-| 9 | **v004** | 2x192 + input projection | 0.672206 | **-12.4** | **worse, real** | Do not ship | -- |
+| Rank | Ver | What it changed | full_valid_wp | sigma vs seed mean | Verdict | Status | Public score | Duration | Memory |
+|---:|---|---|---:|---:|---|---|---:|---|---:|
+| 1 | **v009** | signed-log volumes | 0.674456 | +1.8 | within noise | Yet to package | -- | -- | -- |
+| 2 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | +1.7 | within noise | Yet to package | -- | -- | -- |
+| 3 | **v002** | baseline config, seed 1337 | 0.674350 | +1.1 | within noise | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 4 | **v001** | 1x256 wider GRU | 0.674315 | +0.9 | within noise | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 5 | **v007** | first differences | 0.674258 | +0.5 | within noise | Yet to package | -- | -- | -- |
+| 6 | **v006** | baseline config, seed 1339 | 0.674149 | -0.2 | within noise | Yet to package | -- | -- | -- |
+| 7 | **v005** | baseline config, seed 1338 | 0.674037 | -0.9 | within noise | Yet to package | -- | -- | -- |
+| 8 | **v003** | aux MSE + EMA | 0.673711 | **-2.9** | **worse, real** | Submitted | **0.6457** | 30m57s (52%) | 627 MB |
+| 9 | **v004** | 2x192 + input projection | 0.672206 | **-12.4** | **worse, real** | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
 
 All nine beat the organiser baseline of 0.617052 by roughly +0.055 to +0.057.
+
+Duration and memory are the grader's own readings for the 39.4 M-row test set,
+as a fraction of the 60-minute / 16 GB limits.
+
+### Reference points on the leaderboard
+
+| Entry | Public score | Duration | Memory |
+|---|---:|---|---:|
+| organiser `baseline_submission.zip` | 0.5935 | 26m21s (44%) | 624 MB |
+| our `gru_v000` (60-step smoke test) | 0.4986 | 29m47s (50%) | 626 MB |
+| **our best** (`gru_v003`) | **0.6457** | 30m57s (52%) | 627 MB |
+
+The organiser's baseline scores 0.5935 and every one of our completed runs scores
+0.64-0.65, so the training programme is worth roughly **+0.05 public**, consistent
+with the +0.057 measured locally. `gru_v000` is the 60-step framework smoke test
+and is not a modelling result: it is below the organiser's own baseline because it
+has barely trained, and it was uploaded to validate the submission path only.
+
+### v004 was shippable after all
+
+This corrects a verdict in `AGENTS.md`. v004 was marked **DO NOT SHIP** on a local
+p50 of 44.33 us/row, projected to 79 % of budget at p50 and ~76 min at p99. The
+grader ran it in **43m16s, 72.1 % of the limit**, and it scored 0.6446 -- the
+second-best public score of our entries.
+
+So the p99 projection was too pessimistic: the latency tail is thinner on the
+grader than a contended local p99 suggests, and the 1.62x slowdown factor measured
+from `gru_v000` does not apply cleanly to a wider model with more per-row work.
+v004 remains the worst model locally (-12.4 sigma), so it is still not the one to
+ship, but the "must not be uploaded" language was wrong and the latency gate is
+calibrated too conservatively.
 
 ### Still in flight
 
@@ -39,14 +70,14 @@ One of **Training**, **Yet to Train**, **Ready to Submit**, **Submitted**, or
 **Do not ship**. The public score is populated only for Submitted rows, from the
 competition leaderboard.
 
-- **Submitted** -- a bundle exists in `submissions/` and has been uploaded. v001,
-  v002, and v003 all passed the latency gate and were submitted.
-- **Do not ship** -- v004 is a legitimate training result but is *not
-  submittable*: 79 % of the 60-minute budget at p50, and ~76 min at p99 against a
-  hard limit. Its bundle exists but must not be uploaded.
+- **Submitted** -- a bundle exists in `submissions/` and has been uploaded and
+  scored. v001, v002, v003, and v004 are all submitted.
+- **Do not ship** -- reserved for a bundle that has been measured as unable to
+  finish inside the grader's limits. **Nothing currently holds this status.**
 - **Yet to package** -- trained and scored, but no bundle built yet. v005 through
-  v009 all pass the latency gate (same 2x128 architecture as v002) and are
-  eligible to package on demand.
+  v009 are the same 2x128 architecture as v002, which the grader ran in 35m02s
+  (58 % of budget), so they have ample headroom and are eligible to package on
+  demand.
 - **Training** -- v010 (6 epochs) and v011 (soft mask + state reset) are still
   running.
 
