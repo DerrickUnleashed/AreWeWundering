@@ -1,11 +1,11 @@
-### new run, log opened 2026-09-29T01:22:43+0530
+### new run, log opened 2026-09-29T11:49:08+0530
 ==============================================================================
-command            : python exploration/models/train_gru_v001.py --config exploration/version/version_gru_v001.yaml --device cpu
-timestamp          : 2026-09-29T01:22:43+0530
+command            : python exploration/models/train_gru_v001.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v001.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v001/best_001_step9999_val0.672927.pt
+timestamp          : 2026-09-29T11:49:08+0530
 host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
 packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
 cuda               : False   mps: True
-git commit         : 62832d0b12db5bd653986b7c049fa9364d0d14a7
+git commit         : 689918f87eb6ed5a3be5a36b6a5d55d6bf643596
 seed               : 1337
 log                : exploration/logs/log_gru_v001.log
 config:
@@ -14,7 +14,7 @@ identity:
   model: gru
   version: v001
   parent: gru_v000
-  status: planned
+  status: finished
 description: 'WIDE: 1 layer x 256 units, otherwise identical to gru_v000''s recipe.'
 hypothesis: 'At roughly equal inference latency, width should buy more than depth
   for a tail-weighted global correlation: the same parameter budget concentrated in
@@ -44,7 +44,7 @@ model:
   dropout: 0.0
   layernorm: false
   head: linear
-  param_count: null
+  param_count: 284674
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -80,37 +80,25 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 19889
+  best_val_wp: 0.6836933903923514
+  best_val_t0: 0.6812022721904728
+  best_val_t1: 0.6861845085942302
+  full_valid_wp: 0.674315
+  latency_us_p50: 32.46
+  latency_us_p99: 49.04
+  train_hours: 3.2524
+  finished_utc: '2026-09-28T23:07:52Z'
 artifacts:
   log: exploration/logs/log_gru_v001.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v001
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v001
 
 ==============================================================================
 device: cpu
-model: gru hidden=256 layers=1 input_proj=0 in_dim=112 params=284,674
-max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
-train sequences=10607  valid sequences=200  steps=19890
-step 0/19890 lr 4.00e-06 loss 1.030756 grad_norm 3.078 (1s)
-step 25/19890 lr 1.04e-04 loss 0.734028 grad_norm 3.175 (16s)
-step 50/19890 lr 2.04e-04 loss 0.793471 grad_norm 1.767 (30s)
-step 75/19890 lr 3.04e-04 loss 0.709989 grad_norm 1.704 (45s)
-step 100/19890 lr 4.04e-04 loss 0.567649 grad_norm 1.144 (60s)
-step 125/19890 lr 5.04e-04 loss 0.582438 grad_norm 1.089 (75s)
-step 150/19890 lr 6.04e-04 loss 0.668873 grad_norm 1.379 (89s)
-step 175/19890 lr 7.04e-04 loss 0.761872 grad_norm 1.008 (104s)
-step 200/19890 lr 8.04e-04 loss 0.695983 grad_norm 1.003 (119s)
-step 225/19890 lr 9.04e-04 loss 0.654962 grad_norm 2.089 (133s)
-step 250/19890 lr 1.00e-03 loss 0.843976 grad_norm 0.951 (147s)
-step 275/19890 lr 1.10e-03 loss 0.687077 grad_norm 1.002 (162s)
-step 300/19890 lr 1.20e-03 loss 0.653280 grad_norm 0.739 (176s)
-step 325/19890 lr 1.30e-03 loss 0.616077 grad_norm 0.660 (191s)
-step 350/19890 lr 1.40e-03 loss 0.603570 grad_norm 0.516 (205s)
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v001.py:503: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 2.801e-06
+exported inference artifacts from best_001_step9999_val0.672927.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v001
