@@ -4,19 +4,55 @@ All scores are `full_valid_wp`: global weighted Pearson over every one of the
 1,873 validation sequences (3,528,273 scored rows), computed with the
 reference metric in `tools/metric_ref.py`.
 
-| Rank | Ver | What it changed | full_valid_wp | sigma vs seed mean | Verdict |
-|---:|---|---|---:|---:|---|
-| 1 | **v009** | signed-log volumes | 0.674456 | +1.8 | within noise |
-| 2 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | +1.7 | within noise |
-| 3 | **v002** | baseline config, seed 1337 | 0.674350 | +1.1 | within noise |
-| 4 | **v001** | 1x256 wider GRU | 0.674315 | +0.9 | within noise |
-| 5 | **v007** | first differences | 0.674258 | +0.5 | within noise |
-| 6 | **v006** | baseline config, seed 1339 | 0.674149 | -0.2 | within noise |
-| 7 | **v005** | baseline config, seed 1338 | 0.674037 | -0.9 | within noise |
-| 8 | **v003** | aux MSE + EMA | 0.673711 | **-2.9** | **worse, real** |
-| 9 | **v004** | 2x192 + input projection | 0.672206 | **-12.4** | **worse, real** |
+| Rank | Ver | What it changed | full_valid_wp | sigma vs seed mean | Verdict | Status | Public score |
+|---:|---|---|---:|---:|---|---|---:|
+| 1 | **v009** | signed-log volumes | 0.674456 | +1.8 | within noise | Yet to package | -- |
+| 2 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | +1.7 | within noise | Yet to package | -- |
+| 3 | **v002** | baseline config, seed 1337 | 0.674350 | +1.1 | within noise | Submitted | 0.6435 |
+| 4 | **v001** | 1x256 wider GRU | 0.674315 | +0.9 | within noise | Submitted | 0.6416 |
+| 5 | **v007** | first differences | 0.674258 | +0.5 | within noise | Yet to package | -- |
+| 6 | **v006** | baseline config, seed 1339 | 0.674149 | -0.2 | within noise | Yet to package | -- |
+| 7 | **v005** | baseline config, seed 1338 | 0.674037 | -0.9 | within noise | Yet to package | -- |
+| 8 | **v003** | aux MSE + EMA | 0.673711 | **-2.9** | **worse, real** | Submitted | 0.6457 |
+| 9 | **v004** | 2x192 + input projection | 0.672206 | **-12.4** | **worse, real** | Do not ship | -- |
 
 All nine beat the organiser baseline of 0.617052 by roughly +0.055 to +0.057.
+
+### Still in flight
+
+Not ranked yet, since neither has a final `full_valid_wp`.
+
+| Ver | What it changed | best so far (subset) | Status | Public score |
+|---|---|---:|---|---:|
+| **v010** | 6 epochs instead of 3 | 0.684870 (step 24,999) | Training | -- |
+| **v011** | soft mask on `P(is_scored)` + state reset | 0.689067 (step 14,999) | Training | -- |
+
+v011 is the only hypothesis in this batch with a mechanism that could explain a
+gain: it changes the objective and the state handling rather than the inputs. At
+0.689067 on the subset metric it sits about +4.9 sigma above the seed mean
+(0.685955), which is the first result here to clear the noise bar. Its two levers
+are confounded, so a single-variable follow-up would be needed to attribute it.
+
+### Status column
+
+One of **Training**, **Yet to Train**, **Ready to Submit**, **Submitted**, or
+**Do not ship**. The public score is populated only for Submitted rows, from the
+competition leaderboard.
+
+- **Submitted** -- a bundle exists in `submissions/` and has been uploaded. v001,
+  v002, and v003 all passed the latency gate and were submitted.
+- **Do not ship** -- v004 is a legitimate training result but is *not
+  submittable*: 79 % of the 60-minute budget at p50, and ~76 min at p99 against a
+  hard limit. Its bundle exists but must not be uploaded.
+- **Yet to package** -- trained and scored, but no bundle built yet. v005 through
+  v009 all pass the latency gate (same 2x128 architecture as v002) and are
+  eligible to package on demand.
+- **Training** -- v010 (6 epochs) and v011 (soft mask + state reset) are still
+  running.
+
+v007 is a legal candidate but has a truncated training log (stdout buffering lost
+roughly 12,000 lines), so it is the weakest of the seven on the reproducibility
+criterion even though it ranks 5th.
 
 ## Why ranks 1-7 are one statistical blob
 
