@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v011
   parent: gru_v003
-  status: running
+  status: finished
 description: 'THIRD-PARTY RECIPE: soft mask on likely-scored rows + periodic state
   reset, on top of the best scoring base (v003).'
 hypothesis: 'Scored rows are a distinct regime (0.58 WP on them vs 0.30 on all rows),
@@ -81,15 +81,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 19889
+  best_val_wp: 0.689478538609773
+  best_val_t0: 0.685205965598288
+  best_val_t1: 0.6937511116212582
+  full_valid_wp: 0.6799864682831658
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 4.697
+  finished_utc: '2026-09-29T17:02:54Z'
 artifacts:
   log: exploration/logs/log_gru_v011.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v011
