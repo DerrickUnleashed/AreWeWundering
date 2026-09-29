@@ -182,6 +182,10 @@ def main():
     ap.add_argument('--threads', type=int, default=8)
     ap.add_argument('--device', default='cpu')
     ap.add_argument('--no-label', action='store_true', help='train and report, skip writing labels')
+    ap.add_argument('--reuse-ckpt', action='store_true',
+                    help='skip training and reuse an existing --ckpt, going straight to '
+                         'labelling. Use when training already succeeded and only the '
+                         'labelling pass failed.')
     args = ap.parse_args()
 
     torch.set_num_threads(args.threads)
@@ -202,6 +206,21 @@ def main():
     print(f'positive rate: fit {Sf.mean():.4f}   holdout {Sh.mean():.4f}', flush=True)
 
     m = MaskGRU(args.hidden).to(dev)
+    if args.reuse_ckpt:
+        from pathlib import Path as _P
+        if not _P(args.ckpt).exists():
+            raise SystemExit(f'--reuse-ckpt but {args.ckpt} does not exist')
+        st = torch.load(args.ckpt, map_location='cpu', weights_only=False)
+        m.load_state_dict(st['model'])
+        best_auc = st.get('auc', float('nan'))
+        print(f'reusing {args.ckpt} (holdout AUC {best_auc:.4f}); skipping training',
+              flush=True)
+        if best_auc < 0.85:
+            print('ABORT: the reused checkpoint is below 0.85 AUC; the soft mask would be a '
+                  'no-op and v011 would quietly become a state-reset-only run.', flush=True)
+            return 3
+        return finish(m, args, root, dev)
+
     opt = torch.optim.AdamW(m.parameters(), lr=args.lr, weight_decay=args.wd)
     pw = torch.tensor(args.pos_weight, device=dev)
     lossf = nn.BCEWithLogitsLoss(pos_weight=pw, reduction='none')
@@ -248,8 +267,12 @@ def main():
     print(f'saved predictor -> {args.ckpt}', flush=True)
 
     if args.no_label:
-        return
-    # ---- label the TRAIN rows
+        return 0
+    return finish(m, args, root, dev, best_auc)
+
+
+def finish(m, args, root, dev, best_auc=float('nan')):
+    """Label every training row with P(is_scored) and write the manifest."""
     n_train = len(np.load(root / 'train' / 'seq_index.npy')) - 1
     Xtr = np.load(root / 'train' / 'X.npy', mmap_mode='r')
     idx = np.load(root / 'train' / 'seq_index.npy')
@@ -260,20 +283,30 @@ def main():
         for i in tqdm(range(n_train), desc='label train'):
             a, b = int(idx[i]), int(idx[i + 1])
             x = torch.from_numpy(np.asarray(Xtr[a:b], dtype=np.float32)).unsqueeze(0)
-            h = [torch.zeros(1, 1, args.hidden)]
+            h = torch.zeros(1, 1, args.hidden)
             p = np.empty(SEQUENCE_LENGTH, dtype=np.float32)
             for c in range(0, SEQUENCE_LENGTH, args.chunk):
-                d = min(c + args.chunk, SEQUENCE_LENGTH)
+                d = min(c + chunk_len(args), SEQUENCE_LENGTH)
                 logit, h = m.forward_chunk(x[:, c:d], h)
                 p[c:d] = torch.sigmoid(logit[0]).numpy()
             out[a:b] = p.astype(np.float16)
     out.flush()
+    sample = np.asarray(out[::1003], dtype=np.float32)
     print(f'wrote {args.out}  ({n_train:,} rows, {(time.time()-t0)/60:.1f} min, '
-          f'mean P(scored) {float(np.asarray(out[::997]).mean()):.4f})')
+          f'mean P(scored) {sample.mean():.4f}, frac>0.5 {float((sample>0.5).mean()):.4f})',
+          flush=True)
     meta = {'auc': best_auc, 'hidden': args.hidden, 'rows': int(n_train * SEQUENCE_LENGTH),
-            'fit': [fit_ids[0], fit_ids[-1]], 'holdout': [hold_ids[0], hold_ids[-1]],
-            'eval_untouched': [0, args.mask_start - 1], 'args': vars(args)}
+            'mask_start': args.mask_start, 'mask_holdout': args.mask_holdout,
+            'note': 'fitted on validation sequences [mask_start, mask_holdout), '
+                    'early-stopped on [mask_holdout, end); sequences [0, mask_start) are '
+                    'never touched and remain the repo-wide evaluation set',
+            'args': vars(args)}
     Path(args.out).with_suffix('.json').write_text(json.dumps(meta, indent=1))
+    return 0
+
+
+def chunk_len(args):
+    return args.chunk
 
 
 @torch.no_grad()
