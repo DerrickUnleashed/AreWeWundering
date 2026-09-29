@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v002
   parent: gru_v000
-  status: running
+  status: finished
 description: 'INPUTS: train-only robust z-score with +-8 sigma clipping, on top of
   the organiser-standardised features.'
 hypothesis: The organisers standardise globally rather than per-window, so re-standardising
@@ -70,16 +70,16 @@ inference:
   ort_threads: 1
   target_us_per_row: 68.5
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 17499
+  best_val_wp: 0.6866541062303888
+  best_val_t0: 0.6835054967480245
+  best_val_t1: 0.6898027157127532
+  full_valid_wp: 0.67435
+  latency_us_p50: 31.71
+  latency_us_p99: 45.88
+  train_hours: 3.7671
+  finished_utc: '2026-09-28T23:38:45Z'
 artifacts:
   log: exploration/logs/log_gru_v002.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v002
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v002
