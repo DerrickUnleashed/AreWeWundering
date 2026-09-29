@@ -1,0 +1,162 @@
+### new run, log opened 2026-09-29T14:46:45+0530
+==============================================================================
+command            : python exploration/models/train_gru_v005.py --config exploration/version/version_gru_v005.yaml --device cpu
+timestamp          : 2026-09-29T14:46:45+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 60ddfc5bb5ad25b9957a60cc5945400119d6a903
+seed               : 1338
+log                : exploration/logs/log_gru_v005.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v005
+  parent: gru_v002
+  status: planned
+description: SEED REPLICATE of the gru_v002 recipe, seed 1338. A control, not a candidate.
+hypothesis: Changing nothing but the seed reproduces gru_v002's 0.674350 to within
+  a small tolerance. The spread across the three seeds IS the noise floor that decides
+  whether any of the v001-v004 differences are real.
+change_vs_parent: training.seed 1337->1338. NOTHING else changes.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 8
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1338
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v005.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v005
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
+train sequences=10607  valid sequences=200  steps=19890
+step 0/19890 lr 4.00e-06 loss 0.917313 grad_norm 3.777 (1s)
+step 25/19890 lr 1.04e-04 loss 0.740001 grad_norm 3.757 (17s)
+step 50/19890 lr 2.04e-04 loss 0.772416 grad_norm 2.255 (33s)
+step 75/19890 lr 3.04e-04 loss 0.779888 grad_norm 2.248 (48s)
+step 100/19890 lr 4.04e-04 loss 0.798987 grad_norm 2.058 (65s)
+step 125/19890 lr 5.04e-04 loss 0.597435 grad_norm 1.248 (80s)
+step 150/19890 lr 6.04e-04 loss 0.600284 grad_norm 0.659 (95s)
+step 175/19890 lr 7.04e-04 loss 0.643520 grad_norm 0.753 (111s)
+step 200/19890 lr 8.04e-04 loss 0.708011 grad_norm 0.859 (127s)
+step 225/19890 lr 9.04e-04 loss 0.700003 grad_norm 0.600 (142s)
+step 250/19890 lr 1.00e-03 loss 0.569957 grad_norm 0.640 (158s)
+step 275/19890 lr 1.10e-03 loss 0.680531 grad_norm 0.853 (174s)
+step 300/19890 lr 1.20e-03 loss 0.603044 grad_norm 0.353 (190s)
+step 325/19890 lr 1.30e-03 loss 0.688082 grad_norm 0.537 (205s)
+step 350/19890 lr 1.40e-03 loss 0.700559 grad_norm 0.536 (222s)
+step 375/19890 lr 1.50e-03 loss 0.713691 grad_norm 0.555 (238s)
+step 400/19890 lr 1.60e-03 loss 0.727143 grad_norm 0.610 (254s)
+step 425/19890 lr 1.70e-03 loss 0.720997 grad_norm 0.798 (270s)
+step 450/19890 lr 1.80e-03 loss 0.613064 grad_norm 0.463 (287s)
+step 475/19890 lr 1.90e-03 loss 0.738979 grad_norm 0.480 (305s)
+step 500/19890 lr 2.00e-03 loss 0.624800 grad_norm 0.818 (322s)
+step 525/19890 lr 2.00e-03 loss 0.821699 grad_norm 0.900 (340s)
+step 550/19890 lr 2.00e-03 loss 0.447563 grad_norm 0.363 (359s)
+step 575/19890 lr 2.00e-03 loss 0.643062 grad_norm 0.406 (377s)
+step 600/19890 lr 2.00e-03 loss 0.674494 grad_norm 0.539 (395s)
+step 625/19890 lr 2.00e-03 loss 0.645500 grad_norm 0.411 (414s)
+step 650/19890 lr 2.00e-03 loss 0.485616 grad_norm 0.280 (432s)
+step 675/19890 lr 2.00e-03 loss 0.867805 grad_norm 0.742 (450s)
+step 700/19890 lr 2.00e-03 loss 0.664723 grad_norm 0.759 (468s)
+step 725/19890 lr 2.00e-03 loss 0.679507 grad_norm 0.924 (487s)
+step 750/19890 lr 2.00e-03 loss 0.577666 grad_norm 0.572 (505s)
+step 775/19890 lr 2.00e-03 loss 0.557432 grad_norm 0.483 (523s)
+step 800/19890 lr 2.00e-03 loss 0.790440 grad_norm 0.589 (541s)
+step 825/19890 lr 2.00e-03 loss 0.651848 grad_norm 1.375 (559s)
+step 850/19890 lr 2.00e-03 loss 0.601798 grad_norm 0.322 (578s)
+step 875/19890 lr 2.00e-03 loss 0.724248 grad_norm 0.837 (596s)
+step 900/19890 lr 2.00e-03 loss 0.751677 grad_norm 1.164 (613s)
+step 925/19890 lr 2.00e-03 loss 0.661458 grad_norm 0.628 (631s)
+step 950/19890 lr 2.00e-03 loss 0.469937 grad_norm 0.292 (649s)
+step 975/19890 lr 2.00e-03 loss 0.573755 grad_norm 0.382 (667s)
+step 1000/19890 lr 2.00e-03 loss 0.735826 grad_norm 0.519 (684s)
+step 1025/19890 lr 2.00e-03 loss 0.684787 grad_norm 0.705 (702s)
+step 1050/19890 lr 2.00e-03 loss 0.646390 grad_norm 0.324 (719s)
+step 1075/19890 lr 2.00e-03 loss 0.614944 grad_norm 0.565 (737s)
+step 1100/19890 lr 2.00e-03 loss 0.776018 grad_norm 0.606 (754s)
+step 1125/19890 lr 1.99e-03 loss 0.611030 grad_norm 0.470 (772s)
+step 1150/19890 lr 1.99e-03 loss 0.609826 grad_norm 0.329 (789s)
+step 1175/19890 lr 1.99e-03 loss 0.554592 grad_norm 0.455 (806s)
+step 1200/19890 lr 1.99e-03 loss 0.570737 grad_norm 0.676 (823s)
+step 1225/19890 lr 1.99e-03 loss 0.601729 grad_norm 0.371 (840s)
+step 1250/19890 lr 1.99e-03 loss 0.603177 grad_norm 0.508 (857s)
+step 1275/19890 lr 1.99e-03 loss 0.454522 grad_norm 0.340 (873s)
+step 1300/19890 lr 1.99e-03 loss 0.688720 grad_norm 0.646 (890s)
+step 1325/19890 lr 1.99e-03 loss 0.757277 grad_norm 0.721 (906s)
+step 1350/19890 lr 1.99e-03 loss 0.592491 grad_norm 0.678 (922s)
+step 1375/19890 lr 1.99e-03 loss 0.542123 grad_norm 0.624 (939s)
+step 1400/19890 lr 1.99e-03 loss 0.636921 grad_norm 0.688 (958s)
+step 1425/19890 lr 1.99e-03 loss 0.657478 grad_norm 0.448 (975s)
+step 1450/19890 lr 1.99e-03 loss 0.718445 grad_norm 0.459 (993s)
+step 1475/19890 lr 1.99e-03 loss 0.592303 grad_norm 0.651 (1010s)
+step 1500/19890 lr 1.99e-03 loss 0.641642 grad_norm 0.454 (1028s)
+step 1525/19890 lr 1.99e-03 loss 0.535808 grad_norm 0.279 (1046s)
+step 1550/19890 lr 1.99e-03 loss 0.711798 grad_norm 0.382 (1064s)
