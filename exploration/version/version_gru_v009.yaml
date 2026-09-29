@@ -1,0 +1,85 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v009
+  parent: gru_v002
+  status: running
+description: 'INPUTS: append sign(x)*log1p(|x|) of every feature, to compress the
+  heavy tails.'
+hypothesis: 'The features saturate near +-2.33 and carry a -5.199 floor sentinel,
+  so the distribution is heavy-tailed. A signed-log copy gives the model a compressed
+  view of the same information, which is often easier to fit for a tail-weighted metric.
+  NOTE: the template applies this to ALL 112 columns, not a selectable subset.'
+change_vs_parent: features.signed_log_volumes false -> true (appends 112 signed-log
+  columns). Single variable off gru_v002.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: true
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 8
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 235266
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v009.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v009
+  submission_dir: null
