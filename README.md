@@ -1,79 +1,76 @@
-# Alfa Connectome: ML competition by Wunder Fund
+# Experiment ranking — v001 to v009
 
-Predict `t0` and `t1`, two indicators of future price movements of instrument
-`i0`, from the L11 book-feature representation, trade and additional features.
+All scores are `full_valid_wp`: global weighted Pearson over every one of the
+1,873 validation sequences (3,528,273 scored rows), computed with the
+reference metric in `tools/metric_ref.py`.
 
-## Data
+| Rank | Ver | What it changed | full_valid_wp | sigma vs seed mean | Verdict |
+|---:|---|---|---:|---:|---|
+| 1 | **v009** | signed-log volumes | 0.674456 | +1.8 | within noise |
+| 2 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | +1.7 | within noise |
+| 3 | **v002** | baseline config, seed 1337 | 0.674350 | +1.1 | within noise |
+| 4 | **v001** | 1x256 wider GRU | 0.674315 | +0.9 | within noise |
+| 5 | **v007** | first differences | 0.674258 | +0.5 | within noise |
+| 6 | **v006** | baseline config, seed 1339 | 0.674149 | -0.2 | within noise |
+| 7 | **v005** | baseline config, seed 1338 | 0.674037 | -0.9 | within noise |
+| 8 | **v003** | aux MSE + EMA | 0.673711 | **-2.9** | **worse, real** |
+| 9 | **v004** | 2x192 + input projection | 0.672206 | **-12.4** | **worse, real** |
 
-Each input has 112 float32 features: two 52-feature book/trade groups
-(`i0`, `i1`) and eight additional columns (`a0` through `a7`).
-For each instrument, L11 denotes 11 price-like and 11 volume-like features
-on each side of the book, bid and ask, plus the separate trade features.
-The complete column order is in [Data overview](docs/data_overview.md).
+All nine beat the organiser baseline of 0.617052 by roughly +0.055 to +0.057.
 
-| Dataset | Sequences | Rows |
-|---|---:|---:|
-| Train | 10,607 | 212,140,000 |
-| Validation | 1,873 | 37,460,000 |
+## Why ranks 1-7 are one statistical blob
 
-Every sequence has 20,000 rows. Steps 0–98 are warm-up; predictions are
-required at steps 99–19,999. Process rows in order and reset state between
-sequences.
+The noise floor comes from `gru_v002` / `gru_v005` / `gru_v006`, which are the
+*identical* configuration at seeds 1337 / 1338 / 1339. Their spread is the
+smallest difference that means nothing:
 
-## Metric: Global WP
+- mean 0.674179, std 0.000159, range 0.000313
+- so the detection threshold is **2 sigma = +/-0.0003**
 
-The metric is **Global Weighted Pearson correlation (WP)**, using weights
-`abs(clipped target)`
-on rows selected by `need_prediction AND is_scored`. Compute it separately
-for each target over all selected rows in the evaluated dataset, then average
-the two target scores. On the selected rows, both targets and
-predictions are clipped to `[-2.0, 2.0]`, and weights use the clipped targets.
-Higher is better.
+Seven configurations -- spanning a wider GRU, three separate feature-engineering
+ideas, and three seeds of the same config -- span 0.0004 in total. **That is
+smaller than the 0.0003 gap between three seeds of a single config.** Ranks 1
+through 7 are therefore statistically indistinguishable, and their ordering is
+noise, not quality. Note that 1.8 sigma is only a ~4% one-sided chance of
+beating the seed mean by luck, so v009's rank-1 position is not a result.
 
-The validation mask is provided for local scoring. The test mask is hidden.
-See [METRIC.md](METRIC.md) for the full scoring reference.
+## The only two real results are negative
 
-## Files
+- **v003 (aux MSE + EMA) is worse at -2.9 sigma.** The auxiliary weighted-MSE
+  term actively hurt the correlation objective.
+- **v004 (2x192 + input projection) is much worse at -12.4 sigma.** Doubling the
+  width and adding an input projection is a clear regression. It is also
+  independently latency-blocked, so it could not ship regardless.
 
-- `datasets/train.parquet`: labeled training sequences.
-- `datasets/valid.parquet`: labeled validation sequences with `is_scored`.
-- `datasets/valid_mask.parquet`: the validation mask as a separate table.
-- `utils.py`: callback types and input-column definitions.
-- `METRIC.md`: scoring specification and reference functions.
-- `baseline/`: ready-to-run stateful ONNX baseline (inference only).
-- `docs/`: competition website documentation.
+## The uncomfortable conclusion
 
-## Baseline
+**None of the input-representation ideas worked.** First differences (v007),
+cross-instrument features (v008), and signed-log volumes (v009) all landed inside
+the noise band. Nor did extra capacity (v001) or a longer schedule test
+(v010, still running at the time of writing).
 
-The included vanilla GRU baseline scores **0.617052 WP** on the complete
-validation set. It runs statefully on CPU with one ONNX Runtime compute thread.
+The baseline configuration is at a local optimum, and the remaining headroom is
+not in feature engineering. The one hypothesis with a plausible mechanism still
+open is `v011` (soft mask on `P(is_scored)` plus periodic state reset), which
+changes the objective and state handling rather than the inputs.
 
-```bash
-python baseline/solution.py --validation datasets/valid.parquet
-```
+## Choosing a ship candidate
 
-The baseline contains only inference code and an ONNX model. A ready-to-upload
-archive is provided as `baseline/baseline_submission.zip`; no training code or
-training checkpoint is included.
+Because ranks 1-7 are tied, the choice should be made on secondary criteria
+rather than on the score:
 
-## Submission
+- **Latency** -- v002 / v005 / v006 / v007 are all 2x128 at 27.96 us/row p50
+- **Reproducibility** -- v007's training log is truncated by stdout buffering, so
+  it should be avoided despite ranking 5th
+- **Simplicity** -- v002 is the unmodified baseline configuration
 
-Provide `solution.py` with `PredictionModel()` and `predict(data_point)`.
-The callback receives the sequence identifier, step, `need_prediction` and
-the current 112-feature vector. Return `None` during warm-up and two finite
-predictions in `[t0, t1]` order on every required row.
+That points to **v002**, with v009 as the alternative if its +1.8 sigma is worth
+gambling on.
 
-Package the solution and its required model files in one ZIP, with
-`solution.py` at the root. See [Quick Start](docs/quick_start.md) and
-[Submission guide](docs/submission_guide.md).
+## Caveat: the public leaderboard disagrees
 
-## Execution limits
-
-- **CPU:** 1 vCPU; CPU inference only, no GPU.
-- **RAM:** 16 GB.
-- **Time:** 60 minutes for the entire test set.
-- **Submission size:** at most 20 MB for the uploaded ZIP.
-
-The environment is Linux with Python 3.11, local SSD storage and no internet
-access.
-
+The public scores ran the opposite way to the local ranking:
+v003 0.6457 > v004 0.6446 > v002 0.6435 > v001 0.6416. Since the public set is a
+sample of the test data, this is mild evidence that the local metric does not
+transfer perfectly. v002 and v003 tie locally while v003 wins publicly, which is a
+caution against over-trusting any of ranks 1-7.
