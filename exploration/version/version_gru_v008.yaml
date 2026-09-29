@@ -1,0 +1,116 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v008
+  parent: gru_v002
+  status: running
+description: 'INPUTS: cross-instrument spreads and imbalances between i0 and i1.'
+hypothesis: The organisers supply i1 as a second instrument with no target, so it
+  is there to be related to i0. Cross-instrument differences and volume imbalances
+  are the classic relative-value features for paired instruments and are completely
+  untested here.
+change_vs_parent: features.cross_instrument [] -> 12 price pairs and 4 volume pairs
+  between i0 and i1. Single variable off gru_v002.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument:
+  - - 0
+    - 52
+  - - 1
+    - 53
+  - - 2
+    - 54
+  - - 3
+    - 55
+  - - 4
+    - 56
+  - - 5
+    - 57
+  - - 6
+    - 58
+  - - 7
+    - 59
+  - - 8
+    - 60
+  - - 9
+    - 61
+  - - 10
+    - 62
+  - - 11
+    - 63
+  - - 22
+    - 74
+  - - 23
+    - 75
+  - - 24
+    - 76
+  - - 25
+    - 77
+  step_feature: false
+  clip_sigma: 8
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 198402
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.0
+  target_clip: 2.0
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.0
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v008.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v008
+  submission_dir: null
