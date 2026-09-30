@@ -1,0 +1,144 @@
+### new run, log opened 2026-09-30T17:32:47+0530
+==============================================================================
+command            : python exploration/models/train_gru_v016.py --config exploration/version/version_gru_v016.yaml --device cpu
+timestamp          : 2026-09-30T17:32:47+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : b77031e527b11a77ca90cee710d7ade392b51538
+seed               : 1337
+log                : exploration/logs/log_gru_v016.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v016
+  parent: gru_v011
+  status: running
+description: DISTILLATION STUDENT. A fresh GRU 2x128 trained against the raw predictions
+  of a masked teacher (v011/v015 weights, reset 4k) replayed over all 212M train rows,
+  alongside the real labels.
+hypothesis: 'Distillation is the only lever that decouples teacher cost from serving
+  cost, and dozken''s NOTES show it works: they reproduced a 2-graph teacher (0.6879)
+  in ONE graph (0.6879) after the 2-graph version was killed at 69m59s, and a SMALLER
+  student (distil160, 314k) then beat the teacher at 0.6888. Ours should exceed that
+  route because our teacher carries the soft mask, which they lack, and v013 proved
+  it is worth +23.8 sigma on top of the reset.
+
+  Expected: the student matches or slightly beats its teacher (0.679986), and because
+  distillation regularises, possibly by enough to matter. If instead the student lands
+  at or below the seed mean, distillation is transferring nothing here and the teacher
+  labels are not the asset we thought.'
+change_vs_parent: 'Two changes off gru_v011: (1) loss.distill_weight=0.5 adds an MSE
+  term onto the teacher''s clipped prediction, weighted by the SAME soft mask as the
+  main loss so the student is steered toward what the teacher believes on the rows
+  the metric scores; (2) loss.teacher_labels points at cache/teacher/teacher_v011s.npy,
+  212,140,000 rows of float16 soft targets produced by tools/make_teacher_labels.py.
+
+  Unchanged: architecture 2x128 proj0 (192,258 params), seed 1337, 3-epoch cosine
+  schedule, chunk_len 2000, state_reset 4000 in training and inference, aux weighted-MSE
+  0.05, EMA 0.999, and the soft mask itself.
+
+  distill_weight 0.5 matches the weight in dozken''s own recipe, so the comparison
+  is like-for-like rather than tuned in our favour.
+
+  WHY THIS SIZE: the teacher ensemble is 2 x 192k effective, and both dozken students
+  (436k, 314k) were SMALLER than their 872k teacher. v014 showed 379k params is a
+  dead heat with 192k here (-0.0003, 1 sigma) at 1.5x the latency, so the student
+  is sized at the teacher''s own 192k and inference stays at 27.75 us/row.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 0.5
+  teacher_labels:
+  - cache/teacher/teacher_v011s.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v016.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v016
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 1 member(s), 212,140,000 rows, weight 0.5
+train sequences=10607  valid sequences=200  steps=19890
+step 0/19890 lr 4.00e-06 loss 1.557200 grad_norm 3.999 (1s)
+step 25/19890 lr 1.04e-04 loss 1.074599 grad_norm 3.294 (15s)
+step 50/19890 lr 2.04e-04 loss 0.987316 grad_norm 1.874 (31s)
+step 75/19890 lr 3.04e-04 loss 0.867908 grad_norm 1.863 (47s)
+step 100/19890 lr 4.04e-04 loss 0.699884 grad_norm 1.188 (64s)
+step 125/19890 lr 5.04e-04 loss 0.693313 grad_norm 1.019 (81s)
+step 150/19890 lr 6.04e-04 loss 0.714650 grad_norm 1.162 (96s)
+step 175/19890 lr 7.04e-04 loss 0.915356 grad_norm 1.267 (115s)
+step 200/19890 lr 8.04e-04 loss 0.758534 grad_norm 1.093 (131s)
+step 225/19890 lr 9.04e-04 loss 0.676915 grad_norm 1.490 (148s)
