@@ -243,7 +243,8 @@ So the honest reading, now tested rather than assumed:
 | | public | rank | params |
 |---|---:|---|---:|
 | organiser baseline | 0.5935 | 17/100 | — |
-| **ours, best (v011)** | **0.6515** | — | 192k |
+| **ours, best (v014)** | **0.6517** | — | 379k |
+| ours (v011 / v015) | 0.6515 | — | 192k |
 | dozken `reset2k` | 0.6569 | 25/100 | 436k |
 | dozken `distil_ens` | 0.6585 | 27/100 | 436k |
 | **dozken `distil160`** | **0.6588** | 27/100 | 314k |
@@ -276,9 +277,7 @@ before spending a submission.
 Every one of our 11 entries beats the organiser baseline; the programme is worth
 **+0.058 public**, matching the +0.057 measured locally.
 
-**The gap to their best is 0.0073 public, and to their #1 is 0.0107.** Our v011
-also carried a serving bug (see below) that was never fixed in the submitted
-bundle, so our true position is better than 0.6515 suggests.
+**The gap to their best is 0.0071 public, and to their #1 is 0.0105.**
 
 The two levers visible in their names are worth reading as a roadmap:
 
