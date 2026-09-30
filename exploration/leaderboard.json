@@ -149,5 +149,12 @@
     "memory_mb": 627,
     "submitted_utc": "2026-09-30T23:17Z",
     "note": "Distilled student, same 192,258 params as v011 (no capacity reduction). Publicly 0.6541, a hair above v017's 0.6540 -- a 0.0001 gap that is far inside the noise floor, so the two students are effectively TIED on score while differing by 21% in runtime and 39% in parameter count. That makes v017 the strictly better artifact. Submitted one minute before v017."
+  },
+  "v018": {
+    "public_score": 0.6518,
+    "grader_seconds": 1761,
+    "memory_mb": 627,
+    "submitted_utc": "2026-09-30T00:02Z",
+    "note": "Soft mask + periodic state reset every 10,000, 192,258 params. Scored 0.6518, BELOW v017's 0.6540, which the local metric correctly predicted: v018 local 0.680603 vs v017 local 0.681866 (-0.001263, 4 sigma), and the public gap is -0.0022 in the same direction. The local-to-public offset holds again. Confirms my packaging recommendation NOT to spend a slot on it was correct -- this slot was spent and returned a weaker entry than the one already held."
   }
 }
