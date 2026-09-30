@@ -135,13 +135,36 @@ def offline_predict(offline_script, offline_config, offline_checkpoint, parquet_
     model.eval()
     out = {}
     with torch.no_grad():
+        # The parity reference must be driven through the SAME periodic state reset
+        # the served model uses, or it is not the same model. A version with
+        # state_reset=4000 that is scored here with an unreseted state diverges from
+        # solution.py from the first reset onward -- which is exactly how the v011
+        # export bug hid: parity read 1.466 instead of failing loudly, because the
+        # reference had no reset and the bundle had none either, so the two agreed
+        # while both were wrong.
+        state_reset = int(cfg['inference'].get('state_reset')
+                          or cfg['training'].get('state_reset') or 0)
+        seq_len = int(cfg['data']['seq_len'])
+        chunk = int(cfg['training']['chunk_len'])
+        if state_reset and (seq_len % state_reset or state_reset % chunk):
+            raise SystemExit(f'offline parity cannot honour state_reset={state_reset} '
+                             f'with seq_len={seq_len} chunk_len={chunk}')
         for g in groups:
             seq_ix, feats, _, _, _ = read_sequence(parquet_path, g)
-            x = torch.from_numpy(transform.batch(feats)).unsqueeze(0)
+            xb = transform.batch(feats)
+            preds = []
             h = [torch.zeros(1, 1, model.hidden) for _ in range(model.layers)]
-            p, _ = model.forward_chunk(x, h)
+            with torch.no_grad():
+                for c0 in range(0, xb.shape[0], chunk):
+                    c1 = min(c0 + chunk, xb.shape[0])
+                    if state_reset and c0 and c0 % state_reset == 0:
+                        h = [torch.zeros(1, 1, model.hidden) for _ in range(model.layers)]
+                    p, h = model.forward_chunk(
+                        torch.from_numpy(xb[c0:c1]).unsqueeze(0), h)
+                    preds.append(p[0].numpy())
+            p = np.concatenate(preds, axis=0)
             # clip exactly as PredictionModel.predict does, so parity compares like with like
-            out[g] = np.clip(p[0].numpy(), -2.0, 2.0).astype(np.float32)
+            out[g] = np.clip(np.asarray(p), -2.0, 2.0).astype(np.float32)
     return out
 
 
