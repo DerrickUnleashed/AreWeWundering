@@ -1,0 +1,159 @@
+### new run, log opened 2026-09-30T19:04:30+0530
+==============================================================================
+command            : python exploration/models/train_gru_v019.py --config exploration/version/version_gru_v019.yaml --device cpu
+timestamp          : 2026-09-30T19:04:30+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : a00fe71a37f29c96a6385790a95c69cba88ae0df
+seed               : 1337
+log                : exploration/logs/log_gru_v019.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v019
+  parent: gru_v011
+  status: running
+description: 'The loss fix alone: globally-pooled weighted Pearson with a running
+  statistic, everything else exactly as v011.'
+hypothesis: 'The single most important fix in this repo''s history, and it was sitting
+  in plain sight. This repo trained nineteen versions on a loss whose own docstring
+  lied: chunk_loss() accepted a `state` argument and claimed it ''carries the moments
+  across chunks so the statistic is cumulative rather than restarted''. The body never
+  read `state`, and the call site never passed it. The weighted-Pearson statistic
+  was therefore recomputed from each chunk''s own rows and restarted 20 times per
+  sequence.
+
+
+  That is exactly the failure dozken/wunder documents and calls out by name: a per-chunk
+  Pearson subtracts a weighted mean estimated from that chunk alone, so the slow level
+  component the metric actually scores is discarded and any per-chunk level offset
+  is free. Their chunk4k runs ''win within-sequence correlation and lose on level
+  drift'', and models trained on their chunk loss get WORSE with more training (0.575
+  -> 0.553) instead of better. Their fix -- a running detached sufficient statistic
+  pooled over the batch as well as over time -- is the 2026-09-15 metric, which pools
+  every scored row of every sequence into ONE correlation per target.
+
+
+  Expected: a large gain, larger than anything else we have tried, because every prior
+  run was optimising a surrogate that structurally cannot see the quantity being scored.
+  Our +0.058 over the organiser baseline came from the soft mask and the state reset
+  on top of a mis-specified loss; with the loss correct those two should compound
+  rather than merely survive.'
+change_vs_parent: 'ONE change off gru_v011: the loss. chunk_loss now keeps a running
+  detached sufficient statistic [sum w, sum wy, sum wp, sum wy^2, sum wp^2, sum wyp]
+  pooled over BOTH the batch and the time axis into one value per target, reset every
+  stats_window steps (default one sequence''s worth of chunks). The previous implementation
+  recomputed the statistic from each chunk''s own rows and discarded it, despite accepting
+  a `state` argument it never read.
+
+  Unchanged: the soft mask, state_reset 4000, chunk_len 2000, aux weighted-MSE 0.05,
+  EMA 0.999, architecture 2x128 proj0 (192,258 params), seed 1337, 3-epoch cosine
+  schedule, data (train shard only).'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  stats_window: null
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v019.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v019
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+train sequences=10607  valid sequences=200  steps=19890
+global pooled Pearson over a 10-step window (320,000 rows)
+step 0/19890 lr 4.00e-06 loss 1.180364 grad_norm 3.108 (1s)
+step 25/19890 lr 1.04e-04 loss 0.952507 grad_norm 1.212 (23s)
+step 50/19890 lr 2.04e-04 loss 0.808520 grad_norm 2.020 (44s)
+step 75/19890 lr 3.04e-04 loss 0.662893 grad_norm 0.452 (65s)
+step 100/19890 lr 4.04e-04 loss 0.562883 grad_norm 1.095 (87s)
+step 125/19890 lr 5.04e-04 loss 0.635067 grad_norm 0.335 (109s)
+step 150/19890 lr 6.04e-04 loss 0.670714 grad_norm 1.270 (132s)
+step 175/19890 lr 7.04e-04 loss 0.702371 grad_norm 0.949 (153s)
+step 200/19890 lr 8.04e-04 loss 0.712620 grad_norm 0.891 (175s)
+step 225/19890 lr 9.04e-04 loss 0.692647 grad_norm 0.743 (197s)
+step 250/19890 lr 1.00e-03 loss 0.800883 grad_norm 0.913 (220s)
+step 275/19890 lr 1.10e-03 loss 0.586391 grad_norm 0.231 (244s)
+step 300/19890 lr 1.20e-03 loss 0.567478 grad_norm 0.727 (269s)
+step 325/19890 lr 1.30e-03 loss 0.763838 grad_norm 0.304 (294s)
+step 350/19890 lr 1.40e-03 loss 0.593333 grad_norm 0.515 (318s)
+step 375/19890 lr 1.50e-03 loss 0.606761 grad_norm 0.574 (341s)
+step 400/19890 lr 1.60e-03 loss 0.784869 grad_norm 0.885 (366s)
+step 425/19890 lr 1.70e-03 loss 0.626010 grad_norm 0.416 (390s)
+step 450/19890 lr 1.80e-03 loss 0.784098 grad_norm 0.569 (416s)
+step 475/19890 lr 1.90e-03 loss 0.496623 grad_norm 0.192 (441s)
+step 500/19890 lr 2.00e-03 loss 0.773086 grad_norm 0.740 (466s)
+step 525/19890 lr 2.00e-03 loss 0.703059 grad_norm 0.446 (492s)
