@@ -1,0 +1,243 @@
+{
+ "key": "gru_v017",
+ "packaged_utc": "2026-09-30T17:21:28Z",
+ "git_commit": "c85c65df9eb0a9be1102e7b5558ed259df6020e5",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v017",
+   "parent": "gru_v016",
+   "status": "finished"
+  },
+  "description": "DISTILLATION STUDENT, SMALLER. Same recipe as v016 but 2x96 instead of 2x128 -- 116,546 params against a 192,258-param teacher (0.61x).",
+  "hypothesis": "Distillation regularises, and dozken's own results show the effect clearly: from a 872k teacher, their 436k student scored 0.6879 and their SMALLER 314k student (0.36x) scored 0.6888 -- smaller beat larger on the public board, confirmed at 55m16s vs 61m06s. If that holds here, a student below the teacher should beat v016's equal-size one, AND inference would drop to roughly 20 us/row.\nExpected: match or beat v016's 0.679986-equivalent, and if it wins, cut inference cost by ~40%. If instead the smaller student is clearly worse, the regularisation story is size-sensitive and the sweet spot is near the teacher's own width -- which is itself the useful answer, and matches v014 showing 379k is a dead heat with 192k.",
+  "change_vs_parent": "ONE change off gru_v016: model.hidden 128 -> 96 (192,258 -> 116,546 params). Unchanged: distill_weight 0.5 and the same teacher labels, the soft mask, state_reset 4000 in training and inference, chunk_len 2000, aux weighted-MSE 0.05, EMA 0.999, seed 1337, 3-epoch cosine schedule.\n0.61x the teacher is deliberately between dozken's winning 0.36x and their losing-on-size 0.50x-equal student, chosen to answer the question without repeating their exact point on a different codebase.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 96,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": 116546
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.05,
+   "target_clip": 2.0,
+   "mask_floor": 0.1,
+   "mask_model": "cache/train_scored.npy",
+   "distill_weight": 0.5,
+   "teacher_labels": [
+    "cache/teacher/teacher_v011s.npy"
+   ]
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.999,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true,
+   "state_reset": 4000
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5,
+   "state_reset": 4000
+  },
+  "results": {
+   "best_step": 19889,
+   "best_val_wp": 0.6922027945267548,
+   "best_val_t0": 0.6886197234422096,
+   "best_val_t1": 0.6957858656113,
+   "full_valid_wp": 0.6818664717290095,
+   "latency_us_p50": 40.38,
+   "latency_us_p99": 106.0,
+   "train_hours": 4.1459,
+   "finished_utc": "2026-09-30T17:08:30Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v017.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v017",
+   "submission_dir": "submissions/submission_gru_v017"
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step19889_val0.692203.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v017/best_001_step19889_val0.692203.pt",
+  "step": 19889,
+  "sha256": "e1e46dccec7827c001a66d4b2bc877bfee6ee6bd365d92064f0957075f27ec99",
+  "train_time_metrics": {
+   "t0": 0.6886197234422096,
+   "t1": 0.6957858656113,
+   "weighted_pearson": 0.6922027945267548,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.708731549497651,
+  "t1": 0.7594260931044796,
+  "weighted_pearson": 0.7340788213010654,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 36.9,
+  "call_us_p50": 29.42,
+  "call_us_p99": 42.87,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 29.04,
+  "us_p99": 37.88,
+  "projected_min_p50": 19.1,
+  "projected_min_p99": 24.9,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": true,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 47.04,
+  "grader_us_p99": 61.37,
+  "grader_min_p50": 30.9,
+  "grader_min_p99": 40.3,
+  "grader_pct_budget_p50": 51.5,
+  "grader_target_us_local": 42.3,
+  "grader_safe": true,
+  "p99_gate_retired": "p99 no longer gates. Measured against five real submissions it over-projects by 1.5-2.1x while p50 is accurate to within 5%; v014 was blocked by it and turned out to be our best entry. p99 is still recorded, as a diagnostic only."
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 3.815e-06 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.734079 vs offline 0.734079, |diff| = 2.238e-08 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.708731549497651,
+   "t1": 0.7594260931044796,
+   "weighted_pearson": 0.7340788213010654,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 36.9,
+   "call_us_p50": 29.42,
+   "call_us_p99": 42.87,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 29.04,
+   "us_p99": 37.88,
+   "projected_min_p50": 19.1,
+   "projected_min_p99": 24.9,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": true,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 47.04,
+   "grader_us_p99": 61.37,
+   "grader_min_p50": 30.9,
+   "grader_min_p99": 40.3,
+   "grader_pct_budget_p50": 51.5,
+   "grader_target_us_local": 42.3,
+   "grader_safe": true,
+   "p99_gate_retired": "p99 no longer gates. Measured against five real submissions it over-projects by 1.5-2.1x while p50 is accurate to within 5%; v014 was blocked by it and turned out to be our best entry. p99 is still recorded, as a diagnostic only."
+  },
+  "size": {
+   "zip_bytes": 1311895,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": true
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "80aa343fa25447c777b6101ca54d27a3451a283ebab1c45fe00f58c92bcde168",
+  "solution_py": "0a3091a41cf1b1341b077a5d97ec8fedd6f0ddc0d1ae0d59e77b23f01357d50c",
+  "model_onnx": "87254e322c4ac3c0cf2c72bcbd061d4d38d3001089120192b4321d5563735bd5",
+  "feature_stats_npz": "f1a50518fc9c4bb08f9274b04ca598fa410c7d2abb01ba11d341e820752ef497"
+ },
+ "zip": {
+  "file": "submission_gru_v017.zip",
+  "bytes": 1311895,
+  "root_entries": [
+   "best_001_step19889_val0.692203.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 0.9 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [],
+ "status": "PASS"
+}
