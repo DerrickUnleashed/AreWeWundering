@@ -1,0 +1,155 @@
+### new run, log opened 2026-09-30T11:12:54+0530
+==============================================================================
+command            : python exploration/models/train_gru_v014.py --config exploration/version/version_gru_v014.yaml --device cpu
+timestamp          : 2026-09-30T11:12:54+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : e91852035fadc722c29ef0628e3154ebd3fa44b2
+seed               : 1337
+log                : exploration/logs/log_gru_v014.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v014
+  parent: gru_v011
+  status: running
+description: 'Capacity scale under the v011 recipe: the soft mask and the 4,000-row
+  periodic state reset, at GRU 2x192 with a 64-unit input projection (378,562 params)
+  instead of 2x128 proj0 (192,258). Architecture matches dozken''s own non-distilled
+  models.'
+hypothesis: 'Capacity only pays once the state is reset and the objective matches
+  the metric. Our own v004 ran 2x192 proj128 at 423k params and scored 0.672206, BELOW
+  the 192k v002 baseline of 0.674350 -- but v004 had no state reset and no soft mask,
+  so it never had a fair test. The reset bounds how much history the model must carry
+  across 20k rows, which is exactly the constraint that made extra width useless before;
+  with the reset in place a wider model has something to spend capacity on. Expected:
+  at or above v011''s 0.679986, and if it clears dozken''s reset2k at 0.6864 we can
+  distil it into a servable student.
+
+  WHY THIS SHAPE: dozken''s non-distilled models (reset2k, distil_ens) are exactly
+  GRU 2x192 proj64 at 435,714 params. Their 160-wide model (distil160, our target
+  at 0.6888) was DISTILLED, so ''smaller is better'' there is a distillation-regularisation
+  effect, not a point on the non-distilled capacity curve. Matching their non-distilled
+  shape is the cleanest test of whether their capacity advantage was architecture
+  or training.'
+change_vs_parent: 'ONE conceptual lever, capacity, in two fields: model.hidden 128
+  -> 192 and model.input_proj 0 -> 64 (192,258 -> 378,562 params). Unchanged: the
+  soft mask (loss.mask_model, mask_floor 0.1), state_reset 4000 in training and inference,
+  chunk_len 2000, aux weighted-MSE 0.05, EMA 0.999, architecture family gru with 2
+  layers, seed 1337, 3-epoch cosine schedule.
+
+  KNOWN CONFOUND, accepted deliberately: hidden and input_proj move together, so a
+  win will not attribute which mattered. That attribution is not needed here -- we
+  need the win. v013 already covers the mask axis on the objective side.
+
+  LATENCY (measured, not assumed): fitted from our two idle-box models that also have
+  real grader readings, latency_us = 14.68 + 6.927e-5 * params. It reproduces v011
+  at 28.00 (actual 28.00) and v004 at 44.0 (actual 43.96). This architecture projects
+  40.9 us/row p50 -> 43.5 min on the grader, inside the 60-min documented target and
+  well inside the 70-min hard kill. dozken needed 61m06s for a comparable model because
+  their per-row pipeline is ~1.4x slower than ours, not because the model is slower.
+
+
+  LATENCY, MEASURED PAIRED rather than fitted (this is the second time a contended
+  measurement nearly sent us the wrong way, so the method matters): v011 and v014
+  were benchmarked back to back with both training jobs running. v011 read 58.04 us/row
+  and v014 read 88.67, a ratio of 1.528 for 1.969x the parameters. An absolute read
+  of 85-88 us/row is NOT usable -- it is inflated 2.07x by the two concurrent v012/v013
+  jobs, and v011''s own idle figure is 28.00. The ratio is what transfers: an independent
+  idle pair (v011 28.00 vs v004 43.96) gives 1.570 for 2.198x params, and the implied
+  elasticity ln(1.528)/ln(1.969) = 0.566 agrees with ln(1.570)/ln(2.198) = 0.573.
+  So idle v014 = 28.00 x 1.528 = 42.8 us/row -> 45.5 min on the grader, against a
+  60-min documented target and a 70-min hard kill.
+
+  MUST RE-MEASURE ON AN IDLE BOX before packaging. Every other latency number in this
+  repo measured under contention over-projected, sometimes by 1.7x. This is a 76%-of-target
+  model, not a 50% one, so it has less margin than v011 and should not be shipped
+  on a derived number.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 192
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 378562
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v014.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v014
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=192 layers=2 input_proj=64 in_dim=112 params=378,562
+max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+train sequences=10607  valid sequences=200  steps=19890
+step 0/19890 lr 4.00e-06 loss 0.968832 grad_norm 5.512 (2s)
+step 25/19890 lr 1.04e-04 loss 0.648834 grad_norm 4.001 (36s)
+step 50/19890 lr 2.04e-04 loss 0.767255 grad_norm 2.970 (68s)
+step 75/19890 lr 3.04e-04 loss 0.694591 grad_norm 1.953 (103s)
