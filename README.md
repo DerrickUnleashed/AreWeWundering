@@ -10,22 +10,23 @@ reference metric in `tools/metric_ref.py`.
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Ready to Submit | -- | 30m54s (52%) | -- |
 | 2 | **v016** | distilled student, 192k | 0.681753 | Ready to Submit | -- | 37m24s (62%) | -- |
-| 3 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
-| 4 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 5 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
-| 6 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 7 | **v019** | FIX loss: globally pooled | 0.678374 | Yet to package | -- | -- | -- |
-| 8 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
-| 9 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
-| 10 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
-| 11 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
-| 12 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 13 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
-| 14 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
-| 15 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
-| 16 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
-| 17 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 18 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 3 | **v018** | soft mask + state reset 10k | 0.680603 | Yet to package | -- | -- | -- |
+| 4 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
+| 5 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 6 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
+| 7 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
+| 8 | **v019** | FIX loss: globally pooled | 0.678374 | Yet to package | -- | -- | -- |
+| 9 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
+| 10 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 11 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
+| 12 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 13 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 14 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 15 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 16 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
+| 17 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
+| 18 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 19 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
@@ -37,7 +38,6 @@ Real runs with no `full_valid_wp` of their own: still training (v018-v020), or a
 | Ver | What it changed | best so far (subset) | Status | Public score |
 |---|---|---|---|---|
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
-| **v018** | soft mask + state reset 10k | -- | Training | -- |
 | **v020** | FIX loss + train+valid data | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
