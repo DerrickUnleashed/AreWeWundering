@@ -180,7 +180,34 @@ def main():
                          f'promote a new version instead.')
 
     # ---- 2. export inference artifacts
+    #
+    # The --export-only subprocess re-opens the CANONICAL LOG and truncates it: the
+    # Tee logger opens with `resume=False`, so `w` mode. That destroyed gru_v018's
+    # log a second time on 2026-09-30, on top of the inode-orphaning that had
+    # already frozen it at step 1050 -- after packaging, the log held 0 training
+    # step lines and only the packager's own export output.
+    #
+    # Preserving the pre-export bytes and restoring them afterwards makes the
+    # canonical log idempotent under packaging, which AGENTS.md §8 requires (it
+    # must hold the run's exact stdout, not the packager's).
+    pre_export_log = None
+    if log_path.exists():
+        pre_export_log = log_path.read_bytes()
+
     r = run([args.python, script, '--config', config, '--export-only', '--checkpoint', ck])
+
+    export_log = log_path.read_bytes() if log_path.exists() else b''
+    if pre_export_log is not None:
+        # keep the export transcript alongside the run log; it is real evidence
+        # (the ONNX==PyTorch verification lives there) and must not be thrown away
+        export_path = log_path.with_suffix('.export.log')
+        if export_log and export_log != pre_export_log:
+            export_path.write_bytes(export_log)
+            log_path.write_bytes(pre_export_log)
+            notes.append(f'preserved the pre-export canonical log; export transcript '
+                         f'saved to {export_path.name}')
+        else:
+            notes.append('canonical log was not modified by --export-only')
     if r.returncode:
         failures.append(f'--export-only failed:\n{r.stdout[-2000:]}\n{r.stderr[-2000:]}')
     for f in ('model.onnx', 'feature_stats.npz'):
