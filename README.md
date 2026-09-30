@@ -1,4 +1,4 @@
-# Experiment ranking — v001 to v011
+# Experiment ranking — v001 to v016
 
 All scores are `full_valid_wp`: global weighted Pearson over every one of the
 1,873 validation sequences (3,528,273 scored rows), computed with the
@@ -9,9 +9,9 @@ reference metric in `tools/metric_ref.py`.
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v011** | soft mask on P(is_scored) + reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 2 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Ready to Submit (latency unverified) | -- | -- | -- |
-| 3 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Ready to Submit | -- | -- | -- |
-| 4 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Ready to Submit | -- | -- | -- |
+| 2 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Do not ship | -- | 44 min | -- |
+| 3 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Ready to Submit | -- | 30 min | -- |
+| 4 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Ready to Submit | -- | 30 min | -- |
 | 5 | **v009** | INPUTS: append sign(x)*log1p(|x|) of every | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
 | 6 | **v008** | INPUTS: cross-instrument spreads and | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
 | 7 | **v002** | INPUTS: train-only robust z-score with +-8 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
@@ -26,14 +26,15 @@ reference metric in `tools/metric_ref.py`.
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
 
-### Still in flight
+### No full-validation score
 
-No final `full_valid_wp` yet, so not ranked.
+Listed here because they are real runs, but there is no `full_valid_wp` to rank them by -- either still training, or (v015) deliberately reusing another version's weights rather than retraining.
 
 | Ver | What it changed | best so far (subset) | Status | Public score |
-|---|---|---:|---|---|
-| **v000** | Framework smoke test | 0.570341 | Yet to Train | -- |
-| **v015** | v011 weights, reset 4k actually shipped | -- | Yet to Train | -- |
+|---|---|---:|---|---|---:|
+| **v000** | Framework smoke test | 0.570341 | Submitted | 0.4986 |
+| **v015** | v011 weights, reset 4k actually shipped | -- | Ready to Submit | -- |
+| **v016** | DISTILLATION STUDENT | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -58,7 +59,7 @@ the public board**: those seven occupy local ranks 2-8 and public ranks 2-11, wi
 no ordering preserved. The noise band is real and the public test set cannot
 resolve differences inside it.
 
-## v011 is the one real win
+## v011: the recipe that worked
 
 **`v011` scores 0.679986, which is +0.0058 above the seed mean -- 36 sigma.** It
 is the only version in this batch that clears the noise floor by a wide margin,
@@ -229,12 +230,12 @@ bundle, so our true position is better than 0.6515 suggests.
 
 The two levers visible in their names are worth reading as a roadmap:
 
-- **`reset2k` (0.6569)** is a periodic state reset at **2,000** steps. Our v011
-  used 4,000. That is the same lever we independently validated, at half the
-  period -- so the obvious next experiment is `v012 = v011 with state_reset=2000`,
-  a single-variable change against a recipe we already trust.
-- **The distillation / ensemble entries (0.6585)** are a family, and which one
-  the number belongs to is unresolved (see above). Two distinct levers:
+- **`reset2k` (0.6569)** is a periodic state reset at **2,000** steps. This is the
+  lever we independently validated, and **v012 tested it: 4,000 beats 2,000** by
+  0.0012, so the shorter horizon does not help. Note our original premise -- "their
+  reset2k outscores their reset4k" -- was an inference presented as fact; we have
+  still never seen a public score for their reset4k.
+- **The distillation entries (0.6585 / 0.6588)** are two distinct levers:
   - **Distillation** — teacher trained without the latency limit, compressed into
     one budget-sized student. Inference cost unchanged. This is the natural Phase 6
     move from the original roadmap and the larger of the two jumps left.
@@ -291,18 +292,54 @@ Four facts from those notes that shape our roadmap:
 Their own stated reason for stopping: "reaching #1 needs a genuinely different BASE
 model, not more averaging." We already have one they lack.
 
-## The next two experiments
+## Ship candidate: v015, not v011
 
-Both are single-variable, both against the v011 parent, and both are justified by
-evidence rather than novelty:
+**`v015` is what should be submitted next, and it is packaged and gate-clear.**
 
-1. **v012: `state_reset = 2000`** (v011 has 4000). Confirms whether the period
-   matters, and if so in which direction. Cheap: same architecture, same schedule.
-2. **v013: distillation** from a wide/deep teacher into the v011 architecture.
-   The largest remaining gap, and the one lever we have not tried at all.
+It carries v011's exact weights with the state reset **actually served** — v011
+trained with `state_reset=4000` but shipped `state_reset=0`, because the export
+path read a checkpoint key that was never written and silently defaulted to zero.
+So the 0.6515 above is not v011's real score; it is v011 served in a regime it was
+never trained for.
 
-**v011 stays the ship candidate until one of those beats it publicly**, since a
-local gain inside the noise band is not evidence.
+| | |
+|---|---|
+| latency (idle, 3 runs) | **27.75 µs/row → 29.5 min, 49.2 % of budget** |
+| contract / determinism / parity | PASS (2.15e-07) |
+| ZIP | 2.16 MB, `state_reset=4000` verified inside the archive |
+
+v013 proved the reset is worth **+12.7σ** on its own, so v015 should land
+meaningfully above the broken 0.6515 — plausibly 0.653–0.658, which would put it
+level with dozken's `reset2k` (0.6569). That is a genuine one-shot read on
+whether the fix lands as the attribution predicts.
+
+v011's submitted bundle is left untouched at 0.6515 rather than patched in place:
+a defective artifact that was actually submitted is exactly the record
+`AGENTS.md` §2.5 exists to preserve.
+
+## Running now: v016, the distillation student
+
+`v016` is a fresh GRU 2×128 trained against **212,140,000 rows** of soft targets —
+the raw predictions of the v011/v015 weights replayed over the whole train shard
+on their own 4,000 reset grid (`tools/make_teacher_labels.py`, 135 min, sha256 in
+the manifest, verified against the served row-by-row stream to 4.9e-04).
+
+`distill_weight=0.5` sits on top of the same soft-masked global-pooled loss, so the
+student is steered toward what the teacher believes on the rows the metric scores.
+**0.5 matches dozken's own weight**, so this is like-for-like rather than tuned in
+our favour.
+
+Sized at the teacher's own 192k because v014 showed 379k is a dead heat here at
+1.5× the latency, and both of dozken's students were smaller than their teacher.
+Inference should stay at 27.75 µs/row.
+
+A second teacher member (v012, reset 2k) is being generated in parallel, which
+would give a two-member teacher matching dozken's construction.
+
+**Why distillation is the right remaining lever, in one line:** our best
+pure-capacity model (v014) ties our baseline, so the 0.0073 gap is not width —
+matching their own note that reaching #1 needs a different *base* model, and the
+soft mask is the one we have that they lack.
 
 ## Latency is a solved problem
 
