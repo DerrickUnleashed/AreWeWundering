@@ -1,11 +1,11 @@
-### new run, log opened 2026-09-30T18:29:43+0530
+### new run, log opened 2026-09-30T22:51:03+0530
 ==============================================================================
-command            : python exploration/models/train_gru_v017.py --config exploration/version/version_gru_v017.yaml --device cpu
-timestamp          : 2026-09-30T18:29:43+0530
+command            : python exploration/models/train_gru_v017.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v017.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v017/best_001_step19889_val0.692203.pt
+timestamp          : 2026-09-30T22:51:03+0530
 host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
 packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
 cuda               : False   mps: True
-git commit         : 1d8cd066a444382802fc6e63fa10fa34964e89a8
+git commit         : c85c65df9eb0a9be1102e7b5558ed259df6020e5
 seed               : 1337
 log                : exploration/logs/log_gru_v017.log
 config:
@@ -14,7 +14,7 @@ identity:
   model: gru
   version: v017
   parent: gru_v016
-  status: running
+  status: finished
 description: DISTILLATION STUDENT, SMALLER. Same recipe as v016 but 2x96 instead of
   2x128 -- 116,546 params against a 192,258-param teacher (0.61x).
 hypothesis: 'Distillation regularises, and dozken''s own results show the effect clearly:
@@ -100,92 +100,25 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 19889
+  best_val_wp: 0.6922027945267548
+  best_val_t0: 0.6886197234422096
+  best_val_t1: 0.6957858656113
+  full_valid_wp: 0.6818664717290095
+  latency_us_p50: 40.38
+  latency_us_p99: 106.0
+  train_hours: 4.1459
+  finished_utc: '2026-09-30T17:08:30Z'
 artifacts:
   log: exploration/logs/log_gru_v017.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v017
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v017
 
 ==============================================================================
 device: cpu
-model: gru hidden=96 layers=2 input_proj=0 in_dim=112 params=116,546
-max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
-soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
-distillation: 1 member(s), 212,140,000 rows, weight 0.5
-train sequences=10607  valid sequences=200  steps=19890
-step 0/19890 lr 4.00e-06 loss 1.520562 grad_norm 3.251 (1s)
-step 25/19890 lr 1.04e-04 loss 1.338106 grad_norm 3.261 (18s)
-step 50/19890 lr 2.04e-04 loss 1.082066 grad_norm 2.441 (35s)
-step 75/19890 lr 3.04e-04 loss 0.875986 grad_norm 1.316 (52s)
-step 100/19890 lr 4.04e-04 loss 0.795681 grad_norm 1.274 (68s)
-step 125/19890 lr 5.04e-04 loss 0.727602 grad_norm 0.886 (86s)
-step 150/19890 lr 6.04e-04 loss 0.746733 grad_norm 1.358 (104s)
-step 175/19890 lr 7.04e-04 loss 0.926700 grad_norm 1.220 (121s)
-step 200/19890 lr 8.04e-04 loss 0.763721 grad_norm 0.885 (139s)
-step 225/19890 lr 9.04e-04 loss 0.703258 grad_norm 1.630 (157s)
-step 250/19890 lr 1.00e-03 loss 0.877342 grad_norm 1.119 (176s)
-step 275/19890 lr 1.10e-03 loss 0.716222 grad_norm 0.996 (197s)
-step 300/19890 lr 1.20e-03 loss 0.674747 grad_norm 1.205 (220s)
-step 325/19890 lr 1.30e-03 loss 0.733658 grad_norm 1.170 (241s)
-step 350/19890 lr 1.40e-03 loss 0.674963 grad_norm 1.683 (261s)
-step 375/19890 lr 1.50e-03 loss 0.593679 grad_norm 0.900 (284s)
-step 400/19890 lr 1.60e-03 loss 0.811065 grad_norm 0.944 (303s)
-step 425/19890 lr 1.70e-03 loss 0.651899 grad_norm 0.808 (323s)
-step 450/19890 lr 1.80e-03 loss 0.843918 grad_norm 1.029 (341s)
-step 475/19890 lr 1.90e-03 loss 0.566388 grad_norm 0.594 (357s)
-step 500/19890 lr 2.00e-03 loss 0.759864 grad_norm 0.986 (374s)
-step 525/19890 lr 2.00e-03 loss 0.729027 grad_norm 0.747 (391s)
-step 550/19890 lr 2.00e-03 loss 0.553066 grad_norm 0.767 (408s)
-step 575/19890 lr 2.00e-03 loss 0.708628 grad_norm 0.638 (427s)
-step 600/19890 lr 2.00e-03 loss 0.657708 grad_norm 0.491 (444s)
-step 625/19890 lr 2.00e-03 loss 0.788068 grad_norm 1.601 (461s)
-step 650/19890 lr 2.00e-03 loss 0.732525 grad_norm 1.383 (478s)
-step 675/19890 lr 2.00e-03 loss 0.549758 grad_norm 0.553 (494s)
-step 700/19890 lr 2.00e-03 loss 0.964791 grad_norm 0.879 (511s)
-step 725/19890 lr 2.00e-03 loss 0.593251 grad_norm 0.665 (526s)
-step 750/19890 lr 2.00e-03 loss 0.594128 grad_norm 0.405 (541s)
-step 775/19890 lr 2.00e-03 loss 0.637798 grad_norm 0.502 (558s)
-step 800/19890 lr 2.00e-03 loss 0.632409 grad_norm 0.531 (574s)
-step 825/19890 lr 2.00e-03 loss 0.538453 grad_norm 0.528 (591s)
-step 850/19890 lr 2.00e-03 loss 0.531489 grad_norm 0.683 (608s)
-step 875/19890 lr 2.00e-03 loss 0.558862 grad_norm 0.517 (624s)
-step 900/19890 lr 2.00e-03 loss 0.686329 grad_norm 0.711 (640s)
-step 925/19890 lr 2.00e-03 loss 0.631600 grad_norm 0.836 (657s)
-step 950/19890 lr 2.00e-03 loss 0.629926 grad_norm 0.513 (673s)
-step 975/19890 lr 2.00e-03 loss 0.621071 grad_norm 0.542 (691s)
-step 1000/19890 lr 2.00e-03 loss 0.738131 grad_norm 0.566 (711s)
-step 1025/19890 lr 2.00e-03 loss 0.589740 grad_norm 0.671 (730s)
-step 1050/19890 lr 2.00e-03 loss 0.561160 grad_norm 0.507 (747s)
-step 1075/19890 lr 2.00e-03 loss 0.631135 grad_norm 0.489 (768s)
-step 1100/19890 lr 2.00e-03 loss 0.722958 grad_norm 0.516 (786s)
-step 1125/19890 lr 1.99e-03 loss 0.452403 grad_norm 0.554 (805s)
-step 1150/19890 lr 1.99e-03 loss 0.808394 grad_norm 0.796 (823s)
-step 1175/19890 lr 1.99e-03 loss 0.686020 grad_norm 0.496 (842s)
-step 1200/19890 lr 1.99e-03 loss 0.560046 grad_norm 0.761 (861s)
-step 1225/19890 lr 1.99e-03 loss 0.675169 grad_norm 0.747 (879s)
-step 1250/19890 lr 1.99e-03 loss 0.650820 grad_norm 0.720 (898s)
-step 1275/19890 lr 1.99e-03 loss 0.595504 grad_norm 0.376 (916s)
-step 1300/19890 lr 1.99e-03 loss 0.472675 grad_norm 0.534 (934s)
-step 1325/19890 lr 1.99e-03 loss 0.712245 grad_norm 0.715 (956s)
-step 1350/19890 lr 1.99e-03 loss 0.853535 grad_norm 0.963 (976s)
-step 1375/19890 lr 1.99e-03 loss 0.687018 grad_norm 0.529 (997s)
-step 1400/19890 lr 1.99e-03 loss 0.570450 grad_norm 0.598 (1019s)
-step 1425/19890 lr 1.99e-03 loss 0.730064 grad_norm 0.593 (1040s)
-step 1450/19890 lr 1.99e-03 loss 0.546383 grad_norm 0.947 (1062s)
-step 1475/19890 lr 1.99e-03 loss 0.640336 grad_norm 0.906 (1084s)
-step 1500/19890 lr 1.99e-03 loss 0.601619 grad_norm 0.687 (1105s)
-step 1525/19890 lr 1.99e-03 loss 0.632633 grad_norm 0.451 (1126s)
-step 1550/19890 lr 1.99e-03 loss 0.495322 grad_norm 0.504 (1146s)
-step 1575/19890 lr 1.98e-03 loss 0.511766 grad_norm 0.344 (1167s)
-step 1600/19890 lr 1.98e-03 loss 0.712237 grad_norm 0.802 (1188s)
-step 1625/19890 lr 1.98e-03 loss 0.586993 grad_norm 0.856 (1210s)
-step 1650/19890 lr 1.98e-03 loss 0.731990 grad_norm 0.580 (1233s)
-step 1675/19890 lr 1.98e-03 loss 0.555586 grad_norm 0.530 (1253s)
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v017.py:538: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 1.073e-06
+exported inference artifacts from best_001_step19889_val0.692203.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v017
