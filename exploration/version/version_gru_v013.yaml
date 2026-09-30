@@ -1,0 +1,95 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v013
+  parent: gru_v011
+  status: running
+description: 'Single-variable follow-up to v011: identical except the soft mask is removed.
+  Keeps the periodic state reset at 4,000 and drops only the P(is_scored) loss weighting.'
+hypothesis: v011 moved full_valid_wp from 0.674179 (3-seed mean) to 0.679986, +0.0058 at 36
+  sigma, but it changed the mask AND the reset together, so the gain is unattributed. This
+  run isolates them. If it lands near 0.674 the soft mask did the work and the reset is inert;
+  if near 0.680 the reset did the work and the mask is inert. Either way we learn which lever
+  the Phase B/C distillation teacher should be built from, instead of attributing +0.0058
+  to the wrong mechanism.
+change_vs_parent: 'EXACTLY ONE change off gru_v011: loss.mask_model -> null, which leaves
+  soft_mask None in chunk_loss so every required row keeps unit weight. Unchanged: training.state_reset
+  and inference.state_reset stay at 4000, aux weighted-MSE 0.05, EMA 0.999, architecture 2x128,
+  seed 1337, 3-epoch cosine schedule. WHY IT MATTERS: every downstream decision depends on
+  the attribution, especially whether the distillation teacher should be a pair of masked
+  models (v011-like) or masked plus unmasked for ensemble diversity.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: null
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v013.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v013
+  submission_dir: null
