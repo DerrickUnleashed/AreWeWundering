@@ -1,0 +1,150 @@
+### new run, log opened 2026-09-30T10:57:18+0530
+==============================================================================
+command            : python exploration/models/train_gru_v012.py --config exploration/version/version_gru_v012.yaml --device cpu
+timestamp          : 2026-09-30T10:57:18+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : c4b181b594b09909aabb9e0c7608d1d0b0d9428f
+seed               : 1337
+log                : exploration/logs/log_gru_v012.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v012
+  parent: gru_v011
+  status: smoke
+description: 'Single-variable follow-up to v011: same soft mask, same 3-epoch schedule,
+  but the periodic recurrent-state reset fires every 2,000 rows instead of every 4,000.'
+hypothesis: 'The reset period is a knob, not a threshold, and 2,000 rows beats 4,000.
+  dozken''s public reset2k scores 0.6569 against their reset4k, so shortening our
+  horizon should gain rather than cost. Mechanism: across 20k rows the recurrent state
+  degrades (their Q1 0.70 -> Q4 0.638) and a zero state beats the model''s own 10k-row
+  state, so more frequent resets keep the model nearer its best regime. If 2,000 instead
+  loses to 4,000 then the horizon is near-optimal at 4,000 and this lever is spent.'
+change_vs_parent: 'Shorter absolute reset horizon: 4,000 rows -> 2,000 rows. Implemented
+  as chunk_len 2000 -> 1000 with state_reset 4000 -> 2000. Unchanged: the soft mask
+  (loss.mask_model), aux weighted-MSE 0.05, EMA 0.999, architecture 2x128 (192,258
+  params), seed 1337, 3-epoch cosine schedule.
+
+  WHY chunk_len MUST MOVE TOO, and the resulting confound: the trainer enforces state_reset
+  = k * chunk_len with k >= 2, because a reset at every chunk boundary would discard
+  all carried state and silently leave the model with no memory beyond one chunk.
+  At chunk_len 2000 the shortest legal period is therefore 4000, which is exactly
+  v011''s value, so a shorter horizon is unreachable without also halving chunk_len.
+  Keeping k=2 preserves the 2-chunks-of-carry ratio the trainer enforces and changes
+  the absolute horizon from 4,000 to 2,000, which is also dozken''s literal reset
+  period. The confound is that chunk_len sets truncated-BPTT granularity, so this
+  run is not a pure period change; a (chunk_len 2000, state_reset 6000) run would
+  isolate the ratio and test the opposite direction. 1000 divides 20,000 exactly,
+  so no chunk crosses a sequence boundary.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 2000
+results:
+  best_step: 59
+  best_val_wp: 0.011531421286637374
+  best_val_t0: -0.07615187990274942
+  best_val_t1: 0.09921472247602417
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0062
+  finished_utc: '2026-09-30T05:27:09Z'
+artifacts:
+  log: exploration/logs/log_gru_v012.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v012
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+max_steps derived: 13,259 steps/epoch x 3 epoch(s) = 39,777 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+train sequences=10607  valid sequences=200  steps=39777
+step 0/39777 lr 4.00e-06 loss 1.086668 grad_norm 3.068 (0s)
+step 25/39777 lr 1.04e-04 loss 1.058447 grad_norm 4.371 (7s)
+step 50/39777 lr 2.04e-04 loss 0.564794 grad_norm 1.425 (13s)
+step 75/39777 lr 3.04e-04 loss 0.691305 grad_norm 1.878 (19s)
+step 100/39777 lr 4.04e-04 loss 0.756401 grad_norm 2.263 (25s)
+step 125/39777 lr 5.04e-04 loss 0.831965 grad_norm 1.475 (31s)
+step 150/39777 lr 6.04e-04 loss 0.558586 grad_norm 0.990 (37s)
+step 175/39777 lr 7.04e-04 loss 0.870234 grad_norm 1.670 (43s)
+step 200/39777 lr 8.04e-04 loss 0.603901 grad_norm 0.769 (48s)
+step 225/39777 lr 9.04e-04 loss 0.643330 grad_norm 1.235 (54s)
+step 250/39777 lr 1.00e-03 loss 0.570463 grad_norm 0.621 (60s)
+step 275/39777 lr 1.10e-03 loss 0.653877 grad_norm 0.962 (66s)
+step 300/39777 lr 1.20e-03 loss 0.706552 grad_norm 0.999 (72s)
+step 325/39777 lr 1.30e-03 loss 0.710550 grad_norm 1.175 (78s)
+step 350/39777 lr 1.40e-03 loss 0.728557 grad_norm 0.907 (84s)
+step 375/39777 lr 1.50e-03 loss 0.638077 grad_norm 0.613 (90s)
+step 400/39777 lr 1.60e-03 loss 0.844883 grad_norm 0.887 (96s)
+step 425/39777 lr 1.70e-03 loss 0.624258 grad_norm 0.714 (102s)
+step 450/39777 lr 1.80e-03 loss 0.684681 grad_norm 0.685 (108s)
+step 475/39777 lr 1.90e-03 loss 0.550040 grad_norm 0.871 (114s)
+step 500/39777 lr 2.00e-03 loss 0.718338 grad_norm 0.660 (120s)
+step 525/39777 lr 2.00e-03 loss 0.582696 grad_norm 0.498 (126s)
+step 550/39777 lr 2.00e-03 loss 0.564555 grad_norm 0.637 (132s)
+step 575/39777 lr 2.00e-03 loss 0.544908 grad_norm 0.585 (138s)
+step 600/39777 lr 2.00e-03 loss 0.641308 grad_norm 0.724 (145s)
+step 625/39777 lr 2.00e-03 loss 0.757682 grad_norm 0.621 (151s)
+step 650/39777 lr 2.00e-03 loss 0.697541 grad_norm 0.613 (157s)
