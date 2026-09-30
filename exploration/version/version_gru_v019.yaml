@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v019
   parent: gru_v011
-  status: running
+  status: finished
 description: 'The loss fix alone: globally-pooled weighted Pearson with a running
   statistic, everything else exactly as v011.'
 hypothesis: 'The single most important fix in this repo''s history, and it was sitting
@@ -103,15 +103,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 19889
+  best_val_wp: 0.6874144574894405
+  best_val_t0: 0.6834362518111948
+  best_val_t1: 0.6913926631676861
+  full_valid_wp: 0.6783738060385076
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 4.5681
+  finished_utc: '2026-09-30T18:08:37Z'
 artifacts:
   log: exploration/logs/log_gru_v019.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v019
