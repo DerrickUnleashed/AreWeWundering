@@ -135,5 +135,19 @@
     "memory_mb": 627,
     "submitted_utc": "2026-09-30T17:49Z",
     "note": "v011 weights with state_reset=4000 actually shipped, correcting the export bug. Scored 0.6515, IDENTICAL to v011 which shipped state_reset=0. So the inference-time reset changes per-row predictions substantially (parity 1.466) yet leaves the aggregate weighted-Pearson unchanged. The reset is a TRAINING-side lever: it shapes what the model learns, and must be applied while training, but whether it is also applied at inference does not move the score."
+  },
+  "v017": {
+    "public_score": 0.654,
+    "grader_seconds": 1537,
+    "memory_mb": 625,
+    "submitted_utc": "2026-09-30T23:18Z",
+    "note": "Distilled student, 116,546 params = 0.61x the v011/v015 teacher, trained against the teacher's raw predictions alongside the labels. Highest public score of ours (0.6540) and highest local score of any version (full_valid_wp 0.681866). Also our fastest entry by a wide margin: 1537s = 25m37s = 42.7% of the 60-min limit, against 30m56s for v016 and 40m12s for v014. So the smaller student costs nothing in score and saves 21% of the runtime."
+  },
+  "v016": {
+    "public_score": 0.6541,
+    "grader_seconds": 1856,
+    "memory_mb": 627,
+    "submitted_utc": "2026-09-30T23:17Z",
+    "note": "Distilled student, same 192,258 params as v011 (no capacity reduction). Publicly 0.6541, a hair above v017's 0.6540 -- a 0.0001 gap that is far inside the noise floor, so the two students are effectively TIED on score while differing by 21% in runtime and 39% in parameter count. That makes v017 the strictly better artifact. Submitted one minute before v017."
   }
 }

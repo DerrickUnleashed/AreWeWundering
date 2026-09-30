@@ -8,8 +8,8 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Ready to Submit | -- | 30m54s (52%) | -- |
-| 2 | **v016** | distilled student, 192k | 0.681753 | Ready to Submit | -- | 37m24s (62%) | -- |
+| 1 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
+| 2 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
 | 3 | **v018** | soft mask + state reset 10k | 0.680603 | Yet to package | -- | -- | -- |
 | 4 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
 | 5 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
