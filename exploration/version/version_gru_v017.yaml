@@ -1,0 +1,104 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v017
+  parent: gru_v016
+  status: running
+description: DISTILLATION STUDENT, SMALLER. Same recipe as v016 but 2x96 instead of
+  2x128 -- 116,546 params against a 192,258-param teacher (0.61x).
+hypothesis: 'Distillation regularises, and dozken''s own results show the effect clearly:
+  from a 872k teacher, their 436k student scored 0.6879 and their SMALLER 314k student
+  (0.36x) scored 0.6888 -- smaller beat larger on the public board, confirmed at 55m16s
+  vs 61m06s. If that holds here, a student below the teacher should beat v016''s equal-size
+  one, AND inference would drop to roughly 20 us/row.
+
+  Expected: match or beat v016''s 0.679986-equivalent, and if it wins, cut inference
+  cost by ~40%. If instead the smaller student is clearly worse, the regularisation
+  story is size-sensitive and the sweet spot is near the teacher''s own width -- which
+  is itself the useful answer, and matches v014 showing 379k is a dead heat with 192k.'
+change_vs_parent: 'ONE change off gru_v016: model.hidden 128 -> 96 (192,258 -> 116,546
+  params). Unchanged: distill_weight 0.5 and the same teacher labels, the soft mask,
+  state_reset 4000 in training and inference, chunk_len 2000, aux weighted-MSE 0.05,
+  EMA 0.999, seed 1337, 3-epoch cosine schedule.
+
+  0.61x the teacher is deliberately between dozken''s winning 0.36x and their losing-on-size
+  0.50x-equal student, chosen to answer the question without repeating their exact
+  point on a different codebase.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 96
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 116546
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 0.5
+  teacher_labels:
+  - cache/teacher/teacher_v011s.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v017.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v017
+  submission_dir: null
