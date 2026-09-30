@@ -1,4 +1,4 @@
-# Experiment ranking — v001 to v016
+# Experiment ranking — v001 to v020
 
 All scores are `full_valid_wp`: global weighted Pearson over every one of the
 1,873 validation sequences (3,528,273 scored rows), computed with the
@@ -8,37 +8,37 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v017** | DISTILLATION STUDENT, SMALLER | 0.681866 | Ready to Submit | -- | 31 min | -- |
-| 2 | **v016** | DISTILLATION STUDENT | 0.681753 | Ready to Submit | -- | 37 min | -- |
-| 3 | **v011** | soft mask on P(is_scored) + reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 4 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
-| 5 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 6 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
-| 7 | **v009** | INPUTS: append sign(x)*log1p(|x|) of every | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
-| 8 | **v008** | INPUTS: cross-instrument spreads and | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
-| 9 | **v002** | INPUTS: train-only robust z-score with +-8 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
-| 10 | **v001** | WIDE: 1 layer x 256 units, otherwise | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 11 | **v007** | INPUTS: first differences of the i0 | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
-| 12 | **v006** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
-| 13 | **v005** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
-| 14 | **v003** | TRAINING STABILITY: add a 0.05 |t|-weighted | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
-| 15 | **v004** | THIRD-PARTY ARCHITECTURE: 2 layers x 192 | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 16 | **v010** | SCHEDULE: the gru_v002 recipe trained for 6 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 1 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Ready to Submit | -- | 30m54s (52%) | -- |
+| 2 | **v016** | distilled student, 192k | 0.681753 | Ready to Submit | -- | 37m24s (62%) | -- |
+| 3 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
+| 4 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 5 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
+| 6 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
+| 7 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
+| 8 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 9 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
+| 10 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 11 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 12 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 13 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 14 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
+| 15 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
+| 16 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 17 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
 
-### No full-validation score
+### Not ranked by `full_valid_wp`
 
-Listed here because they are real runs, but there is no `full_valid_wp` to rank them by -- either still training, or (v015) deliberately reusing another version's weights rather than retraining.
+Real runs with no `full_valid_wp` of their own: still training (v018-v020), or a framework smoke test that was never a modelling result (v000). v000 does have a public score -- it was submitted to validate the submission path, not to compete.
 
 | Ver | What it changed | best so far (subset) | Status | Public score |
-|---|---|---:|---|---|---:|
-| **v000** | Framework smoke test | 0.570341 | Submitted | 0.4986 |
-| **v015** | v011 weights, reset 4k actually shipped | -- | Submitted | 0.6515 |
-| **v018** | Soft mask + periodic state reset at 10,000 | -- | Training | -- |
-| **v019** | The loss fix alone: globally-pooled | -- | Training | -- |
-| **v020** | v019's globally-pooled loss PLUS training | -- | Training | -- |
+|---|---|---|---|---|
+| **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
+| **v018** | soft mask + state reset 10k | -- | Training | -- |
+| **v019** | FIX loss: globally pooled | -- | Training | -- |
+| **v020** | FIX loss + train+valid data | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 

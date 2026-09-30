@@ -39,11 +39,37 @@ END = '<!-- END GENERATED: leaderboard -->'
 # forgotten. The short label comes from the yaml's own `description`, which is
 # the single place the change is already written down.
 DESCRIPTIONS: dict[str, str] = {
-    'v011': 'soft mask on P(is_scored) + reset 4k',
-    'v012': 'soft mask + reset 2k (shorter horizon)',
-    'v013': 'reset 4k, NO soft mask (control)',
+    'v000': 'framework smoke test (60 steps)',
+    'v001': 'wider: 1 layer x 256',
+    'v002': 'input: robust z-score, 8-sigma clip',
+    'v003': 'aux |t|-weighted MSE + EMA',
+    'v004': 'bigger: 2x192 with 128 proj',
+    'v005': 'seed replicate of v002 (1338)',
+    'v006': 'seed replicate of v002 (1339)',
+    'v007': 'input: first differences',
+    'v008': 'input: cross-instrument i0/i1',
+    'v009': 'input: signed-log tail compression',
+    'v010': 'schedule: 6 epochs not 3',
+    'v011': 'soft mask + state reset 4k',
+    'v012': 'soft mask + state reset 2k',
+    'v013': 'reset 4k, no soft mask (control)',
     'v014': 'soft mask + reset 4k, 2x192 proj64',
-    'v015': 'v011 weights, reset 4k actually shipped',
+    'v015': 'v011 re-exported, reset served',
+    'v016': 'distilled student, 192k',
+    'v017': 'distilled student, 117k (0.61x teacher)',
+    'v018': 'soft mask + state reset 10k',
+    'v019': 'FIX loss: globally pooled',
+    'v020': 'FIX loss + train+valid data',
+}
+
+
+# Versions that deliberately reuse another version's WEIGHTS, so they have no
+# independent full_valid_wp but do share one. v015 is v011's checkpoint re-exported
+# with the state reset actually baked in; the model, and therefore the score, is
+# identical. It belongs in the ranking, flagged, rather than parked as unranked --
+# it is a real submission at 0.6515, not a placeholder.
+INHERITS_FULL_SCORE: dict[str, str] = {
+    'v015': 'v011',
 }
 
 
@@ -52,17 +78,26 @@ def discover() -> list[str]:
 
 
 def label(v: str) -> str:
+    """Short human label for the table.
+
+    The auto-derived fallback used to truncate at a fixed character count and cut
+    mid-phrase, producing cells like 'INPUTS: append sign(x)*log1p(|x|) of every'
+    and 'SEED REPLICATE of the gru_v002 recipe, seed'. Worse, a label containing a
+    pipe -- v003's '0.05 |t|-weighted auxiliary MSE' -- SILENTLY BREAKS the markdown
+    table, because an unescaped | is a cell separator. Pipes are escaped here so a
+    label can never corrupt the table again.
+    """
     if v in DESCRIPTIONS:
-        return DESCRIPTIONS[v]
+        return DESCRIPTIONS[v].replace('|', '\\|')
     y = load_yaml(v)
     if not y:
         return v
     d = ' '.join(str(y.get('description') or '').split())
-    # first clause, cut at a sentence break or a comma-separated aside
-    d = d.split('. ')[0]
+    d = d.split('. ')[0]                 # first clause only
     if len(d) > 44:
-        d = d[:44].rsplit(' ', 1)[0]
-    return d or v
+        cut = d[:44].rsplit(' ', 1)[0]    # never mid-word
+        d = cut + '...'
+    return d.replace('|', '\\|')
 
 
 
@@ -84,6 +119,19 @@ def fmt_mmss(seconds) -> str:
     if seconds is None:
         return '--'
     return f'{int(seconds) // 60}m{int(seconds) % 60:02d}s'
+
+
+def _proj_dur(mins, pct) -> str:
+    """Projected grader runtime, formatted like a measured one (m:ss plus % of limit).
+
+    A projected duration was rendered as '31 min' while every measured one read
+    '30m12s (50%)', so two formats sat in one column. Same shape now.
+    """
+    if mins is None:
+        return '--'
+    total = int(round(float(mins) * 60))
+    s = f'{total // 60}m{total % 60:02d}s'
+    return f'{s} ({float(pct):.0f}%)' if pct else s
 
 
 def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
@@ -117,12 +165,12 @@ def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
             meta = json.loads(meta_path.read_text())
             lat = (meta.get('gate') or {}).get('latency') or {}
             if lat.get('grader_safe'):
-                mins = lat.get('grader_min_p50')
-                return 'Ready to Submit', '--', (f'{mins:.0f} min' if mins else '--'), '--'
+                return ('Ready to Submit', '--',
+                        _proj_dur(lat.get('grader_min_p50'), lat.get('grader_pct_budget_p50')), '--')
             if meta.get('latency_contaminated'):
                 return 'Ready to Submit (latency unverified)', '--', '--', '--'
-            mins = lat.get('grader_min_p50')
-            return 'Do not ship', '--', (f'{mins:.0f} min' if mins else '--'), '--'
+            return ('Do not ship', '--',
+                    _proj_dur(lat.get('grader_min_p50'), lat.get('grader_pct_budget_p50')), '--')
 
     # No bundle. Distinguish "trained but never packaged" from "not trained".
     if st in ('finished', 'smoke'):
@@ -185,12 +233,21 @@ def build_tables() -> str:
         fv, bv = r.get('full_valid_wp'), r.get('best_val_wp')
         st = y.get('identity', {}).get('status')
         status, pub, dur, mem = bundle_status(v, y, lb)
+        inherits = INHERITS_FULL_SCORE.get(v)
+        if fv is None and inherits:
+            donor = load_yaml(inherits)
+            fv = (donor or {}).get('results', {}).get('full_valid_wp')
+            bv = bv if bv is not None else (donor or {}).get('results', {}).get('best_val_wp')
+            # mark the inheritance in the label rather than a separate column
+            label_txt = f"{label(v)} [shares {inherits}'s weights]"
+
         # A version with no local full score still belongs in the main table if it
         # was actually submitted -- v000 scored 0.4986 publicly. Sorting it by its
         # subset number would imply a ranking it never had, so such rows go below
         # with the reason stated.
         if fv is not None:
-            rows.append((fv, v, label(v), status, pub, dur, mem))
+            rows.append((fv, v, label_txt if inherits else label(v),
+                         status, pub, dur, mem))
         else:
             unranked.append((v, label(v), bv, status, pub, st))
 
@@ -211,12 +268,13 @@ def build_tables() -> str:
                 '']
 
     if unranked:
-        out += ['### No full-validation score', '',
-                'Listed here because they are real runs, but there is no `full_valid_wp` '
-                'to rank them by -- either still training, or (v015) deliberately reusing '
-                'another version\'s weights rather than retraining.', '',
+        out += ['### Not ranked by `full_valid_wp`', '',
+                'Real runs with no `full_valid_wp` of their own: still training '
+                '(v018-v020), or a framework smoke test that was never a modelling '
+                'result (v000). v000 does have a public score -- it was submitted to '
+                'validate the submission path, not to compete.', '',
                 '| Ver | What it changed | best so far (subset) | Status | Public score |',
-                '|---|---|---:|---|---|---:|']
+                '|---|---|---|---|---|']
         for v, desc, bv, status, pub, st in unranked:
             best = f'{bv:.6f}' if bv is not None else '--'
             out.append(f'| **{v}** | {desc} | {best} | {status} | {pub} |')
