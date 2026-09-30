@@ -126,7 +126,11 @@ def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
 
     # No bundle. Distinguish "trained but never packaged" from "not trained".
     if st in ('finished', 'smoke'):
-        return 'No full score', '--', '--', '--'
+        # Trained but never packaged. Distinguish "finished, no bundle" from
+        # "no full score to report" -- v016/v017 finished with real scores and no
+        # bundle, and labelling those 'No full score' hid the fact entirely.
+        has_fv = y.get('results', {}).get('full_valid_wp') is not None
+        return ('Yet to package' if has_fv else 'No full score'), '--', '--', '--'
     return 'Yet to Train', '--', '--', '--'
 
 

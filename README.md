@@ -8,20 +8,22 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v011** | soft mask on P(is_scored) + reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 2 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
-| 3 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 4 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
-| 5 | **v009** | INPUTS: append sign(x)*log1p(|x|) of every | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
-| 6 | **v008** | INPUTS: cross-instrument spreads and | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
-| 7 | **v002** | INPUTS: train-only robust z-score with +-8 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
-| 8 | **v001** | WIDE: 1 layer x 256 units, otherwise | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 9 | **v007** | INPUTS: first differences of the i0 | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
-| 10 | **v006** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
-| 11 | **v005** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
-| 12 | **v003** | TRAINING STABILITY: add a 0.05 |t|-weighted | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
-| 13 | **v004** | THIRD-PARTY ARCHITECTURE: 2 layers x 192 | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 14 | **v010** | SCHEDULE: the gru_v002 recipe trained for 6 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 1 | **v017** | DISTILLATION STUDENT, SMALLER | 0.681866 | Yet to package | -- | -- | -- |
+| 2 | **v016** | DISTILLATION STUDENT | 0.681753 | Yet to package | -- | -- | -- |
+| 3 | **v011** | soft mask on P(is_scored) + reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 4 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
+| 5 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
+| 6 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
+| 7 | **v009** | INPUTS: append sign(x)*log1p(|x|) of every | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 8 | **v008** | INPUTS: cross-instrument spreads and | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
+| 9 | **v002** | INPUTS: train-only robust z-score with +-8 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 10 | **v001** | WIDE: 1 layer x 256 units, otherwise | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 11 | **v007** | INPUTS: first differences of the i0 | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 12 | **v006** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 13 | **v005** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
+| 14 | **v003** | TRAINING STABILITY: add a 0.05 |t|-weighted | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
+| 15 | **v004** | THIRD-PARTY ARCHITECTURE: 2 layers x 192 | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 16 | **v010** | SCHEDULE: the gru_v002 recipe trained for 6 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
@@ -34,9 +36,9 @@ Listed here because they are real runs, but there is no `full_valid_wp` to rank 
 |---|---|---:|---|---|---:|
 | **v000** | Framework smoke test | 0.570341 | Submitted | 0.4986 |
 | **v015** | v011 weights, reset 4k actually shipped | -- | Submitted | 0.6515 |
-| **v016** | DISTILLATION STUDENT | -- | Training | -- |
-| **v017** | DISTILLATION STUDENT, SMALLER | -- | Training | -- |
 | **v018** | Soft mask + periodic state reset at 10,000 | -- | Training | -- |
+| **v019** | The loss fix alone: globally-pooled | -- | Training | -- |
+| **v020** | v019's globally-pooled loss PLUS training | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -82,6 +84,30 @@ nothing at inference.
 
 The two failures below are also informative: they are the *objective* and
 *capacity* directions, which the soft-mask result now brackets.
+
+## Distillation works here too, and smaller wins again (v016, v017)
+
+Both distilled students beat the teacher they learned from — and the **smaller** one
+won, reproducing dozken's result on a different codebase:
+
+| | params | best_val (subset) | full_valid_wp | vs seed | σ |
+|---|---:|---:|---:|---:|---:|
+| v011 (the teacher) | 192,258 | 0.689479 | 0.679986 | +0.0058 | +36.5 |
+| **v016** distilled student | 192,258 | 0.690937 | **0.681753** | +0.0076 | **+47.6** |
+| **v017** distilled student | **116,546** | 0.692203 | **0.681866** | +0.0077 | **+48.3** |
+
+**v017 is 0.61× the teacher and scores marginally higher, at 60 % of the inference
+cost.** That is distillation regularisation, and it is the same effect dozken
+measured publicly: from an 872k teacher, their 436k student scored 0.6879 and their
+**smaller** 314k student (0.36×) scored 0.6888. Two independent implementations,
+same conclusion — a distilled student should be sized *below* its teacher, not at
+it.
+
+Distillation is worth **+0.0019 over the teacher** at equal size and **+0.0019 at
+0.61× size with 40 % less inference cost**, which is a rare free lunch. It is also
+the only lever so far that works *without* fixing the loss — and that is exactly
+why v019/v020 matter: on a correctly specified objective the distillation gain
+should compound rather than merely survive.
 
 ## The public board has now settled what local could not
 
