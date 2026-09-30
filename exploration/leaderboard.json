@@ -156,5 +156,14 @@
     "memory_mb": 627,
     "submitted_utc": "2026-09-30T00:02Z",
     "note": "Soft mask + periodic state reset every 10,000, 192,258 params. Scored 0.6518, BELOW v017's 0.6540, which the local metric correctly predicted: v018 local 0.680603 vs v017 local 0.681866 (-0.001263, 4 sigma), and the public gap is -0.0022 in the same direction. The local-to-public offset holds again. Confirms my packaging recommendation NOT to spend a slot on it was correct -- this slot was spent and returned a weaker entry than the one already held."
+  },
+  "_leaderboard_top": {
+    "public_score": 0.6677,
+    "note": "Reported by the user on 2026-10-01 as the current #1 on the PUBLIC leaderboard. NOT ours and NOT dozken's. This is the number to beat, and it supersedes the 0.6622 figure previously recorded as dozken's claimed #1 (ne_onnx), which was never verified. IMPORTANT: final ranking is decided solely by the PRIVATE leaderboard on a separate hidden dataset, so 0.6677 is a public-split target, not the ranking number."
+  },
+  "_organiser_baseline": {
+    "public_score": 0.5935,
+    "grader_seconds": 1581,
+    "note": "The organiser's own baseline on the public leaderboard, restated by the user. Confirms the number already on file. We are +0.0605 above it with v017 (0.6540); dozken is +0.0653; the leader is +0.0742."
   }
 }
