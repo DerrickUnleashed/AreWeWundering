@@ -1,0 +1,127 @@
+==============================================================================
+RECONSTRUCTED TRAINING LOG -- NOT THE ORIGINAL CANONICAL LOG
+==============================================================================
+
+This file was rebuilt from durable checkpoint state by
+tools/rebuild_log.py after the canonical log was orphaned by an
+accidental in-place file replacement while the run was live. The training
+run itself did not fail and lost no results.
+
+model            : gru
+version          : v018
+built (UTC)      : 2026-09-30T18:23:00Z
+built by         : macOS-27.0-arm64-arm-64bit  python 3.11.9
+source config    : exploration/version/version_gru_v018.yaml
+source history   : exploration/checkpoints/checkpoint_gru_v018/history.json
+source checkpoints: exploration/checkpoints/checkpoint_gru_v018/
+canonical log    : exploration/logs/log_gru_v018.log  (TRUNCATED -- left untouched as incident evidence)
+
+RECOVERED: config, parameter count, every periodic evaluation with its
+           step / WP / per-target WP / scored rows, which evaluation set
+           each new best, and the final full-validation scores.
+MISSING  : the per-step loss and grad_norm trace, the per-step learning
+           rate, and the launch-time reproducibility header (command,
+           host, package versions, git commit). Those existed only in the
+           orphaned bytes and are NOT reproduced here.
+
+Treat every number below as recovered-from-checkpoints, not as a verbatim
+record of what was printed during the run.
+
+==============================================================================
+CONFIG AS LOADED
+==============================================================================
+data:
+train_shards: cache/train
+valid_shards: cache/valid
+seq_len: 20000
+warmup_steps: 99
+target_clip: 2.0
+train_sequences: null
+features:
+normalisation: none
+signed_log_volumes: false
+first_differences: []
+cross_instrument: []
+step_feature: false
+clip_sigma: 0
+model:
+arch: gru
+input_proj: 0
+hidden: 128
+layers: 2
+dropout: 0.0
+layernorm: false
+head: linear
+param_count: 192258
+loss:
+type: seq_weighted_pearson
+mask: soft
+aux_mse_weight: 0.05
+target_clip: 2.0
+mask_floor: 0.1
+mask_model: cache/train_scored.npy
+optim:
+name: adamw
+lr: 0.002
+weight_decay: 0.01
+betas:
+- 0.9
+- 0.99
+schedule: cosine
+warmup_steps: 500
+grad_clip: 1.0
+ema_decay: 0.999
+precision: fp32
+training:
+chunk_len: 2000
+burn_in: 99
+batch_sequences: 16
+max_steps: null
+smoke_steps: 60
+epochs: 3
+seed: 1337
+eval_every_steps: 2500
+eval_subset_sequences: 200
+device: cpu
+stateful: true
+state_reset: 10000
+inference:
+export: onnx
+opset: 17
+ort_threads: 1
+target_us_per_row: 68.5
+state_reset: 10000
+
+param_count      : 192258
+seed             : 1337
+status           : finished
+
+==============================================================================
+PERIODIC EVALUATIONS  (recovered from history.json)
+==============================================================================
+    step          wp          t0          t1        rows        wall  new best
+------------------------------------------------------------------------------
+    2499    0.676153    0.671357    0.680949     374,199      43m22s  yes
+    4999    0.683816    0.679268    0.688363     374,199    1h24m05s  yes
+    7499    0.686075    0.681737    0.690413     374,199    2h03m46s  yes
+    9999    0.688387    0.684734    0.692041     374,199    2h43m23s  yes
+   12499    0.687853    0.683106    0.692600     374,199    3h22m58s  
+   14999    0.688934    0.683768    0.694100     374,199    4h02m32s  yes
+   17499    0.688943    0.684052    0.693835     374,199    4h37m29s  yes
+   19889    0.689082    0.684170    0.693993     374,199    5h06m52s  yes
+------------------------------------------------------------------------------
+
+==============================================================================
+FINAL RESULTS  (recovered from the version yaml)
+==============================================================================
+best_step           : 19889
+best_val_wp         : 0.689082
+best_val_t0         : 0.684170
+best_val_t1         : 0.693993
+full_valid_wp       : 0.680603
+train_hours         : 5.211600
+finished_utc        : 2026-09-30T18:15:15Z
+
+==============================================================================
+END OF RECONSTRUCTION
+==============================================================================
