@@ -9,9 +9,9 @@ reference metric in `tools/metric_ref.py`.
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v011** | soft mask on P(is_scored) + reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 2 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Do not ship | -- | 44 min | -- |
-| 3 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Ready to Submit | -- | 30 min | -- |
-| 4 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Ready to Submit | -- | 30 min | -- |
+| 2 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
+| 3 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
+| 4 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
 | 5 | **v009** | INPUTS: append sign(x)*log1p(|x|) of every | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
 | 6 | **v008** | INPUTS: cross-instrument spreads and | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
 | 7 | **v002** | INPUTS: train-only robust z-score with +-8 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
@@ -33,8 +33,10 @@ Listed here because they are real runs, but there is no `full_valid_wp` to rank 
 | Ver | What it changed | best so far (subset) | Status | Public score |
 |---|---|---:|---|---|---:|
 | **v000** | Framework smoke test | 0.570341 | Submitted | 0.4986 |
-| **v015** | v011 weights, reset 4k actually shipped | -- | Ready to Submit | -- |
+| **v015** | v011 weights, reset 4k actually shipped | -- | Submitted | 0.6515 |
 | **v016** | DISTILLATION STUDENT | -- | Training | -- |
+| **v017** | DISTILLATION STUDENT, SMALLER | -- | Training | -- |
+| **v018** | Soft mask + periodic state reset at 10,000 | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -80,6 +82,56 @@ nothing at inference.
 
 The two failures below are also informative: they are the *objective* and
 *capacity* directions, which the soft-mask result now brackets.
+
+## The public board has now settled what local could not
+
+All of v011-v015 are scored publicly, and they resolve three questions the local
+metric had left open:
+
+| | local full_valid_wp | public | Δ |
+|---|---:|---:|---:|
+| **v014** 2×192 proj64 (379k) | 0.679676 | **0.6517** | −0.0280 |
+| **v011** 2×128 (192k) | 0.679986 | 0.6515 | −0.0285 |
+| **v015** v011 weights, reset served | — | 0.6515 | — |
+| **v012** reset 2k | 0.678784 | 0.6512 | −0.0276 |
+| **v013** reset 4k, **no mask** | 0.676198 | 0.6490 | −0.0272 |
+
+**1. Local validation IS predictive once differences exceed the noise band.** These
+four order almost identically on both metrics (v014 overtakes v011 publicly; v012
+and v013 follow). The earlier "no correlation" finding was real but only for the
+seven versions packed inside ±0.0013 — inside that band nothing transfers, and
+*outside* it, correlation is essentially perfect. The noise floor is not a
+nuisance; it is the boundary of what local validation can tell you at all.
+
+**2. The reset is a TRAINING-side lever, not an inference one.** v015 shipped
+`state_reset=4000` and v011 shipped `state_reset=0`. They scored **0.6515, identical
+to four decimals** — despite per-row predictions differing by up to 1.466. So
+applying the reset at inference changes what the model emits without changing how
+good it is. The reset must be present *during training* (v013 without the mask
+beats the plain baseline 0.6490 vs 0.6435, +0.0055) but whether it is also applied
+when serving is score-neutral. That is a more interesting result than the bug was:
+it says the mechanism is shaping what the model learns, not conditioning its
+inference.
+
+**3. The reset carries more of the gain than the mask, publicly.** Decomposed
+against the plain baseline (v002, 0.6435):
+
+| | public | Δ |
+|---|---:|---:|
+| + reset 4k only (v013) | 0.6490 | **+0.0055** |
+| + reset **and** mask (v011/v015) | 0.6515 | +0.0080 |
+
+Locally the split was the other way round — reset +0.0020, mask +0.0038 on top —
+so **local and public disagree about which lever matters.** Both levers are
+positive; the weighting between them is not portable.
+
+**4. v014 is our best public entry, and it is the one I marked Do not ship.** Its
+local p99 projected 83 min against a 70-min kill, so I flagged it. It ran in
+**40m12s (67 % of budget)** and scored **0.6517**, beating v015. dozken's NOTES warn
+of exactly this — their same architecture went from 64m04s to *killed* within ten
+hours, so run-to-run grader variance is enormous and a pessimistic local p99 is not
+a hard blocker. This is the second time in this repo that treating a local latency
+tail as a shipping blocker would have discarded the best model we had.
 
 ## Attribution: both levers are real (v013 settled it)
 

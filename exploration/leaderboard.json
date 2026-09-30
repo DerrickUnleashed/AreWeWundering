@@ -107,5 +107,33 @@
       "repo_label": "dozken/2026-09-17_distil_ens",
       "note": "THE ENTRY WE UPLOADED as submission_distil_ens.zip. It was annotated with the comment 'dozken/2026-09-17_distil160', which was WRONG -- it is distil_ens (GRU 192x2 proj64, 435,714 params), not distil160. Confirmed by duration (61m06s, consistent with the 436k model) and by score (0.6585 = their stated held-out 0.6879 minus the 0.0295 offset). Ran 61m06s, past the 60-min documented target but inside the 70-min hard kill."
     }
+  },
+  "v012": {
+    "public_score": 0.6512,
+    "grader_seconds": 1787,
+    "memory_mb": 627,
+    "submitted_utc": "2026-09-30T17:49Z",
+    "note": "soft mask + reset 2k (chunk_len 1000). Submitted 2026-09-30 17:48."
+  },
+  "v013": {
+    "public_score": 0.649,
+    "grader_seconds": 1716,
+    "memory_mb": 627,
+    "submitted_utc": "2026-09-30T17:49Z",
+    "note": "reset 4k, NO soft mask -- the control. Submitted 2026-09-30 17:49."
+  },
+  "v014": {
+    "public_score": 0.6517,
+    "grader_seconds": 2412,
+    "memory_mb": 632,
+    "submitted_utc": "2026-09-30T17:49Z",
+    "note": "soft mask + reset 4k at 2x192 proj64, 378,562 params. OUR BEST PUBLIC SCORE. Ran 40m12s despite a local p99 that projected 83 min; the p99-based Do-not-ship verdict was wrong, exactly as dozken NOTES warned (\"same architecture went 64m04s to killed in about ten hours\" -- and by the same token a pessimistic p99 is not a hard blocker)."
+  },
+  "v015": {
+    "public_score": 0.6515,
+    "grader_seconds": 1831,
+    "memory_mb": 627,
+    "submitted_utc": "2026-09-30T17:49Z",
+    "note": "v011 weights with state_reset=4000 actually shipped, correcting the export bug. Scored 0.6515, IDENTICAL to v011 which shipped state_reset=0. So the inference-time reset changes per-row predictions substantially (parity 1.466) yet leaves the aggregate weighted-Pearson unchanged. The reset is a TRAINING-side lever: it shapes what the model learns, and must be applied while training, but whether it is also applied at inference does not move the score."
   }
 }
