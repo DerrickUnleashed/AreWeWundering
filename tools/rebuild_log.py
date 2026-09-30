@@ -110,7 +110,13 @@ def main() -> int:
     # A run is only reconstructable once it has actually finished; otherwise the
     # tail of the evaluation series is simply missing, not merely unlogged.
     status = ((cfg or {}).get('identity') or {}).get('status')
-    finished = status in ('finished', 'smoke') or res.get('finished_utc') is not None
+    # Trust `status` only. `finished_utc` is written once at the end of a run, so
+    # it can survive from an EARLIER run of the same version -- relaunching v021
+    # after a smoke test left the smoke run's finished_utc in place, and an
+    # `or finished_utc is not None` clause then waved a running job straight
+    # through this guard. `status` is rewritten on every state change, so it is
+    # the only field that reliably describes the CURRENT run.
+    finished = status in ('finished', 'smoke')
     if not finished:
         print(f'error: run status is {status!r}, not finished. '
               f'The reconstruction would be silently incomplete. '
