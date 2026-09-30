@@ -172,5 +172,12 @@
     "memory_mb": 627,
     "submitted_utc": "2026-09-30T19:31Z",
     "note": "The loss-fix experiment, submitted to settle it empirically. Local predicted a 5.1-sigma REGRESSION against its parent v011 (0.678374 vs 0.679986) and the public score agrees: 0.6510 against v011's 0.6515. Replacing the per-chunk Pearson loss with a globally-pooled running-statistic loss did not help, on either metric. The local call was right, which is the useful part: it means the loss fix can be retired without spending more submission slots on it. Cost one of five daily slots for a confirmed negative result."
+  },
+  "v020": {
+    "public_score": 0.6513,
+    "grader_seconds": 1792,
+    "memory_mb": 627,
+    "submitted_utc": "2026-09-30T19:32Z",
+    "note": "THE CONTAMINATION TEST. v020 trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so its local full_valid_wp of 0.681773 was measured on 89% of its own training data and sat within 0.0001 of v017's clean 0.681866, implying a tie. The public score is 0.6513, which is NOT a tie: it is 0.0027 BELOW v017's 0.6540 and level with v011 (0.6515) and v019 (0.6510). So the apparent local gain from training on train+valid was entirely contamination, and the real effect of adding 15.8% more data was NEGATIVE. Its local->public offset is -0.0305, outside the -0.0279+-0.0016 measured across the eight clean submissions, which is the signature of an inflated local score. This is the empirical proof that the contaminated number could not be trusted."
   }
 }
