@@ -87,14 +87,28 @@ def fmt_mmss(seconds) -> str:
 
 
 def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
-    """Return (status, public score, duration, memory) for one version."""
+    """Return (status, public score, duration, memory) for one version.
+
+    Status is derived from EVIDENCE -- a leaderboard reading, else a bundle and its
+    gate -- and only falls back to the yaml's own `identity.status` when there is
+    neither. Reading the yaml status first was wrong in three ways: v015 is
+    `planned` yet fully packaged and gate-clear, v000 is `smoke` yet was actually
+    submitted and scored, and v014 is `finished` with a latency gate that failed on
+    a real idle measurement. The yaml says what the trainer was doing; it does not
+    say what is shippable.
+    """
     entry = lb.get(v)
     if entry and entry.get('public_score') is not None:
-        dur = fmt_mmss(entry.get('grader_seconds'))
-        pct = entry.get('grader_seconds')
-        if pct:
-            dur += f' ({pct / 3600 * 100:.0f}%)'
-        return 'Submitted', f"{entry['public_score']:.4f}", dur, f"{entry.get('memory_mb', '--')} MB"
+        secs = entry.get('grader_seconds')
+        dur = fmt_mmss(secs)
+        if secs:
+            dur += f' ({secs / 3600 * 100:.0f}%)'
+        mem = f"{entry['memory_mb']} MB" if entry.get('memory_mb') else '--'
+        return 'Submitted', f"{entry['public_score']:.4f}", dur, mem
+
+    st = (y.get('identity') or {}).get('status')
+    if st == 'running':
+        return 'Training', '--', '--', '--'
 
     sub = (y.get('artifacts') or {}).get('submission_dir')
     if sub and (ROOT / sub).exists():
@@ -103,14 +117,17 @@ def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
             meta = json.loads(meta_path.read_text())
             lat = (meta.get('gate') or {}).get('latency') or {}
             if lat.get('grader_safe'):
-                return 'Ready to Submit', '--', '--', '--'
-            # A failed latency gate measured under contention is not evidence of a
-            # real failure. flag_contended_latency() marks those; without the flag
-            # a FAIL is taken at face value.
+                mins = lat.get('grader_min_p50')
+                return 'Ready to Submit', '--', (f'{mins:.0f} min' if mins else '--'), '--'
             if meta.get('latency_contaminated'):
                 return 'Ready to Submit (latency unverified)', '--', '--', '--'
-            return 'Do not ship', '--', '--', '--'
-    return 'Yet to package', '--', '--', '--'
+            mins = lat.get('grader_min_p50')
+            return 'Do not ship', '--', (f'{mins:.0f} min' if mins else '--'), '--'
+
+    # No bundle. Distinguish "trained but never packaged" from "not trained".
+    if st in ('finished', 'smoke'):
+        return 'No full score', '--', '--', '--'
+    return 'Yet to Train', '--', '--', '--'
 
 
 def flag_contended_latency() -> list[str]:
@@ -134,6 +151,13 @@ def flag_contended_latency() -> list[str]:
         lat = (meta.get('gate') or {}).get('latency') or {}
         if lat.get('grader_safe') or not lat:
             continue
+        # Only the p50 gate discriminates. Contention inflates the whole
+        # distribution, so it pushes p50 over budget (v015 read 50.33 that way).
+        # A model whose p50 PASSES and only whose p99 fails has a genuine tail --
+        # v014 read 41.50 p50 / 78.25 p99 on an idle box, and flagging that as
+        # 'unverified' would hide a real shipping blocker behind a caveat.
+        if lat.get('pass_p50_75pct'):
+            continue
         meta['latency_contaminated'] = True
         meta['latency_contamination_note'] = (
             'Latency measured while gru_v010 and gru_v011 were training on the same '
@@ -148,7 +172,7 @@ def flag_contended_latency() -> list[str]:
 
 def build_tables() -> str:
     lb = load_leaderboard()
-    rows, inflight = [], []
+    rows, unranked = [], []
     for v in discover():
         y = load_yaml(v)
         if y is None:
@@ -156,10 +180,15 @@ def build_tables() -> str:
         r = y.get('results') or {}
         fv, bv = r.get('full_valid_wp'), r.get('best_val_wp')
         st = y.get('identity', {}).get('status')
-        if st == 'finished' and fv is not None:
-            rows.append((fv, v, label(v)))
+        status, pub, dur, mem = bundle_status(v, y, lb)
+        # A version with no local full score still belongs in the main table if it
+        # was actually submitted -- v000 scored 0.4986 publicly. Sorting it by its
+        # subset number would imply a ranking it never had, so such rows go below
+        # with the reason stated.
+        if fv is not None:
+            rows.append((fv, v, label(v), status, pub, dur, mem))
         else:
-            inflight.append((v, label(v), bv, st))
+            unranked.append((v, label(v), bv, status, pub, st))
 
     rows.sort(reverse=True)
     out = [BEGIN, '']
@@ -170,23 +199,23 @@ def build_tables() -> str:
             '| Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |',
             '|---:|---|---|---:|---|---|---:|---|',
         ]
-        for i, (fv, v, desc) in enumerate(rows, 1):
-            status, pub, dur, mem = bundle_status(v, load_yaml(v), lb)
+        for i, (fv, v, desc, status, pub, dur, mem) in enumerate(rows, 1):
             out.append(f'| {i} | **{v}** | {desc} | {fv:.6f} | {status} | {pub} | {dur} | {mem} |')
         out += ['',
                 f'Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873',
                 'validation sequences (3,528,273 scored rows).',
                 '']
 
-    if inflight:
-        out += ['### Still in flight', '',
-                'No final `full_valid_wp` yet, so not ranked.', '',
+    if unranked:
+        out += ['### No full-validation score', '',
+                'Listed here because they are real runs, but there is no `full_valid_wp` '
+                'to rank them by -- either still training, or (v015) deliberately reusing '
+                'another version\'s weights rather than retraining.', '',
                 '| Ver | What it changed | best so far (subset) | Status | Public score |',
-                '|---|---|---:|---|---|']
-        for v, desc, bv, st in inflight:
-            status = 'Training' if st == 'running' else 'Yet to Train'
+                '|---|---|---:|---|---|---:|']
+        for v, desc, bv, status, pub, st in unranked:
             best = f'{bv:.6f}' if bv is not None else '--'
-            out.append(f'| **{v}** | {desc} | {best} | {status} | -- |')
+            out.append(f'| **{v}** | {desc} | {best} | {status} | {pub} |')
         out.append('')
 
     out.append(END)

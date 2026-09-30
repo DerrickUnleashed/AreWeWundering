@@ -235,7 +235,5 @@
   "failures": [
     "latency gate FAILED against the grader: 41.5 us/row local x 1.62 = 44.1 min at p50 (73.6% of the 60 min budget) and 83.2 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
   ],
-  "status": "NOT-READY",
-  "latency_contaminated": true,
-  "latency_contamination_note": "Latency measured while gru_v010 and gru_v011 were training on the same cores. Reference: gru_v003 measured 27.71 us/row on an idle box and 48.12 us/row in that window (1.7x). This verdict reflects contention, not the model. Re-run the gate on an idle box before shipping."
+  "status": "NOT-READY"
 }
