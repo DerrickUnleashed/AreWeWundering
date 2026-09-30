@@ -955,10 +955,16 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
     mask_path = cfg['loss'].get('mask_model')
     soft = SoftMaskStore(mask_path) if mask_path else None
     if soft is not None:
-        if soft.n != train_store.n_seq * train_store.seq_len:
-            raise SystemExit(f'soft mask has {soft.n:,} rows but the train shard has '
-                             f'{train_store.n_seq * train_store.seq_len:,}; rebuild it with '
-                             f'tools/train_mask_model.py')
+        # A smoke run trains on the first n_train_seq sequences, so it reads only a
+        # PREFIX of the mask. Requiring exact equality with the full shard made
+        # --smoke unusable for any masked config: 212,140,000 mask rows against a
+        # 400,000-row smoke shard. Rows are indexed by absolute sequence index, so
+        # the mask only has to be at least as long as the rows actually consumed.
+        need = n_train_seq * train_store.seq_len
+        if soft.n < need:
+            raise SystemExit(f'soft mask has {soft.n:,} rows but the run needs {need:,} '
+                             f'({n_train_seq} sequences x {train_store.seq_len}); rebuild it '
+                             f'with tools/train_mask_model.py')
         print(f'soft mask: {soft.path} ({soft.n:,} rows, floor {cfg["loss"].get("mask_floor", 0.1)})',
               flush=True)
     stream = StatefulBatchStream(train_store, tcfg['batch_sequences'], tcfg['chunk_len'],
