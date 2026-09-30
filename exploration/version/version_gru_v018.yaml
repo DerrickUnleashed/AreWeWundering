@@ -1,0 +1,106 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v018
+  parent: gru_v011
+  status: running
+description: Soft mask + periodic state reset at 10,000 instead of 4,000 -- the clean
+  next step of the reset-period sweep, with chunk_len held at 2,000.
+hypothesis: 'We have contradictory evidence on the reset period. dozken''s reset2k
+  outscores their reset4k, implying shorter is better; our own v012 found 2,000 WORSE
+  than 4,000, implying longer is better. v012 is confounded -- reaching a 2,000-row
+  horizon required chunk_len 1,000, so it changed the BPTT granularity as well as
+  the period.
+
+  This run removes the confound by holding chunk_len at 2,000 and moving only the
+  period. The trainer requires state_reset to divide 20,000 AND be a multiple of chunk_len
+  with k >= 2, so at chunk_len 2,000 the reachable periods are exactly 4,000 / 10,000
+  / 20,000: 6,000 is not merely inadvisable, it is unreachable. 10,000 is therefore
+  the only clean step upward, and it is a large one -- two segments per sequence instead
+  of five.
+
+  If 10,000 beats 4,000 the lever is real and was under-set, and 20,000 (a single
+  segment, i.e. no reset at all) becomes the next test. If 10,000 is worse, 4,000
+  is near-optimal and the lever is spent at our sequence length.'
+change_vs_parent: 'EXACTLY ONE change off gru_v011: training.state_reset and inference.state_reset
+  4000 -> 10000. chunk_len stays at 2,000, which is what makes this clean -- v012
+  had to drop chunk_len to 1,000 to reach a 2,000-row horizon and so moved two things
+  at once.
+
+  Unchanged: the soft mask (loss.mask_model), architecture 2x128 proj0 (192,258 params),
+  seed 1337, 3-epoch cosine schedule, aux weighted-MSE 0.05, EMA 0.999.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 10000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 10000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v018.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v018
+  submission_dir: null
