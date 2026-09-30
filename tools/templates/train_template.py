@@ -1159,8 +1159,19 @@ def main():
         device = pick_device(args.device or cfg['training'].get('device', 'auto'))
         print(f'device: {device}', flush=True)
         if args.export_only:
-            ck = Path(args.checkpoint) if args.checkpoint else \
-                sorted((ROOT / cfg['artifacts']['checkpoint_dir']).glob('best_*.pt'))[-1]
+            ck_dir = ROOT / cfg['artifacts']['checkpoint_dir']
+            cks = sorted(ck_dir.glob('best_*.pt'))
+            if not cks:
+                raise SystemExit(f'no best_*.pt in {ck_dir}')
+            if args.checkpoint:
+                ck = Path(args.checkpoint)
+            else:
+                def _val_of(p):
+                    try:
+                        return float(p.stem.split('val')[-1])
+                    except ValueError:
+                        return -1.0
+                ck = max(cks, key=_val_of)
             st = torch.load(ck, map_location='cpu', weights_only=False)
             stats_dict = st['feature_stats']
             transform = build_transform_from_stats(stats_dict, cfg['features'])
@@ -1168,8 +1179,14 @@ def main():
                              layers=cfg['model']['layers'],
                              input_proj=cfg['model'].get('input_proj') or 0)
             model.load_state_dict(st['model'])
+            # state_reset is baked into feature_stats.npz and read back by
+            # solution.py. It must come from the CHECKPOINT's config -- the same
+            # value the training loop used -- not st['state_reset'], a top-level
+            # key that is never written, which silently defaulted to 0 and shipped
+            # a solution that never reset its state.
             export_inference(model, transform, ck.parent, opset=cfg['inference']['opset'],
-                             state_reset=int(st.get('state_reset', 0)))
+                             state_reset=int(st['config']['inference'].get('state_reset')
+                                             or st['config']['training'].get('state_reset') or 0))
             print(f'exported inference artifacts from {ck.name} into {ck.parent}', flush=True)
             return 0
         if args.smoke:
