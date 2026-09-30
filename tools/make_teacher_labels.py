@@ -168,8 +168,9 @@ def main():
                     help='output filename stem (default: the version)')
     ap.add_argument('--checkpoint', default=None,
                     help='best_*.pt to replay (default: highest val in the checkpoint dir)')
-    ap.add_argument('--chunk', type=int, default=2000,
-                    help='rows per forward (must divide chunk_len of the member)')
+    ap.add_argument('--chunk', type=int, default=None,
+                    help='rows per forward (default: the member own chunk_len; must '
+                         'divide it, and the replay grid must match how it was trained)')
     ap.add_argument('--lanes', type=int, default=1,
                     help='kept for interface compatibility; replay is strictly sequential '
                          'so lanes=1 is the only correct value')
@@ -208,7 +209,7 @@ def main():
     # The replay grid MUST match the member's own training/serving reset, or the
     # state trajectory differs from what it was trained under.
     state_reset = int(cfg['training'].get('state_reset') or 0)
-    chunk = args.chunk
+    chunk = args.chunk or int(cfg['training']['chunk_len'])
     if cfg['training']['chunk_len'] % chunk:
         sys.exit(f'--chunk {chunk} must divide the member chunk_len '
                  f'{cfg["training"]["chunk_len"]}')
