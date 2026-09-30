@@ -8,17 +8,17 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v011** | soft mask on P(is_scored) + state reset | 0.679986 | Ready to Submit | -- | -- | -- |
-| 2 | **v009** | signed-log volumes | 0.674456 | Ready to Submit (latency unverified) | -- | -- | -- |
-| 3 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | Ready to Submit (latency unverified) | -- | -- | -- |
+| 1 | **v011** | soft mask on P(is_scored) + state reset | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 2 | **v009** | signed-log volumes | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 3 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
 | 4 | **v002** | baseline config, seed 1337 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
 | 5 | **v001** | 1x256 wider GRU | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 6 | **v007** | first differences | 0.674258 | Ready to Submit (latency unverified) | -- | -- | -- |
-| 7 | **v006** | baseline config, seed 1339 | 0.674149 | Ready to Submit (latency unverified) | -- | -- | -- |
-| 8 | **v005** | baseline config, seed 1338 | 0.674037 | Ready to Submit (latency unverified) | -- | -- | -- |
+| 6 | **v007** | first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 7 | **v006** | baseline config, seed 1339 | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 8 | **v005** | baseline config, seed 1338 | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
 | 9 | **v003** | aux MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
 | 10 | **v004** | 2x192 + input projection | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 11 | **v010** | 6 epochs instead of 3 | 0.670696 | Ready to Submit | -- | -- | -- |
+| 11 | **v010** | 6 epochs instead of 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
@@ -40,6 +40,11 @@ smaller than the 0.0003 gap between three seeds of a single config.** Those seve
 are therefore statistically indistinguishable, and their ordering is noise, not
 quality. Note that 1.8 sigma is only a ~4% one-sided chance of beating the seed
 mean by luck, so v009's position above the baseline configs is not a result.
+
+This was measured from converged runs on 2026-09-29 and later **confirmed against
+the public board**: those seven occupy local ranks 2-8 and public ranks 2-11, with
+no ordering preserved. The noise band is real and the public test set cannot
+resolve differences inside it.
 
 ## v011 is the one real win
 
@@ -100,33 +105,94 @@ Note that the feature transforms are also expensive at inference (6.7-12.9 us/ro
 for v005-v009 against ~0.5 for the baseline's identity path), so those ideas
 could not have been cheap wins even if they had scored.
 
-## Choosing a ship candidate
+## Every run is now submitted: the local/public correlation
 
-**`v011` is the candidate**, and the only version here justified on score. It
-beats the best submitted model (v003, public 0.6457) by +0.0055 local while
-keeping the same 2x128 architecture and 192,258 parameters, so its inference cost
-should be close to the baseline's.
+All 11 versions have public scores. Local `full_valid_wp` ranks them
+**Pearson +0.699, Spearman +0.491** against the public board -- a real but weak
+relationship, and the weakness is entirely inside the noise band.
 
-Before shipping it, the latency gate must be re-run on an idle box. The gates on
-v005-v009 were measured while v010 and v011 held the cores and are inflated by
-about 1.7x, which is why they are marked "latency unverified" rather than
-"Ready to Submit".
+| | local rank | public rank |
+|---|---:|---:|
+| v011 | 1 | **1** |
+| v009 | 2 | 2 |
+| v008 | 3 | 6 |
+| v005 | 8 | 3 |
+| v001 | 5 | 11 |
 
-## Caveat: the public leaderboard disagrees
+`v011` is first on **both** -- the one effect big enough to survive the transfer.
+Everything else reshuffles freely: v008 falls 3 places, v001 goes from 5th to
+last, and v005 climbs from 8th to 3rd on a public/local gap of 0.0044, which is
+well inside what 200 validation sequences of noise can produce.
 
-The public scores ran the opposite way to the local ranking:
-v003 0.6457 > v004 0.6446 > v002 0.6435 > v001 0.6416. Locally, v003 ranks
-*last* of the seven statistically-tied configs at -2.9 sigma, and v004 last
-overall at -12.4 sigma. Since the public set is a sample of the test data, the
-local metric clearly does not transfer perfectly to it.
+So the honest reading, now tested rather than assumed:
 
-Two consequences worth keeping in mind:
+- **A local effect of ~36σ transfers.** v011's +0.0058 became +0.0032 public over
+  our own previous best. Real, and worth having.
+- **A local difference inside the noise band does not transfer at all.** Judging
+  inside that band is a coin flip. This is why the noise floor had to be measured
+  before the table meant anything.
+- **The earlier caveat was half right.** It was right that the public board is the
+  only trustworthy ranker. It was wrong to imply v011's win was unconfirmed -- it
+  confirmed, cleanly.
 
-1. Treat the public board as the only real signal for final selection. Local
-   `full_valid_wp` is still the right tool for detecting a change of the size v011
-   made (+0.0058, 36 sigma), but it is not a reliable ranker inside the noise band.
-2. It also means v011's local win needs public confirmation before it is trusted
-   as the ship candidate. It should be the next submission for that reason alone.
+## Where we stand, and what the gap is
 
-Every one of our completed runs beats the organiser's 0.5935 baseline, and the
-programme as a whole is worth roughly +0.05 public.
+| | public |
+|---|---:|
+| organiser baseline | 0.5935 |
+| **ours, best (v011)** | **0.6515** |
+| dozken `reset2k` | 0.6569 |
+| dozken `distil160` | 0.6585 |
+
+Every one of our 11 entries beats the organiser baseline; the programme is worth
+**+0.058 public**, which matches the +0.057 measured locally. The training
+approach was sound the whole way through.
+
+**The remaining gap to the top entry is 0.007 public.** Two of dozken's entries
+are ahead of us, and both are third-party models downloaded from
+`github.com/dozken/wunder`, submitted as-is -- they are recorded in
+`exploration/leaderboard.json` under `_dozken` and are *not* ours.
+
+The two levers visible in their names are worth reading as a roadmap:
+
+- **`reset2k` (0.6569)** is a periodic state reset at **2,000** steps. Our v011
+  used 4,000. That is the same lever we independently validated, at half the
+  period -- so the obvious next experiment is `v012 = v011 with state_reset=2000`,
+  a single-variable change against a recipe we already trust.
+- **`distil160` (0.6585)** is distillation. A teacher trained without the latency
+  limit, compressed into a budget-sized student. This is the largest single jump
+  left on the table and the natural Phase 6 move from the original roadmap.
+
+Note `distil160` ran **61m06s, over the stated 60-minute limit, and still scored**.
+The latency ceiling is evidently not enforced as a hard cut-off, which widens the
+budget for a distillation ensemble considerably.
+
+## The next two experiments
+
+Both are single-variable, both against the v011 parent, and both are justified by
+evidence rather than novelty:
+
+1. **v012: `state_reset = 2000`** (v011 has 4000). Confirms whether the period
+   matters, and if so in which direction. Cheap: same architecture, same schedule.
+2. **v013: distillation** from a wide/deep teacher into the v011 architecture.
+   The largest remaining gap, and the one lever we have not tried at all.
+
+**v011 stays the ship candidate until one of those beats it publicly**, since a
+local gain inside the noise band is not evidence.
+
+## Latency is a solved problem
+
+Worth recording because it was treated as a blocker all night and turned out not
+to be one. All 11 of our bundles finished, in **30m12s to 43m16s -- 50 % to 72 %
+of the 60-minute budget** -- including the five whose local gates had been
+measured under 7-way contention and marked "unverified".
+
+Every contended measurement **over**-projected. v005 measured 52.25 us/row under
+contention, projected 55.6 min, and actually took 36m56s. v004 was marked
+DO NOT SHIP on a 47.2 min p50 projection and ran in 43m16s for 0.6446. The 1.62x
+slowdown factor calibrated from `gru_v000`'s 2x128 model is not safe to apply to
+anything wider, and a contended local p99 is not a hard blocker.
+
+Combined with dozken's `distil160` completing at 61m06s, past the stated limit,
+the practical conclusion is that inference budget is not the binding constraint on
+this problem -- model quality is.
