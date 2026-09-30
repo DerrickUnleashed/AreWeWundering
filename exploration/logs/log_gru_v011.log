@@ -1,11 +1,11 @@
-### new run, log opened 2026-09-29T22:37:39+0530
+### new run, log opened 2026-09-30T11:25:56+0530
 ==============================================================================
-command            : python exploration/models/train_gru_v011.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v011.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v011/best_001_step19889_val0.689479.pt
-timestamp          : 2026-09-29T22:37:39+0530
+command            : python exploration/models/train_gru_v011.py --config exploration/version/version_gru_v011.yaml --export-only --checkpoint exploration/checkpoints/checkpoint_gru_v011/best_001_step19889_val0.689479.pt
+timestamp          : 2026-09-30T11:25:56+0530
 host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
 packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
 cuda               : False   mps: True
-git commit         : 5eee5fc926351572f686cda3402e9e3555be7400
+git commit         : 64e455837c9254d70c4d8be9f6b7c131a9e02699
 seed               : 1337
 log                : exploration/logs/log_gru_v011.log
 config:
@@ -97,14 +97,14 @@ results:
   best_val_t0: 0.685205965598288
   best_val_t1: 0.6937511116212582
   full_valid_wp: 0.6799864682831658
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 28.0
+  latency_us_p99: 41.58
   train_hours: 4.697
   finished_utc: '2026-09-29T17:02:54Z'
 artifacts:
   log: exploration/logs/log_gru_v011.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v011
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v011
 
 ==============================================================================
 device: cpu
@@ -113,4 +113,4 @@ device: cpu
 /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
   return _generic_rnn(
 export verified: ONNX == PyTorch, max |diff| = 1.431e-06
-exported inference artifacts from best_001_step19889_val0.689479.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v011
+exported inference artifacts from best_001_step19889_val0.689479.pt into exploration/checkpoints/checkpoint_gru_v011
