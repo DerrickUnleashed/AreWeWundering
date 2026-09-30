@@ -72,6 +72,15 @@ INHERITS_FULL_SCORE: dict[str, str] = {
     'v015': 'v011',
 }
 
+# Versions whose full_valid_wp is NOT a clean held-out score, and why. Kept here
+# rather than only in metadata.json so the leaderboard generator cannot rank a
+# contaminated number even if the bundle is regenerated.
+SCORE_CONTAMINATED: dict[str, str] = {
+    'v020': ('trained on cache/trainval, which appends valid[200:1872] -- 1,673 of '
+             'the 1,873 validation sequences -- so this score is measured on 89% '
+             'of its own training data and is not comparable with train-only runs'),
+}
+
 
 def discover() -> list[str]:
     return sorted(p.stem.replace('version_gru_', '') for p in VERSIONS.glob('version_gru_v*.yaml'))
@@ -164,6 +173,14 @@ def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
         if meta_path.exists():
             meta = json.loads(meta_path.read_text())
             lat = (meta.get('gate') or {}).get('latency') or {}
+            # A bundle may pass every mechanical gate and still be the wrong thing
+            # to ship: v020 passes contract, determinism, parity and latency, and
+            # its score is contaminated by training on the validation set. The
+            # packager's verdict is a necessary condition, not a sufficient one,
+            # so an explicit 'Do not ship' in metadata wins over 'Ready to Submit'.
+            if meta.get('status') == 'PASS-BUT-DO-NOT-SUBMIT':
+                return ('Do not ship (score contaminated)', '--',
+                        _proj_dur(lat.get('grader_min_p50'), lat.get('grader_pct_budget_p50')), '--')
             if lat.get('grader_safe'):
                 return ('Ready to Submit', '--',
                         _proj_dur(lat.get('grader_min_p50'), lat.get('grader_pct_budget_p50')), '--')
@@ -233,6 +250,17 @@ def build_tables() -> str:
         fv, bv = r.get('full_valid_wp'), r.get('best_val_wp')
         st = y.get('identity', {}).get('status')
         status, pub, dur, mem = bundle_status(v, y, lb)
+
+        # A score computed on rows the model was TRAINED on must never be ranked
+        # beside clean ones. v020 trained on cache/trainval, which appends
+        # valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so its
+        # full_valid_wp of 0.681773 is measured on 89% of its own training data.
+        # Sorted naively it landed at rank 2, above v011 and v018, implying it
+        # beat them. It did not; the number is inflated and not comparable.
+        # Such versions are pushed below with the reason stated.
+        contaminated = bool(SCORE_CONTAMINATED.get(v))
+        if contaminated:
+            fv = None
         inherits = INHERITS_FULL_SCORE.get(v)
         if fv is None and inherits:
             donor = load_yaml(inherits)
@@ -248,6 +276,9 @@ def build_tables() -> str:
         if fv is not None:
             rows.append((fv, v, label_txt if inherits else label(v),
                          status, pub, dur, mem))
+        elif contaminated:
+            unranked.append((v, f'{label(v)}  [SCORE CONTAMINATED: {SCORE_CONTAMINATED[v]}]',
+                             bv, status, pub, st))
         else:
             unranked.append((v, label(v), bv, status, pub, st))
 
@@ -269,10 +300,11 @@ def build_tables() -> str:
 
     if unranked:
         out += ['### Not ranked by `full_valid_wp`', '',
-                'Real runs with no `full_valid_wp` of their own: still training '
-                '(v018-v020), or a framework smoke test that was never a modelling '
-                'result (v000). v000 does have a public score -- it was submitted to '
-                'validate the submission path, not to compete.', '',
+                'Rows that cannot be ranked on `full_valid_wp`, each for a stated '
+                'reason: still training (v021), a contaminated score that is not '
+                'comparable with the rest (v020), or a framework smoke test that was '
+                'never a modelling result (v000). v000 and v020 do have public-capable '
+                'bundles; both are documented, neither is a submission candidate.', '',
                 '| Ver | What it changed | best so far (subset) | Status | Public score |',
                 '|---|---|---|---|---|']
         for v, desc, bv, status, pub, st in unranked:
