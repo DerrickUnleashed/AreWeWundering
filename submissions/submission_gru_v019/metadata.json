@@ -1,0 +1,244 @@
+{
+  "key": "gru_v019",
+  "packaged_utc": "2026-09-30T19:31:42Z",
+  "git_commit": "cc69a52b2868f8fe21f5f26f473a19f86bd80c19",
+  "config": {
+    "schema_version": 1,
+    "identity": {
+      "model": "gru",
+      "version": "v019",
+      "parent": "gru_v011",
+      "status": "finished"
+    },
+    "description": "The loss fix alone: globally-pooled weighted Pearson with a running statistic, everything else exactly as v011.",
+    "hypothesis": "The single most important fix in this repo's history, and it was sitting in plain sight. This repo trained nineteen versions on a loss whose own docstring lied: chunk_loss() accepted a `state` argument and claimed it 'carries the moments across chunks so the statistic is cumulative rather than restarted'. The body never read `state`, and the call site never passed it. The weighted-Pearson statistic was therefore recomputed from each chunk's own rows and restarted 20 times per sequence.\n\nThat is exactly the failure dozken/wunder documents and calls out by name: a per-chunk Pearson subtracts a weighted mean estimated from that chunk alone, so the slow level component the metric actually scores is discarded and any per-chunk level offset is free. Their chunk4k runs 'win within-sequence correlation and lose on level drift', and models trained on their chunk loss get WORSE with more training (0.575 -> 0.553) instead of better. Their fix -- a running detached sufficient statistic pooled over the batch as well as over time -- is the 2026-09-15 metric, which pools every scored row of every sequence into ONE correlation per target.\n\nExpected: a large gain, larger than anything else we have tried, because every prior run was optimising a surrogate that structurally cannot see the quantity being scored. Our +0.058 over the organiser baseline came from the soft mask and the state reset on top of a mis-specified loss; with the loss correct those two should compound rather than merely survive.",
+    "change_vs_parent": "ONE change off gru_v011: the loss. chunk_loss now keeps a running detached sufficient statistic [sum w, sum wy, sum wp, sum wy^2, sum wp^2, sum wyp] pooled over BOTH the batch and the time axis into one value per target, reset every stats_window steps (default one sequence's worth of chunks). The previous implementation recomputed the statistic from each chunk's own rows and discarded it, despite accepting a `state` argument it never read.\nUnchanged: the soft mask, state_reset 4000, chunk_len 2000, aux weighted-MSE 0.05, EMA 0.999, architecture 2x128 proj0 (192,258 params), seed 1337, 3-epoch cosine schedule, data (train shard only).",
+    "data": {
+      "train_shards": "cache/train",
+      "valid_shards": "cache/valid",
+      "seq_len": 20000,
+      "warmup_steps": 99,
+      "target_clip": 2.0,
+      "train_sequences": null
+    },
+    "features": {
+      "normalisation": "none",
+      "signed_log_volumes": false,
+      "first_differences": [],
+      "cross_instrument": [],
+      "step_feature": false,
+      "clip_sigma": 0
+    },
+    "model": {
+      "arch": "gru",
+      "input_proj": 0,
+      "hidden": 128,
+      "layers": 2,
+      "dropout": 0.0,
+      "layernorm": false,
+      "head": "linear",
+      "param_count": 192258
+    },
+    "loss": {
+      "type": "seq_weighted_pearson",
+      "mask": "soft",
+      "aux_mse_weight": 0.05,
+      "target_clip": 2.0,
+      "mask_floor": 0.1,
+      "mask_model": "cache/train_scored.npy",
+      "stats_window": null
+    },
+    "optim": {
+      "name": "adamw",
+      "lr": 0.002,
+      "weight_decay": 0.01,
+      "betas": [
+        0.9,
+        0.99
+      ],
+      "schedule": "cosine",
+      "warmup_steps": 500,
+      "grad_clip": 1.0,
+      "ema_decay": 0.999,
+      "precision": "fp32"
+    },
+    "training": {
+      "chunk_len": 2000,
+      "burn_in": 99,
+      "batch_sequences": 16,
+      "max_steps": null,
+      "smoke_steps": 60,
+      "epochs": 3,
+      "seed": 1337,
+      "eval_every_steps": 2500,
+      "eval_subset_sequences": 200,
+      "device": "cpu",
+      "stateful": true,
+      "state_reset": 4000
+    },
+    "inference": {
+      "export": "onnx",
+      "opset": 17,
+      "ort_threads": 1,
+      "target_us_per_row": 68.5,
+      "state_reset": 4000
+    },
+    "results": {
+      "best_step": 19889,
+      "best_val_wp": 0.6874144574894405,
+      "best_val_t0": 0.6834362518111948,
+      "best_val_t1": 0.6913926631676861,
+      "full_valid_wp": 0.6783738060385076,
+      "latency_us_p50": null,
+      "latency_us_p99": null,
+      "train_hours": 4.5681,
+      "finished_utc": "2026-09-30T18:08:37Z"
+    },
+    "artifacts": {
+      "log": "exploration/logs/log_gru_v019.log",
+      "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v019",
+      "submission_dir": null
+    }
+  },
+  "checkpoint": {
+    "file": "best_001_step19889_val0.687414.pt",
+    "path": "exploration/checkpoints/checkpoint_gru_v019/best_001_step19889_val0.687414.pt",
+    "step": 19889,
+    "sha256": "443ff5e938d6f8b88ec25eca7e430ca8829434e3432882ecd0e34cf0e5583954",
+    "train_time_metrics": {
+      "t0": 0.6834362518111948,
+      "t1": 0.6913926631676861,
+      "weighted_pearson": 0.6874144574894405,
+      "selected_rows": 374199,
+      "blocks": 200,
+      "metric_clip": [
+        -2.0,
+        2.0
+      ],
+      "metric_specification": "global_wp",
+      "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+    }
+  },
+  "scores": {
+    "t0": 0.705141241901463,
+    "t1": 0.7580959980477959,
+    "weighted_pearson": 0.7316186199746295,
+    "selected_rows": 9110,
+    "rows_seen": 100000,
+    "us_per_row": 142.1,
+    "call_us_p50": 81.0,
+    "call_us_p99": 821.21,
+    "sequences": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "protocol": "5 validation sequences"
+  },
+  "latency": {
+    "budget_us_per_row": 91.37,
+    "target_us_per_row": 68.53,
+    "us_p50": 27.71,
+    "us_p99": 54.04,
+    "us_mean": 29.14,
+    "transform_us_per_row": 0.44,
+    "onnx_us_per_row": 25.29,
+    "rows": 39400000,
+    "grader_slowdown": 1.62,
+    "grader_us_p50": 44.89,
+    "projected_min_p50": 18.2,
+    "projected_min_p99": 35.5,
+    "grader_min_p50": 29.5,
+    "grader_pct_budget_p50": 49.1,
+    "pass_p50_75pct": true,
+    "pass_p99_75pct": true,
+    "grader_safe": true,
+    "measured_on": "idle machine, after the teacher replay and the full-validation scorer had finished",
+    "p99_gate_retired": "p99 no longer gates. Measured against five real submissions it over-projects by 1.5-2.1x while p50 is accurate to within 5%; v014 was blocked by it and turned out to be our best entry. Recorded as a diagnostic only."
+  },
+  "gate": {
+    "contract": "PASS",
+    "determinism": "PASS",
+    "parity": "parity raw predictions : max |diff| = 1.580e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.731619 vs offline 0.731619, |diff| = 7.554e-09 (tol 1e-04)  PASS | parity overall         : PASS",
+    "score": {
+      "t0": 0.705141241901463,
+      "t1": 0.7580959980477959,
+      "weighted_pearson": 0.7316186199746295,
+      "selected_rows": 9110,
+      "rows_seen": 100000,
+      "us_per_row": 142.1,
+      "call_us_p50": 81.0,
+      "call_us_p99": 821.21,
+      "sequences": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "protocol": "5 validation sequences"
+    },
+    "latency": {
+      "budget_us_per_row": 91.37,
+      "target_us_per_row": 68.53,
+      "us_p50": 27.71,
+      "us_p99": 54.04,
+      "us_mean": 29.14,
+      "transform_us_per_row": 0.44,
+      "onnx_us_per_row": 25.29,
+      "rows": 39400000,
+      "grader_slowdown": 1.62,
+      "grader_us_p50": 44.89,
+      "projected_min_p50": 18.2,
+      "projected_min_p99": 35.5,
+      "grader_min_p50": 29.5,
+      "grader_pct_budget_p50": 49.1,
+      "pass_p50_75pct": true,
+      "pass_p99_75pct": true,
+      "grader_safe": true,
+      "measured_on": "idle machine, after the teacher replay and the full-validation scorer had finished",
+      "p99_gate_retired": "p99 no longer gates. Measured against five real submissions it over-projects by 1.5-2.1x while p50 is accurate to within 5%; v014 was blocked by it and turned out to be our best entry. Recorded as a diagnostic only."
+    },
+    "size": {
+      "zip_bytes": 2156659,
+      "limit_bytes": 20971520,
+      "pass": true
+    },
+    "imports": []
+  },
+  "packages": {
+    "python": "3.11.9",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "torch": "2.14.0"
+  },
+  "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+  "sha256": {
+    "train_script": "2439277eaffb0747f14b703aa8b11164c310b658d0644cfda53ab3fb5ba98cb4",
+    "solution_py": "3b384cc9f13eeab69cbf464bb2aa25193f236ca526883ff05457c0c70d8d0344",
+    "model_onnx": "5ef6b84696d5fca325e273dee45b39121b5a96419222f64a4434f62453437f1e",
+    "feature_stats_npz": "f1a50518fc9c4bb08f9274b04ca598fa410c7d2abb01ba11d341e820752ef497"
+  },
+  "zip": {
+    "file": "submission_gru_v019.zip",
+    "bytes": 2156659,
+    "root_entries": [
+      "best_001_step19889_val0.687414.pt",
+      "feature_stats.npz",
+      "model.onnx",
+      "solution.py"
+    ]
+  },
+  "notes": [
+    "preserved the pre-export canonical log; export transcript saved to log_gru_v019.export.log",
+    "included the 1.6 MB checkpoint for provenance",
+    "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+  ],
+  "warnings": [],
+  "failures": [],
+  "status": "PASS",
+  "score_interpretation": "Clean held-out score: 0.678374, trained on train alone. This is a REGRESSION against its parent v011 (0.679986), -0.001613, which is 5.1x the 0.000317 noise floor. v019 tested replacing the per-chunk Pearson loss with a globally-pooled running-statistic loss, changing nothing else. The loss fix as implemented here does not help and is clearly harmful. Shipped for completeness and to document the result; not a promotion candidate.",
+  "recommendation": "Do not submit. v011/v017 are strictly better."
+}
