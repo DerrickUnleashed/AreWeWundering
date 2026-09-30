@@ -137,34 +137,45 @@ So the honest reading, now tested rather than assumed:
 
 ## Where we stand, and what the gap is
 
-| | public | rank |
-|---|---:|---|
-| organiser baseline | 0.5935 | 17/100 |
-| **ours, best (v011)** | **0.6515** | — |
-| dozken `reset2k` | 0.6569 | 25/100 |
-| dozken `distil_ens` / `distil160` | 0.6585 | 27/100 |
+| | public | rank | params |
+|---|---:|---|---:|
+| organiser baseline | 0.5935 | 17/100 | — |
+| **ours, best (v011)** | **0.6515** | — | 192k |
+| dozken `reset2k` | 0.6569 | 25/100 | 436k |
+| dozken `distil_ens` | 0.6585 | 27/100 | 436k |
+| **dozken `distil160`** | **0.6588** | 27/100 | 314k |
+| *dozken's #1 (`ne_onnx`)* | *0.6622* | *1/100* | — |
 
-Both third-party entries are by the same author (`dozken`) and were downloaded
-from `github.com/dozken/wunder`, submitted as-is. They are recorded under
+All three third-party entries are by the same author (`dozken`), taken from
+`github.com/dozken/wunder` and submitted as-is. They are recorded under
 `_dozken` in `exploration/leaderboard.json` and are **not ours**.
 
-**`distil160` (distillation) and `distil_ens` (ensemble) are separate
-submissions, not two names for one artifact.** Distillation trains an unconstrained
-teacher and compresses it into a single budget-sized student, so inference cost is
-unchanged. An ensemble combines several models at inference and multiplies cost by
-the member count. The uploaded file is named `submission_distil_ens.zip` but was
-annotated with the repo label `2026-09-17_distil160`, so **which of the two the
-0.6585 belongs to is unresolved** — worth checking against the repo before
-concluding anything from that number.
+**`distil160` and `distil_ens` are separate submissions, and the earlier label was
+wrong.** The entry we uploaded as `submission_distil_ens.zip` was annotated
+`dozken/2026-09-17_distil160`, but it is **distil_ens** — GRU 192×2 proj64, 435,714
+params. Two independent checks confirm it: its 61m06s runtime matches the 436k
+model, and its 0.6585 equals their stated held-out 0.6879 minus the 0.0295 offset
+to four decimals. The genuine `distil160` (GRU **160**×2 proj64, 314,338 params) was
+submitted separately on 2026-09-30 and scored **0.6588**.
+
+That resolves a question this file previously left open, and the answer is
+instructive: **the smaller student is both better and faster** — 314k at 0.6588 in
+55m16s beats 436k at 0.6585 in 61m06s. Same teacher, same distillation, less than
+half the inference cost. That is the distillation-regularisation effect their NOTES
+predicted, now confirmed on the public board rather than only on their held-out.
+
+**The local→public offset is now trustworthy across both authors.** Our own four
+scored runs average −0.0288; theirs is −0.0295. Their held-out 0.6888 therefore
+projects to ~0.660 on our scale, and the actual public figure is 0.6588. Local
+scores are now predictable to roughly four decimals, so a candidate can be screened
+before spending a submission.
 
 Every one of our 11 entries beats the organiser baseline; the programme is worth
-**+0.058 public**, which matches the +0.057 measured locally. The training
-approach was sound the whole way through.
+**+0.058 public**, matching the +0.057 measured locally.
 
-**The remaining gap to the top entry is 0.007 public.** Two of dozken's entries
-are ahead of us, and both are third-party models downloaded from
-`github.com/dozken/wunder`, submitted as-is -- they are recorded in
-`exploration/leaderboard.json` under `_dozken` and are *not* ours.
+**The gap to their best is 0.0073 public, and to their #1 is 0.0107.** Our v011
+also carried a serving bug (see below) that was never fixed in the submitted
+bundle, so our true position is better than 0.6515 suggests.
 
 The two levers visible in their names are worth reading as a roadmap:
 
