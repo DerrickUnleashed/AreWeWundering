@@ -34,9 +34,22 @@ This file is the project memory for any coding agent or human working in this re
 3. **Latency first.** Before training any new architecture, benchmark its inference step (`tools/bench_latency.py`). Never spend GPU hours on a model that cannot meet the budget.
 4. **Metric fidelity.** Every reported score comes from the reference metric code with the correct mask. Never report a Pearson computed some other way as "WP".
 5. **Immutability.** Never overwrite an existing version's script, yaml, log, checkpoint folder or submission folder. A change of any kind = a new version. Never delete anything unless the user explicitly asks.
-6. **No silent uploads. Agents never push.** Two separate prohibitions:
-   (a) agents never upload anything to the competition site — the user does that;
-   (b) **agents never run `git push` (or `git push --force*`, or `git lfs push`), under any circumstances, even when the user asks about pushing.** The user pushes. Committing locally is fine and expected; the moment a change would cross the network, stop and report. Asking "should I push?" is still not enough — the answer is always no; instead tell the user what is ready and let them run it. **A mistake already made on 2026-09-29:** four pushes and one history rewrite were performed after being asked to "help push" the datasets, and the first push had already been authorised for that one task. Do not generalise from one approval to later, unasked-for pushes.
+6. **No silent uploads; every change lands by PR.** Two separate rules:
+   (a) **agents never upload anything to the competition site** — the user does that. Unchanged and absolute.
+   (b) **Branch-and-PR workflow. Agents never commit directly to `main`.** Every change goes on a feature branch, is pushed, and is opened as a pull request. **The user merges.** Agents never merge a PR, never push to `main`, and never run `git push --force*` or `git lfs push` — history is never rewritten. Amended 2026-09-30 by explicit user decision; this replaces the earlier blanket ban on `git push`, which existed because four pushes and a history rewrite were performed on 2026-09-29 after being asked to "help push" the datasets.
+
+   **Why the shape of this rule.** Opening a PR requires a network push, so a PR workflow cannot coexist with an absolute no-push rule. The ban is therefore narrowed rather than lifted: pushing a *feature branch* is allowed and expected, because it carries no more authority than a local commit, whereas pushing to `main` and merging do. Final authority over `main` stays with the user. One approval for a task never generalises to a later, unasked-for push.
+
+   **Workflow per change:**
+   ```bash
+   git checkout -b <type>/<short-slug>        # from main
+   # ... edit, then per-file commits ...
+   git push -u origin <type>/<short-slug>     # first push of a new branch only
+   gh pr create --title "..." --body "..."    # one PR per logical change
+   # STOP. Report the PR URL to the user. The user merges.
+   ```
+
+   **Do not `git add` a file a live process holds open.** Git creates a new file and renames it over the old one rather than editing in place, so staging the path of a running training job's log orphans the writer: its descriptor keeps writing to an unlinked inode, and the bytes become unreachable by name. `lsof` will not flag it, because the inode is still allocated with an open descriptor. This destroyed the canonical log of `gru_v018` on 2026-09-30; `tools/rebuild_log.py` reconstructs it from checkpoints. **Stage live logs only after the run exits.** Checkpoints (`last.pt`) are written atomically and are safe to stage mid-run.
 7. **No data in RAM.** Stream or memory-map; never `pd.read_parquet` the train file whole.
 8. **Reproducibility.** Every run records seed, config (yaml), git commit if available, package versions, hardware, and the exact command in its log header.
 9. **Don't touch organiser files:** `utils.py`, `requirements.txt`, `baseline/`, `datasets/`, `docs/`.
@@ -265,7 +278,7 @@ venv/bin/pip install torch pyyaml onnx matplotlib tqdm
 
 **Packages.** Pre-existing and *guaranteed in the scorer*: `numpy 2.2.6`, `onnxruntime 1.23.2`, `pyarrow 19.0.1`, `protobuf 7.36.2`, `sympy 1.14.0`, `flatbuffers`, `packaging`, `mpmath`, plus `humanfriendly`/`coloredlogs` (coloredlogs is an onnxruntime dep). Installed by us into `venv/` for **training/EDA only, NOT guaranteed at scoring time**: `torch 2.14.0` (MPS available, 8 torch threads), `PyYAML 6.0.3`, `onnx 1.23.0`, `matplotlib 3.11.2`, `tqdm 4.70.1`, `pillow 12.3.0`.
 
-**Git.** The folder **is** a git repository, remote `origin` = `https://github.com/DerrickUnleashed/AreWeWundering.git` (branch `main`, **private**). **Datasets are deliberately NOT in git** (see below). `git log` mixes our framework commits with the owner's own (`Adding gitattributes`, `Add Valid_mask.parquet`), so check `git log --format='%h %an %s'` before assuming who changed what. `.gitignore` covers `cache/`, `exploration/checkpoints/`, `exploration/logs/`, `submissions/*/*.zip`, `venv/`, `__pycache__/`, `.DS_Store`, and the two oversized parquets. Do not `git init`; do not commit without being asked.
+**Git.** The folder **is** a git repository, remote `origin` = `https://github.com/DerrickUnleashed/AreWeWundering.git` (branch `main`, **private**). **Datasets are deliberately NOT in git** (see below). `git log` mixes our framework commits with the owner's own (`Adding gitattributes`, `Add Valid_mask.parquet`), so check `git log --format='%h %an %s'` before assuming who changed what. `.gitignore` covers `cache/`, `exploration/checkpoints/`, `exploration/logs/`, `submissions/*/*.zip`, `venv/`, `__pycache__/`, `.DS_Store`, and the two oversized parquets. Do not `git init`; do not commit without being asked. **Workflow: branch from `main`, commit there, push the branch, open a PR, and let the user merge (§2.6b). Agents never commit straight to `main`.** The 33 commits made before this rule existed are already local on `main`; they are left alone and are **not** rebased, moved or force-pushed, per the user's explicit decision on 2026-09-30.
 
 **Why the parquets are not in git — the GitHub LFS limits, measured 2026-09-29:**
 - **A single LFS object may not exceed 2 GiB.** `train.parquet` (29.2 GB) and `valid.parquet` (5.6 GB) are rejected by the LFS API with `422 Size must be less than or equal to 2147483648`. This is *not* the familiar 100 MB per-blob limit (LFS bypasses that entirely); it is a separate per-object ceiling that **splitting the repository does not avoid**.
