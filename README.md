@@ -137,12 +137,25 @@ So the honest reading, now tested rather than assumed:
 
 ## Where we stand, and what the gap is
 
-| | public |
-|---|---:|
-| organiser baseline | 0.5935 |
-| **ours, best (v011)** | **0.6515** |
-| dozken `reset2k` | 0.6569 |
-| dozken `distil160` | 0.6585 |
+| | public | rank |
+|---|---:|---|
+| organiser baseline | 0.5935 | 17/100 |
+| **ours, best (v011)** | **0.6515** | — |
+| dozken `reset2k` | 0.6569 | 25/100 |
+| dozken `distil_ens` / `distil160` | 0.6585 | 27/100 |
+
+Both third-party entries are by the same author (`dozken`) and were downloaded
+from `github.com/dozken/wunder`, submitted as-is. They are recorded under
+`_dozken` in `exploration/leaderboard.json` and are **not ours**.
+
+**`distil160` (distillation) and `distil_ens` (ensemble) are separate
+submissions, not two names for one artifact.** Distillation trains an unconstrained
+teacher and compresses it into a single budget-sized student, so inference cost is
+unchanged. An ensemble combines several models at inference and multiplies cost by
+the member count. The uploaded file is named `submission_distil_ens.zip` but was
+annotated with the repo label `2026-09-17_distil160`, so **which of the two the
+0.6585 belongs to is unresolved** — worth checking against the repo before
+concluding anything from that number.
 
 Every one of our 11 entries beats the organiser baseline; the programme is worth
 **+0.058 public**, which matches the +0.057 measured locally. The training
@@ -159,9 +172,14 @@ The two levers visible in their names are worth reading as a roadmap:
   used 4,000. That is the same lever we independently validated, at half the
   period -- so the obvious next experiment is `v012 = v011 with state_reset=2000`,
   a single-variable change against a recipe we already trust.
-- **`distil160` (0.6585)** is distillation. A teacher trained without the latency
-  limit, compressed into a budget-sized student. This is the largest single jump
-  left on the table and the natural Phase 6 move from the original roadmap.
+- **The distillation / ensemble entries (0.6585)** are a family, and which one
+  the number belongs to is unresolved (see above). Two distinct levers:
+  - **Distillation** — teacher trained without the latency limit, compressed into
+    one budget-sized student. Inference cost unchanged. This is the natural Phase 6
+    move from the original roadmap and the larger of the two jumps left.
+  - **Ensemble** — several models combined at inference, cost multiplied by the
+    member count. Only viable because the latency limit is not enforced, but worth
+    noting as now-feasible rather than assume it was always off the table.
 
 Note `distil160` ran **61m06s, over the stated 60-minute limit, and still scored**.
 The latency ceiling is evidently not enforced as a hard cut-off, which widens the
