@@ -249,8 +249,35 @@ def main():
     (out_dir / f'teacher_{tag}.json').write_text(json.dumps(manifest, indent=2) + '\n')
     print(f'\nwrote {out_npy.relative_to(ROOT)}  {n_rows:,} rows x 2  in {secs / 60:.1f} min')
     print(f'wrote {out_dir.relative_to(ROOT)}/teacher_{tag}.json')
-    finite = np.isfinite(np.load(out_npy, mmap_mode='r')[::97]).all()
-    print(f'finite check (every 97th row): {"OK" if finite else "FAILED - do not use"}')
+
+    # Finite check: a label file containing NaN or inf would poison distillation
+    # silently, because the student just regresses onto whatever is there. Note
+    # rows 0..98 of each sequence are warm-up and legitimately never written.
+    arr = np.load(out_npy, mmap_mode='r')
+    idx = np.load((ROOT / args.shard) / 'seq_index.npy')
+    seq_len = int(cfg['data']['seq_len'])
+    n_probe = min(64, len(idx) - 1)
+    probe = np.concatenate([np.asarray(arr[int(idx[s]):int(idx[s + 1]) - 1])
+                            for s in range(n_probe)])
+    finite = bool(np.isfinite(probe).all())
+    print(f'finite check over {len(probe):,} rows of {n_probe} sequences: '
+          f'{"OK" if finite else "FAILED - do not use"}')
+    if not finite:
+        raise SystemExit('teacher labels contain non-finite values; refusing to continue')
+
+    # The replay deliberately labels EVERY row of every sequence, warm-up
+    # included: the teacher is a forward pass of a fully-trained model and has no
+    # warm-up semantics of its own. The distillation loss masks the burn-in rows
+    # downstream exactly as training does, so keeping them is harmless and avoids
+    # a special case. What matters is that the file is row-aligned to the shard and
+    # that nothing is unwritten, so assert every row of a probe sequence is finite
+    # INCLUDING its first, which would be a zero fill if the replay had skipped it.
+    firsts = np.asarray([arr[int(idx[s])] for s in range(n_probe)])
+    firsts_ok = bool(np.isfinite(firsts).all() and not np.all(firsts == 0))
+    print(f'all {n_probe} sequence-leading rows written and finite: {firsts_ok}')
+    if not firsts_ok:
+        raise SystemExit('sequence-leading rows are zero or non-finite, so the replay '
+                         'skipped them and the file is not what we expect')
 
 
 if __name__ == '__main__':
