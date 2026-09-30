@@ -4,42 +4,36 @@ identity:
   version: v019
   parent: gru_v011
   status: finished
-description: 'The loss fix alone: globally-pooled weighted Pearson with a running
-  statistic, everything else exactly as v011.'
-hypothesis: 'The single most important fix in this repo''s history, and it was sitting
-  in plain sight. This repo trained nineteen versions on a loss whose own docstring
-  lied: chunk_loss() accepted a `state` argument and claimed it ''carries the moments
-  across chunks so the statistic is cumulative rather than restarted''. The body never
-  read `state`, and the call site never passed it. The weighted-Pearson statistic
-  was therefore recomputed from each chunk''s own rows and restarted 20 times per
-  sequence.
+description: 'The loss fix alone: globally-pooled weighted Pearson with a running statistic, everything
+  else exactly as v011.'
+hypothesis: 'The single most important fix in this repo''s history, and it was sitting in plain sight.
+  This repo trained nineteen versions on a loss whose own docstring lied: chunk_loss() accepted a `state`
+  argument and claimed it ''carries the moments across chunks so the statistic is cumulative rather than
+  restarted''. The body never read `state`, and the call site never passed it. The weighted-Pearson statistic
+  was therefore recomputed from each chunk''s own rows and restarted 20 times per sequence.
 
 
-  That is exactly the failure dozken/wunder documents and calls out by name: a per-chunk
-  Pearson subtracts a weighted mean estimated from that chunk alone, so the slow level
-  component the metric actually scores is discarded and any per-chunk level offset
-  is free. Their chunk4k runs ''win within-sequence correlation and lose on level
-  drift'', and models trained on their chunk loss get WORSE with more training (0.575
-  -> 0.553) instead of better. Their fix -- a running detached sufficient statistic
-  pooled over the batch as well as over time -- is the 2026-09-15 metric, which pools
-  every scored row of every sequence into ONE correlation per target.
+  That is exactly the failure dozken/wunder documents and calls out by name: a per-chunk Pearson subtracts
+  a weighted mean estimated from that chunk alone, so the slow level component the metric actually scores
+  is discarded and any per-chunk level offset is free. Their chunk4k runs ''win within-sequence correlation
+  and lose on level drift'', and models trained on their chunk loss get WORSE with more training (0.575
+  -> 0.553) instead of better. Their fix -- a running detached sufficient statistic pooled over the batch
+  as well as over time -- is the 2026-09-15 metric, which pools every scored row of every sequence into
+  ONE correlation per target.
 
 
-  Expected: a large gain, larger than anything else we have tried, because every prior
-  run was optimising a surrogate that structurally cannot see the quantity being scored.
-  Our +0.058 over the organiser baseline came from the soft mask and the state reset
-  on top of a mis-specified loss; with the loss correct those two should compound
-  rather than merely survive.'
-change_vs_parent: 'ONE change off gru_v011: the loss. chunk_loss now keeps a running
-  detached sufficient statistic [sum w, sum wy, sum wp, sum wy^2, sum wp^2, sum wyp]
-  pooled over BOTH the batch and the time axis into one value per target, reset every
-  stats_window steps (default one sequence''s worth of chunks). The previous implementation
-  recomputed the statistic from each chunk''s own rows and discarded it, despite accepting
-  a `state` argument it never read.
+  Expected: a large gain, larger than anything else we have tried, because every prior run was optimising
+  a surrogate that structurally cannot see the quantity being scored. Our +0.058 over the organiser baseline
+  came from the soft mask and the state reset on top of a mis-specified loss; with the loss correct those
+  two should compound rather than merely survive.'
+change_vs_parent: 'ONE change off gru_v011: the loss. chunk_loss now keeps a running detached sufficient
+  statistic [sum w, sum wy, sum wp, sum wy^2, sum wp^2, sum wyp] pooled over BOTH the batch and the time
+  axis into one value per target, reset every stats_window steps (default one sequence''s worth of chunks).
+  The previous implementation recomputed the statistic from each chunk''s own rows and discarded it, despite
+  accepting a `state` argument it never read.
 
-  Unchanged: the soft mask, state_reset 4000, chunk_len 2000, aux weighted-MSE 0.05,
-  EMA 0.999, architecture 2x128 proj0 (192,258 params), seed 1337, 3-epoch cosine
-  schedule, data (train shard only).'
+  Unchanged: the soft mask, state_reset 4000, chunk_len 2000, aux weighted-MSE 0.05, EMA 0.999, architecture
+  2x128 proj0 (192,258 params), seed 1337, 3-epoch cosine schedule, data (train shard only).'
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -108,11 +102,11 @@ results:
   best_val_t0: 0.6834362518111948
   best_val_t1: 0.6913926631676861
   full_valid_wp: 0.6783738060385076
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 27.71
+  latency_us_p99: 54.04
   train_hours: 4.5681
   finished_utc: '2026-09-30T18:08:37Z'
 artifacts:
   log: exploration/logs/log_gru_v019.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v019
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v019
