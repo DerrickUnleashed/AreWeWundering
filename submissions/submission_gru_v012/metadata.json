@@ -1,0 +1,237 @@
+{
+ "key": "gru_v012",
+ "packaged_utc": "2026-09-30T11:49:28Z",
+ "git_commit": "c92bb5cdedcf8d244b4c9ff9ac34577a1b744a6c",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v012",
+   "parent": "gru_v011",
+   "status": "finished"
+  },
+  "description": "Single-variable follow-up to v011: same soft mask, same 3-epoch schedule, but the periodic recurrent-state reset fires every 2,000 rows instead of every 4,000.",
+  "hypothesis": "The reset period is a knob, not a threshold, and 2,000 rows beats 4,000. dozken's public reset2k scores 0.6569 against their reset4k, so shortening our horizon should gain rather than cost. Mechanism: across 20k rows the recurrent state degrades (their Q1 0.70 -> Q4 0.638) and a zero state beats the model's own 10k-row state, so more frequent resets keep the model nearer its best regime. If 2,000 instead loses to 4,000 then the horizon is near-optimal at 4,000 and this lever is spent.",
+  "change_vs_parent": "Shorter absolute reset horizon: 4,000 rows -> 2,000 rows. Implemented as chunk_len 2000 -> 1000 with state_reset 4000 -> 2000. Unchanged: the soft mask (loss.mask_model), aux weighted-MSE 0.05, EMA 0.999, architecture 2x128 (192,258 params), seed 1337, 3-epoch cosine schedule.\nWHY chunk_len MUST MOVE TOO, and the resulting confound: the trainer enforces state_reset = k * chunk_len with k >= 2, because a reset at every chunk boundary would discard all carried state and silently leave the model with no memory beyond one chunk. At chunk_len 2000 the shortest legal period is therefore 4000, which is exactly v011's value, so a shorter horizon is unreachable without also halving chunk_len. Keeping k=2 preserves the 2-chunks-of-carry ratio the trainer enforces and changes the absolute horizon from 4,000 to 2,000, which is also dozken's literal reset period. The confound is that chunk_len sets truncated-BPTT granularity, so this run is not a pure period change; a (chunk_len 2000, state_reset 6000) run would isolate the ratio and test the opposite direction. 1000 divides 20,000 exactly, so no chunk crosses a sequence boundary.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": null
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.05,
+   "target_clip": 2.0,
+   "mask_floor": 0.1,
+   "mask_model": "cache/train_scored.npy"
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.999,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 1000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true,
+   "state_reset": 2000
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5,
+   "state_reset": 2000
+  },
+  "results": {
+   "best_step": 39776,
+   "best_val_wp": 0.6870424102753847,
+   "best_val_t0": 0.6837651223693867,
+   "best_val_t1": 0.6903196981813826,
+   "full_valid_wp": 0.6787835593581937,
+   "latency_us_p50": null,
+   "latency_us_p99": null,
+   "train_hours": 4.018,
+   "finished_utc": "2026-09-30T09:28:24Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v012.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v012",
+   "submission_dir": null
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step39776_val0.687042.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v012/best_001_step39776_val0.687042.pt",
+  "step": 39776,
+  "sha256": "6d0fc9b347a514a77dc937d828b7bfd889f24fe5a194e8614594a1df0a5536e9",
+  "train_time_metrics": {
+   "t0": 0.6837651223693867,
+   "t1": 0.6903196981813826,
+   "weighted_pearson": 0.6870424102753847,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.7102864315351268,
+  "t1": 0.7557734056920572,
+  "weighted_pearson": 0.733029918613592,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 36.8,
+  "call_us_p50": 28.58,
+  "call_us_p99": 59.46,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 28.17,
+  "us_p99": 55.63,
+  "projected_min_p50": 18.5,
+  "projected_min_p99": 36.5,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": true,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 45.64,
+  "grader_us_p99": 90.12,
+  "grader_min_p50": 30.0,
+  "grader_min_p99": 59.2,
+  "grader_pct_budget_p50": 49.9,
+  "grader_target_us_local": 42.3,
+  "grader_safe": true
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 2.477e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.733030 vs offline 0.733030, |diff| = 1.947e-07 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.7102864315351268,
+   "t1": 0.7557734056920572,
+   "weighted_pearson": 0.733029918613592,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 36.8,
+   "call_us_p50": 28.58,
+   "call_us_p99": 59.46,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 28.17,
+   "us_p99": 55.63,
+   "projected_min_p50": 18.5,
+   "projected_min_p99": 36.5,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": true,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 45.64,
+   "grader_us_p99": 90.12,
+   "grader_min_p50": 30.0,
+   "grader_min_p99": 59.2,
+   "grader_pct_budget_p50": 49.9,
+   "grader_target_us_local": 42.3,
+   "grader_safe": true
+  },
+  "size": {
+   "zip_bytes": 2158833,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": true
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "f79e53e1ada2d9e37e8acafb154e06347d75b76df6c1053e35924431fdb7127c",
+  "solution_py": "2fa3bbc363938dbcaa7fb46cfb639ed70b61eb1902c6b2d3cd1e8360d7ac7e4c",
+  "model_onnx": "5d4b33b9de94a3062a96cfeb5b1ca4d4298e51fd20a705c0582bb990dcd05e34",
+  "feature_stats_npz": "f556f9e5b5debc7dcc6e18d10642f986a2ed8f1d9e058d652773ea79e08a1756"
+ },
+ "zip": {
+  "file": "submission_gru_v012.zip",
+  "bytes": 2158833,
+  "root_entries": [
+   "best_001_step39776_val0.687042.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 1.6 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [],
+ "status": "PASS"
+}

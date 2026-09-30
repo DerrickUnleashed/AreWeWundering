@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v014
   parent: gru_v011
-  status: running
+  status: finished
 description: 'Capacity scale under the v011 recipe: the soft mask and the 4,000-row
   periodic state reset, at GRU 2x192 with a 64-unit input projection (378,562 params)
   instead of 2x128 proj0 (192,258). Architecture matches dozken''s own non-distilled
@@ -118,16 +118,16 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 19889
+  best_val_wp: 0.6876249744215277
+  best_val_t0: 0.6837274692932799
+  best_val_t1: 0.6915224795497755
+  full_valid_wp: 0.6796759469131275
+  latency_us_p50: 41.5
+  latency_us_p99: 78.25
+  train_hours: 4.8794
+  finished_utc: '2026-09-30T10:35:41Z'
 artifacts:
   log: exploration/logs/log_gru_v014.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v014
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v014

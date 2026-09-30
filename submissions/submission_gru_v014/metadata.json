@@ -1,0 +1,241 @@
+{
+  "key": "gru_v014",
+  "packaged_utc": "2026-09-30T11:50:27Z",
+  "git_commit": "c92bb5cdedcf8d244b4c9ff9ac34577a1b744a6c",
+  "config": {
+    "schema_version": 1,
+    "identity": {
+      "model": "gru",
+      "version": "v014",
+      "parent": "gru_v011",
+      "status": "finished"
+    },
+    "description": "Capacity scale under the v011 recipe: the soft mask and the 4,000-row periodic state reset, at GRU 2x192 with a 64-unit input projection (378,562 params) instead of 2x128 proj0 (192,258). Architecture matches dozken's own non-distilled models.",
+    "hypothesis": "Capacity only pays once the state is reset and the objective matches the metric. Our own v004 ran 2x192 proj128 at 423k params and scored 0.672206, BELOW the 192k v002 baseline of 0.674350 -- but v004 had no state reset and no soft mask, so it never had a fair test. The reset bounds how much history the model must carry across 20k rows, which is exactly the constraint that made extra width useless before; with the reset in place a wider model has something to spend capacity on. Expected: at or above v011's 0.679986, and if it clears dozken's reset2k at 0.6864 we can distil it into a servable student.\nWHY THIS SHAPE: dozken's non-distilled models (reset2k, distil_ens) are exactly GRU 2x192 proj64 at 435,714 params. Their 160-wide model (distil160, our target at 0.6888) was DISTILLED, so 'smaller is better' there is a distillation-regularisation effect, not a point on the non-distilled capacity curve. Matching their non-distilled shape is the cleanest test of whether their capacity advantage was architecture or training.",
+    "change_vs_parent": "ONE conceptual lever, capacity, in two fields: model.hidden 128 -> 192 and model.input_proj 0 -> 64 (192,258 -> 378,562 params). Unchanged: the soft mask (loss.mask_model, mask_floor 0.1), state_reset 4000 in training and inference, chunk_len 2000, aux weighted-MSE 0.05, EMA 0.999, architecture family gru with 2 layers, seed 1337, 3-epoch cosine schedule.\nKNOWN CONFOUND, accepted deliberately: hidden and input_proj move together, so a win will not attribute which mattered. That attribution is not needed here -- we need the win. v013 already covers the mask axis on the objective side.\nLATENCY (measured, not assumed): fitted from our two idle-box models that also have real grader readings, latency_us = 14.68 + 6.927e-5 * params. It reproduces v011 at 28.00 (actual 28.00) and v004 at 44.0 (actual 43.96). This architecture projects 40.9 us/row p50 -> 43.5 min on the grader, inside the 60-min documented target and well inside the 70-min hard kill. dozken needed 61m06s for a comparable model because their per-row pipeline is ~1.4x slower than ours, not because the model is slower.\n\nLATENCY, MEASURED PAIRED rather than fitted (this is the second time a contended measurement nearly sent us the wrong way, so the method matters): v011 and v014 were benchmarked back to back with both training jobs running. v011 read 58.04 us/row and v014 read 88.67, a ratio of 1.528 for 1.969x the parameters. An absolute read of 85-88 us/row is NOT usable -- it is inflated 2.07x by the two concurrent v012/v013 jobs, and v011's own idle figure is 28.00. The ratio is what transfers: an independent idle pair (v011 28.00 vs v004 43.96) gives 1.570 for 2.198x params, and the implied elasticity ln(1.528)/ln(1.969) = 0.566 agrees with ln(1.570)/ln(2.198) = 0.573. So idle v014 = 28.00 x 1.528 = 42.8 us/row -> 45.5 min on the grader, against a 60-min documented target and a 70-min hard kill.\nMUST RE-MEASURE ON AN IDLE BOX before packaging. Every other latency number in this repo measured under contention over-projected, sometimes by 1.7x. This is a 76%-of-target model, not a 50% one, so it has less margin than v011 and should not be shipped on a derived number.",
+    "data": {
+      "train_shards": "cache/train",
+      "valid_shards": "cache/valid",
+      "seq_len": 20000,
+      "warmup_steps": 99,
+      "target_clip": 2.0,
+      "train_sequences": null
+    },
+    "features": {
+      "normalisation": "none",
+      "signed_log_volumes": false,
+      "first_differences": [],
+      "cross_instrument": [],
+      "step_feature": false,
+      "clip_sigma": 0
+    },
+    "model": {
+      "arch": "gru",
+      "input_proj": 64,
+      "hidden": 192,
+      "layers": 2,
+      "dropout": 0.0,
+      "layernorm": false,
+      "head": "linear",
+      "param_count": 378562
+    },
+    "loss": {
+      "type": "seq_weighted_pearson",
+      "mask": "soft",
+      "aux_mse_weight": 0.05,
+      "target_clip": 2.0,
+      "mask_floor": 0.1,
+      "mask_model": "cache/train_scored.npy"
+    },
+    "optim": {
+      "name": "adamw",
+      "lr": 0.002,
+      "weight_decay": 0.01,
+      "betas": [
+        0.9,
+        0.99
+      ],
+      "schedule": "cosine",
+      "warmup_steps": 500,
+      "grad_clip": 1.0,
+      "ema_decay": 0.999,
+      "precision": "fp32"
+    },
+    "training": {
+      "chunk_len": 2000,
+      "burn_in": 99,
+      "batch_sequences": 16,
+      "max_steps": null,
+      "smoke_steps": 60,
+      "epochs": 3,
+      "seed": 1337,
+      "eval_every_steps": 2500,
+      "eval_subset_sequences": 200,
+      "device": "cpu",
+      "stateful": true,
+      "state_reset": 4000
+    },
+    "inference": {
+      "export": "onnx",
+      "opset": 17,
+      "ort_threads": 1,
+      "target_us_per_row": 68.5,
+      "state_reset": 4000
+    },
+    "results": {
+      "best_step": 19889,
+      "best_val_wp": 0.6876249744215277,
+      "best_val_t0": 0.6837274692932799,
+      "best_val_t1": 0.6915224795497755,
+      "full_valid_wp": 0.6796759469131275,
+      "latency_us_p50": null,
+      "latency_us_p99": null,
+      "train_hours": 4.8794,
+      "finished_utc": "2026-09-30T10:35:41Z"
+    },
+    "artifacts": {
+      "log": "exploration/logs/log_gru_v014.log",
+      "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v014",
+      "submission_dir": null
+    }
+  },
+  "checkpoint": {
+    "file": "best_001_step19889_val0.687625.pt",
+    "path": "exploration/checkpoints/checkpoint_gru_v014/best_001_step19889_val0.687625.pt",
+    "step": 19889,
+    "sha256": "eb2486aa11003c9dd007a3ad638a2acd7e95a55faa7f872e19e9474ae1112de6",
+    "train_time_metrics": {
+      "t0": 0.6837274692932799,
+      "t1": 0.6915224795497755,
+      "weighted_pearson": 0.6876249744215277,
+      "selected_rows": 374199,
+      "blocks": 200,
+      "metric_clip": [
+        -2.0,
+        2.0
+      ],
+      "metric_specification": "global_wp",
+      "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+    }
+  },
+  "scores": {
+    "t0": 0.7079109763704469,
+    "t1": 0.754595460661764,
+    "weighted_pearson": 0.7312532185161054,
+    "selected_rows": 9110,
+    "rows_seen": 100000,
+    "us_per_row": 50.8,
+    "call_us_p50": 42.17,
+    "call_us_p99": 79.54,
+    "sequences": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "protocol": "5 validation sequences"
+  },
+  "latency": {
+    "budget_us_per_row": 91.37,
+    "target_us_per_row": 68.53,
+    "us_p50": 41.5,
+    "us_p99": 78.25,
+    "projected_min_p50": 27.3,
+    "projected_min_p99": 51.4,
+    "pass_p50_75pct": true,
+    "pass_p99_75pct": false,
+    "rows": 39400000,
+    "grader_slowdown": 1.62,
+    "grader_us_p50": 67.23,
+    "grader_us_p99": 126.77,
+    "grader_min_p50": 44.1,
+    "grader_min_p99": 83.2,
+    "grader_pct_budget_p50": 73.6,
+    "grader_target_us_local": 42.3,
+    "grader_safe": false
+  },
+  "gate": {
+    "contract": "PASS",
+    "determinism": "PASS",
+    "parity": "parity raw predictions : max |diff| = 2.110e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.731253 vs offline 0.731253, |diff| = 1.432e-08 (tol 1e-04)  PASS | parity overall         : PASS",
+    "score": {
+      "t0": 0.7079109763704469,
+      "t1": 0.754595460661764,
+      "weighted_pearson": 0.7312532185161054,
+      "selected_rows": 9110,
+      "rows_seen": 100000,
+      "us_per_row": 50.8,
+      "call_us_p50": 42.17,
+      "call_us_p99": 79.54,
+      "sequences": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "protocol": "5 validation sequences"
+    },
+    "latency": {
+      "budget_us_per_row": 91.37,
+      "target_us_per_row": 68.53,
+      "us_p50": 41.5,
+      "us_p99": 78.25,
+      "projected_min_p50": 27.3,
+      "projected_min_p99": 51.4,
+      "pass_p50_75pct": true,
+      "pass_p99_75pct": false,
+      "rows": 39400000,
+      "grader_slowdown": 1.62,
+      "grader_us_p50": 67.23,
+      "grader_us_p99": 126.77,
+      "grader_min_p50": 44.1,
+      "grader_min_p99": 83.2,
+      "grader_pct_budget_p50": 73.6,
+      "grader_target_us_local": 42.3,
+      "grader_safe": false
+    },
+    "size": {
+      "zip_bytes": 4233415,
+      "limit_bytes": 20971520,
+      "pass": true
+    },
+    "imports": [],
+    "latency_pass": false
+  },
+  "packages": {
+    "python": "3.11.9",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "torch": "2.14.0"
+  },
+  "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+  "sha256": {
+    "train_script": "d271c1f797d4c41333167c74dfedd35ddec9f808da5c04a1af8ce1f2cb5e774f",
+    "solution_py": "17e16ea54843b15051fafce5337e75d2b522656a8f8d88d6bb978c31c2d85cc0",
+    "model_onnx": "80af264ecdc3e575573b50fa15372b83d27ef2ca0b383a2d92061127aaf9423e",
+    "feature_stats_npz": "f1a50518fc9c4bb08f9274b04ca598fa410c7d2abb01ba11d341e820752ef497"
+  },
+  "zip": {
+    "file": "submission_gru_v014.zip",
+    "bytes": 4233415,
+    "root_entries": [
+      "best_001_step19889_val0.687625.pt",
+      "feature_stats.npz",
+      "model.onnx",
+      "solution.py"
+    ]
+  },
+  "notes": [
+    "included the 3.0 MB checkpoint for provenance",
+    "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+  ],
+  "warnings": [],
+  "failures": [
+    "latency gate FAILED against the grader: 41.5 us/row local x 1.62 = 44.1 min at p50 (73.6% of the 60 min budget) and 83.2 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
+  ],
+  "status": "NOT-READY",
+  "latency_contaminated": true,
+  "latency_contamination_note": "Latency measured while gru_v010 and gru_v011 were training on the same cores. Reference: gru_v003 measured 27.71 us/row on an idle box and 48.12 us/row in that window (1.7x). This verdict reflects contention, not the model. Re-run the gate on an idle box before shipping."
+}

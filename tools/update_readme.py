@@ -32,21 +32,39 @@ BUNDLES = ROOT / 'submissions'
 BEGIN = '<!-- BEGIN GENERATED: leaderboard -->'
 END = '<!-- END GENERATED: leaderboard -->'
 
-# Ordered by the local full_valid_wp ranking. Anything not listed is appended
-# as still-in-flight, so a new run shows up without editing this file.
-DESCRIPTION = {
-    'v001': '1x256 wider GRU',
-    'v002': 'baseline config, seed 1337',
-    'v003': 'aux MSE + EMA',
-    'v004': '2x192 + input projection',
-    'v005': 'baseline config, seed 1338',
-    'v006': 'baseline config, seed 1339',
-    'v007': 'first differences',
-    'v008': 'cross-instrument (i0 vs i1)',
-    'v009': 'signed-log volumes',
-    'v010': '6 epochs instead of 3',
-    'v011': 'soft mask on P(is_scored) + state reset',
+# Versions are DISCOVERED, not listed. A hardcoded dict silently omitted every
+# version added after it was written -- v012, v013, v014 and v015 all trained,
+# scored and packaged while never appearing in the table, because nothing here
+# had heard of them. Globs the directory instead, so a new run cannot be
+# forgotten. The short label comes from the yaml's own `description`, which is
+# the single place the change is already written down.
+DESCRIPTIONS: dict[str, str] = {
+    'v011': 'soft mask on P(is_scored) + reset 4k',
+    'v012': 'soft mask + reset 2k (shorter horizon)',
+    'v013': 'reset 4k, NO soft mask (control)',
+    'v014': 'soft mask + reset 4k, 2x192 proj64',
+    'v015': 'v011 weights, reset 4k actually shipped',
 }
+
+
+def discover() -> list[str]:
+    return sorted(p.stem.replace('version_gru_', '') for p in VERSIONS.glob('version_gru_v*.yaml'))
+
+
+def label(v: str) -> str:
+    if v in DESCRIPTIONS:
+        return DESCRIPTIONS[v]
+    y = load_yaml(v)
+    if not y:
+        return v
+    d = ' '.join(str(y.get('description') or '').split())
+    # first clause, cut at a sentence break or a comma-separated aside
+    d = d.split('. ')[0]
+    if len(d) > 44:
+        d = d[:44].rsplit(' ', 1)[0]
+    return d or v
+
+
 
 
 def load_yaml(v: str) -> dict | None:
@@ -131,7 +149,7 @@ def flag_contended_latency() -> list[str]:
 def build_tables() -> str:
     lb = load_leaderboard()
     rows, inflight = [], []
-    for v, desc in DESCRIPTION.items():
+    for v in discover():
         y = load_yaml(v)
         if y is None:
             continue
@@ -139,9 +157,9 @@ def build_tables() -> str:
         fv, bv = r.get('full_valid_wp'), r.get('best_val_wp')
         st = y.get('identity', {}).get('status')
         if st == 'finished' and fv is not None:
-            rows.append((fv, v, desc))
+            rows.append((fv, v, label(v)))
         else:
-            inflight.append((v, desc, bv, st))
+            inflight.append((v, label(v), bv, st))
 
     rows.sort(reverse=True)
     out = [BEGIN, '']

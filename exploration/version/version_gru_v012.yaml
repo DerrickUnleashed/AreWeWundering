@@ -3,29 +3,30 @@ identity:
   model: gru
   version: v012
   parent: gru_v011
-  status: running
-description: 'Single-variable follow-up to v011: same soft mask, same 3-epoch schedule, but
-  the periodic recurrent-state reset fires every 2,000 rows instead of every 4,000.'
-hypothesis: 'The reset period is a knob, not a threshold, and 2,000 rows beats 4,000. dozken''s
-  public reset2k scores 0.6569 against their reset4k, so shortening our horizon should gain
-  rather than cost. Mechanism: across 20k rows the recurrent state degrades (their Q1 0.70
-  -> Q4 0.638) and a zero state beats the model''s own 10k-row state, so more frequent resets
-  keep the model nearer its best regime. If 2,000 instead loses to 4,000 then the horizon
-  is near-optimal at 4,000 and this lever is spent.'
-change_vs_parent: 'Shorter absolute reset horizon: 4,000 rows -> 2,000 rows. Implemented as
-  chunk_len 2000 -> 1000 with state_reset 4000 -> 2000. Unchanged: the soft mask (loss.mask_model),
-  aux weighted-MSE 0.05, EMA 0.999, architecture 2x128 (192,258 params), seed 1337, 3-epoch
-  cosine schedule.
+  status: finished
+description: 'Single-variable follow-up to v011: same soft mask, same 3-epoch schedule,
+  but the periodic recurrent-state reset fires every 2,000 rows instead of every 4,000.'
+hypothesis: 'The reset period is a knob, not a threshold, and 2,000 rows beats 4,000.
+  dozken''s public reset2k scores 0.6569 against their reset4k, so shortening our
+  horizon should gain rather than cost. Mechanism: across 20k rows the recurrent state
+  degrades (their Q1 0.70 -> Q4 0.638) and a zero state beats the model''s own 10k-row
+  state, so more frequent resets keep the model nearer its best regime. If 2,000 instead
+  loses to 4,000 then the horizon is near-optimal at 4,000 and this lever is spent.'
+change_vs_parent: 'Shorter absolute reset horizon: 4,000 rows -> 2,000 rows. Implemented
+  as chunk_len 2000 -> 1000 with state_reset 4000 -> 2000. Unchanged: the soft mask
+  (loss.mask_model), aux weighted-MSE 0.05, EMA 0.999, architecture 2x128 (192,258
+  params), seed 1337, 3-epoch cosine schedule.
 
   WHY chunk_len MUST MOVE TOO, and the resulting confound: the trainer enforces state_reset
-  = k * chunk_len with k >= 2, because a reset at every chunk boundary would discard all carried
-  state and silently leave the model with no memory beyond one chunk. At chunk_len 2000 the
-  shortest legal period is therefore 4000, which is exactly v011''s value, so a shorter horizon
-  is unreachable without also halving chunk_len. Keeping k=2 preserves the 2-chunks-of-carry
-  ratio the trainer enforces and changes the absolute horizon from 4,000 to 2,000, which is
-  also dozken''s literal reset period. The confound is that chunk_len sets truncated-BPTT
-  granularity, so this run is not a pure period change; a (chunk_len 2000, state_reset 6000)
-  run would isolate the ratio and test the opposite direction. 1000 divides 20,000 exactly,
+  = k * chunk_len with k >= 2, because a reset at every chunk boundary would discard
+  all carried state and silently leave the model with no memory beyond one chunk.
+  At chunk_len 2000 the shortest legal period is therefore 4000, which is exactly
+  v011''s value, so a shorter horizon is unreachable without also halving chunk_len.
+  Keeping k=2 preserves the 2-chunks-of-carry ratio the trainer enforces and changes
+  the absolute horizon from 4,000 to 2,000, which is also dozken''s literal reset
+  period. The confound is that chunk_len sets truncated-BPTT granularity, so this
+  run is not a pure period change; a (chunk_len 2000, state_reset 6000) run would
+  isolate the ratio and test the opposite direction. 1000 divides 20,000 exactly,
   so no chunk crosses a sequence boundary.'
 data:
   train_shards: cache/train
@@ -89,16 +90,16 @@ inference:
   target_us_per_row: 68.5
   state_reset: 2000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  best_step: 39776
+  best_val_wp: 0.6870424102753847
+  best_val_t0: 0.6837651223693867
+  best_val_t1: 0.6903196981813826
+  full_valid_wp: 0.6787835593581937
+  latency_us_p50: 28.17
+  latency_us_p99: 55.63
+  train_hours: 4.018
+  finished_utc: '2026-09-30T09:28:24Z'
 artifacts:
   log: exploration/logs/log_gru_v012.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v012
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v012

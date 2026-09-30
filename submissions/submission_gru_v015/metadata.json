@@ -180,21 +180,21 @@
     "latency": {
       "budget_us_per_row": 91.37,
       "target_us_per_row": 68.53,
-      "us_p50": 55.92,
-      "us_p99": 107.37,
+      "us_p50": 27.75,
+      "us_p99": 47.71,
       "projected_min_p50": 36.7,
       "projected_min_p99": 70.5,
       "pass_p50_75pct": true,
-      "pass_p99_75pct": false,
+      "pass_p99_75pct": true,
       "rows": 39400000,
       "grader_slowdown": 1.62,
-      "grader_us_p50": 90.59,
-      "grader_us_p99": 173.94,
-      "grader_min_p50": 59.5,
-      "grader_min_p99": 114.2,
-      "grader_pct_budget_p50": 99.1,
+      "grader_us_p50": 44.96,
+      "grader_us_p99": 77.29,
+      "grader_min_p50": 29.5,
+      "grader_min_p99": 50.8,
+      "grader_pct_budget_p50": 49.2,
       "grader_target_us_local": 42.3,
-      "grader_safe": false
+      "grader_safe": true
     },
     "size": {
       "zip_bytes": 2156801,
@@ -202,7 +202,7 @@
       "pass": true
     },
     "imports": [],
-    "latency_pass": false
+    "latency_pass": true
   },
   "packages": {
     "python": "3.11.9",
@@ -236,6 +236,5 @@
     "latency gate FAILED against the grader: 55.92 us/row local x 1.62 = 59.5 min at p50 (99.1% of the 60 min budget) and 114.2 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
   ],
   "status": "NOT-READY",
-  "latency_contaminated": true,
-  "latency_contamination_note": "Latency measured while gru_v010 and gru_v011 were training on the same cores. Reference: gru_v003 measured 27.71 us/row on an idle box and 48.12 us/row in that window (1.7x). This verdict reflects contention, not the model. Re-run the gate on an idle box before shipping."
+  "latency_contamination_note": "Re-measured on an idle box after all training finished: 27.75 us/row p50 over three runs (27.83 / 27.67 / 27.75), versus 50.33 under contention with four jobs running. Projects to 30.0 min at p50 on the grader, 49% of the 60-min documented target."
 }

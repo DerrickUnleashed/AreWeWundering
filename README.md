@@ -8,20 +8,32 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v011** | soft mask on P(is_scored) + state reset | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 2 | **v009** | signed-log volumes | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
-| 3 | **v008** | cross-instrument (i0 vs i1) | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
-| 4 | **v002** | baseline config, seed 1337 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
-| 5 | **v001** | 1x256 wider GRU | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 6 | **v007** | first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
-| 7 | **v006** | baseline config, seed 1339 | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
-| 8 | **v005** | baseline config, seed 1338 | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
-| 9 | **v003** | aux MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
-| 10 | **v004** | 2x192 + input projection | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 11 | **v010** | 6 epochs instead of 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 1 | **v011** | soft mask on P(is_scored) + reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 2 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Ready to Submit (latency unverified) | -- | -- | -- |
+| 3 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Ready to Submit | -- | -- | -- |
+| 4 | **v013** | reset 4k, NO soft mask (control) | 0.676198 | Ready to Submit | -- | -- | -- |
+| 5 | **v009** | INPUTS: append sign(x)*log1p(|x|) of every | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 6 | **v008** | INPUTS: cross-instrument spreads and | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
+| 7 | **v002** | INPUTS: train-only robust z-score with +-8 | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 8 | **v001** | WIDE: 1 layer x 256 units, otherwise | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 9 | **v007** | INPUTS: first differences of the i0 | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 10 | **v006** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 11 | **v005** | SEED REPLICATE of the gru_v002 recipe, seed | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
+| 12 | **v003** | TRAINING STABILITY: add a 0.05 |t|-weighted | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
+| 13 | **v004** | THIRD-PARTY ARCHITECTURE: 2 layers x 192 | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 14 | **v010** | SCHEDULE: the gru_v002 recipe trained for 6 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
+
+### Still in flight
+
+No final `full_valid_wp` yet, so not ranked.
+
+| Ver | What it changed | best so far (subset) | Status | Public score |
+|---|---|---:|---|---|
+| **v000** | Framework smoke test | 0.570341 | Yet to Train | -- |
+| **v015** | v011 weights, reset 4k actually shipped | -- | Yet to Train | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -67,6 +79,44 @@ nothing at inference.
 
 The two failures below are also informative: they are the *objective* and
 *capacity* directions, which the soft-mask result now brackets.
+
+## Attribution: both levers are real (v013 settled it)
+
+v011 changed the soft mask **and** the state reset together, so for a day the
++0.0058 had no owner. **v013** removed exactly one of them and settled it:
+
+| | full_valid_wp | vs seed mean | σ |
+|---|---:|---:|---:|
+| seed baseline (v002/v005/v006) | 0.674179 | — | — |
+| **v013** reset 4k, **no mask** | 0.676198 | +0.0020 | **+12.7** |
+| **v011** reset 4k **+ mask** | 0.679986 | +0.0058 | **+36.5** |
+
+- **the reset alone** (v013 − seed) = **+0.0020**
+- **the mask on top of the reset** (v011 − v013) = **+0.0038**
+
+So the periodic state reset is a real +12.7σ effect and the soft mask adds another
++23.8σ on top. I had said the mask was carrying it and the reset was inert — that
+was wrong, and it came from reading mid-training eval points, the exact mistake
+`AGENTS.md` §11.4 records. Both levers earn their place, and the mask is the larger
+of the two.
+
+### The other two results
+
+- **v012 (reset 4k → 2k) = 0.678784, i.e. 0.0012 _worse_ than v011.** The shorter
+  horizon does not help; 4,000 is better. And this refutes the premise v012 was
+  built on — I justified it as "dozken's reset2k outscores their reset4k", but we
+  have still never seen a public score for their reset4k. That claim was an
+  inference presented as fact.
+- **v014 (192k → 379k params) = 0.679676, a dead heat with v011 (−0.0003, 1σ).**
+  Capacity is *neutral* here, not harmful — which revises v004's old finding that
+  width hurt. Under the v011 recipe, doubling width buys nothing, and it costs
+  **1.5× the latency** (41.50 vs 27.75 µs/row). So v011 strictly dominates v014.
+
+**v014 is the most useful negative result for the next phase.** dozken sit 0.0073
+ahead of us, and our own best pure-capacity model ties ours. So their gap is not
+width — consistent with their NOTES: *"reaching #1 needs a genuinely different BASE
+model, not more averaging."* Our soft mask is the one base-model difference we have
+that they lack, and the teacher labels are already built to exploit it.
 
 ## The failures
 

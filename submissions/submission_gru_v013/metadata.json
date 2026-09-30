@@ -1,0 +1,237 @@
+{
+ "key": "gru_v013",
+ "packaged_utc": "2026-09-30T11:49:53Z",
+ "git_commit": "c92bb5cdedcf8d244b4c9ff9ac34577a1b744a6c",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v013",
+   "parent": "gru_v011",
+   "status": "finished"
+  },
+  "description": "Single-variable follow-up to v011: identical except the soft mask is removed. Keeps the periodic state reset at 4,000 and drops only the P(is_scored) loss weighting.",
+  "hypothesis": "v011 moved full_valid_wp from 0.674179 (3-seed mean) to 0.679986, +0.0058 at 36 sigma, but it changed the mask AND the reset together, so the gain is unattributed. This run isolates them. If it lands near 0.674 the soft mask did the work and the reset is inert; if near 0.680 the reset did the work and the mask is inert. Either way we learn which lever the Phase B/C distillation teacher should be built from, instead of attributing +0.0058 to the wrong mechanism.",
+  "change_vs_parent": "EXACTLY ONE change off gru_v011: loss.mask_model -> null, which leaves soft_mask None in chunk_loss so every required row keeps unit weight. Unchanged: training.state_reset and inference.state_reset stay at 4000, aux weighted-MSE 0.05, EMA 0.999, architecture 2x128, seed 1337, 3-epoch cosine schedule. WHY IT MATTERS: every downstream decision depends on the attribution, especially whether the distillation teacher should be a pair of masked models (v011-like) or masked plus unmasked for ensemble diversity.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": null
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.05,
+   "target_clip": 2.0,
+   "mask_floor": 0.1,
+   "mask_model": null
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.999,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true,
+   "state_reset": 4000
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5,
+   "state_reset": 4000
+  },
+  "results": {
+   "best_step": 19889,
+   "best_val_wp": 0.6857601446734813,
+   "best_val_t0": 0.6814260450040692,
+   "best_val_t1": 0.6900942443428936,
+   "full_valid_wp": 0.6761983096351682,
+   "latency_us_p50": null,
+   "latency_us_p99": null,
+   "train_hours": 3.9745,
+   "finished_utc": "2026-09-30T09:25:50Z"
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v013.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v013",
+   "submission_dir": null
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step19889_val0.685760.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v013/best_001_step19889_val0.685760.pt",
+  "step": 19889,
+  "sha256": "4668e423a2d8d7b4671935a96b1a85116f5acb7aead296c3ca9be399ab701b18",
+  "train_time_metrics": {
+   "t0": 0.6814260450040692,
+   "t1": 0.6900942443428936,
+   "weighted_pearson": 0.6857601446734813,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.7030134050869123,
+  "t1": 0.7579168821142556,
+  "weighted_pearson": 0.730465143600584,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 36.1,
+  "call_us_p50": 28.5,
+  "call_us_p99": 49.75,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 27.96,
+  "us_p99": 48.21,
+  "projected_min_p50": 18.4,
+  "projected_min_p99": 31.7,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": true,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 45.3,
+  "grader_us_p99": 78.1,
+  "grader_min_p50": 29.7,
+  "grader_min_p99": 51.3,
+  "grader_pct_budget_p50": 49.6,
+  "grader_target_us_local": 42.3,
+  "grader_safe": true
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 1.021e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.730465 vs offline 0.730465, |diff| = 9.479e-08 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.7030134050869123,
+   "t1": 0.7579168821142556,
+   "weighted_pearson": 0.730465143600584,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 36.1,
+   "call_us_p50": 28.5,
+   "call_us_p99": 49.75,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 27.96,
+   "us_p99": 48.21,
+   "projected_min_p50": 18.4,
+   "projected_min_p99": 31.7,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": true,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 45.3,
+   "grader_us_p99": 78.1,
+   "grader_min_p50": 29.7,
+   "grader_min_p99": 51.3,
+   "grader_pct_budget_p50": 49.6,
+   "grader_target_us_local": 42.3,
+   "grader_safe": true
+  },
+  "size": {
+   "zip_bytes": 2157834,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": true
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "49a5ed24e1a8ebb8001a06a5c93963a0fd1f8ec8a08778f7b8fd9b919e9b2556",
+  "solution_py": "98a234483e61a1049443f49fb54bf9adfcf3d78070dfaa33c60af0988a746c9e",
+  "model_onnx": "e64b8d9f98a61f7ee10e7b243da67f4ee5357dff24429bb8ad5df63a7cd15484",
+  "feature_stats_npz": "f1a50518fc9c4bb08f9274b04ca598fa410c7d2abb01ba11d341e820752ef497"
+ },
+ "zip": {
+  "file": "submission_gru_v013.zip",
+  "bytes": 2157834,
+  "root_entries": [
+   "best_001_step19889_val0.685760.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 1.6 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [],
+ "status": "PASS"
+}
