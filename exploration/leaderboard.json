@@ -165,5 +165,12 @@
     "public_score": 0.5935,
     "grader_seconds": 1581,
     "note": "The organiser's own baseline on the public leaderboard, restated by the user. Confirms the number already on file. We are +0.0605 above it with v017 (0.6540); dozken is +0.0653; the leader is +0.0742."
+  },
+  "v019": {
+    "public_score": 0.651,
+    "grader_seconds": 1832,
+    "memory_mb": 627,
+    "submitted_utc": "2026-09-30T19:31Z",
+    "note": "The loss-fix experiment, submitted to settle it empirically. Local predicted a 5.1-sigma REGRESSION against its parent v011 (0.678374 vs 0.679986) and the public score agrees: 0.6510 against v011's 0.6515. Replacing the per-chunk Pearson loss with a globally-pooled running-statistic loss did not help, on either metric. The local call was right, which is the useful part: it means the loss fix can be retired without spending more submission slots on it. Cost one of five daily slots for a confirmed negative result."
   }
 }
