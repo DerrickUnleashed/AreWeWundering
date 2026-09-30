@@ -1,5 +1,5 @@
 {
-  "_comment": "Public leaderboard readings, transcribed from the competition UI on 2026-09-29. grader_seconds is the grader's own wall-clock for the full 39.4M-row test set; budget is 3600 s. Manual source of truth for tools/update_readme.py -- the scores live on the website, not in this repo.",
+  "_comment": "Public leaderboard readings, transcribed from the competition UI. grader_seconds is the grader's own wall-clock for the full 39.4M-row test set; the stated limit is 3600 s. Manual source of truth for tools/update_readme.py -- scores live on the website, not in this repo.",
   "baseline": {
     "public_score": 0.5935,
     "grader_seconds": 1581,
@@ -25,13 +25,67 @@
   "v003": {
     "public_score": 0.6457,
     "grader_seconds": 1857,
-    "memory_mb": 627,
-    "note": "best public entry so far"
+    "memory_mb": 627
   },
   "v004": {
     "public_score": 0.6446,
     "grader_seconds": 2596,
     "memory_mb": 630,
     "note": "projected 79% of budget at p50 and marked DO NOT SHIP; the grader ran it in 72.1% and it finished, so that verdict was wrong"
+  },
+  "v005": {
+    "public_score": 0.6481,
+    "grader_seconds": 2216,
+    "memory_mb": 626,
+    "note": "baseline config, seed 1338. Latency gate was measured under 7-way contention (52.25 us/row); the real figure is well under that."
+  },
+  "v006": {
+    "public_score": 0.6475,
+    "grader_seconds": 2132,
+    "memory_mb": 631
+  },
+  "v007": {
+    "public_score": 0.6481,
+    "grader_seconds": 2536,
+    "memory_mb": 626
+  },
+  "v008": {
+    "public_score": 0.6473,
+    "grader_seconds": 2477,
+    "memory_mb": 626
+  },
+  "v009": {
+    "public_score": 0.6483,
+    "grader_seconds": 2392,
+    "memory_mb": 627
+  },
+  "v010": {
+    "public_score": 0.6427,
+    "grader_seconds": 2077,
+    "memory_mb": 626,
+    "note": "6 epochs. Worst model locally (-21.9 sigma) and worst of the completed runs publicly too."
+  },
+  "v011": {
+    "public_score": 0.6515,
+    "grader_seconds": 1812,
+    "memory_mb": 627,
+    "note": "BEST of ours. soft mask on P(is_scored) + state_reset=4000. Rank 1 locally AND publicly, so the local metric did transfer for an effect this size."
+  },
+  "_dozken": {
+    "note": "NOT ours. Downloaded from https://github.com/dozken/wunder/tree/main/challenge-3/submissions and submitted as-is. Recorded for reference only.",
+    "reset2k": {
+      "public_score": 0.6569,
+      "grader_seconds": 3587,
+      "memory_mb": 630,
+      "rank": "25/100",
+      "note": "dozken/2026-09-16_reset2k. Periodic state reset at 2k steps -- the same lever as our v011, at half the period."
+    },
+    "distil160": {
+      "public_score": 0.6585,
+      "grader_seconds": 3666,
+      "memory_mb": 627,
+      "rank": "27/100",
+      "note": "dozken/2026-09-17_distil160. Current public leader. Ran 61m06s, i.e. 101.8% of the stated 60-minute limit, and still scored."
+    }
   }
 }
