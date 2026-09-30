@@ -8,8 +8,8 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v017** | DISTILLATION STUDENT, SMALLER | 0.681866 | Yet to package | -- | -- | -- |
-| 2 | **v016** | DISTILLATION STUDENT | 0.681753 | Yet to package | -- | -- | -- |
+| 1 | **v017** | DISTILLATION STUDENT, SMALLER | 0.681866 | Ready to Submit | -- | 31 min | -- |
+| 2 | **v016** | DISTILLATION STUDENT | 0.681753 | Ready to Submit | -- | 37 min | -- |
 | 3 | **v011** | soft mask on P(is_scored) + reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
 | 4 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
 | 5 | **v012** | soft mask + reset 2k (shorter horizon) | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
@@ -269,8 +269,9 @@ So the honest reading, now tested rather than assumed:
 | | public | rank | params |
 |---|---:|---|---:|
 | organiser baseline | 0.5935 | 17/100 | — |
-| **ours, best (v014)** | **0.6517** | — | 379k |
+| **ours, best submitted (v014)** | **0.6517** | — | 379k |
 | ours (v011 / v015) | 0.6515 | — | 192k |
+| *ours, unsubmitted (v017)* | *~0.653 est.* | — | *117k* |
 | dozken `reset2k` | 0.6569 | 25/100 | 436k |
 | dozken `distil_ens` | 0.6585 | 27/100 | 436k |
 | **dozken `distil160`** | **0.6588** | 27/100 | 314k |
@@ -417,6 +418,40 @@ would give a two-member teacher matching dozken's construction.
 pure-capacity model (v014) ties our baseline, so the 0.0073 gap is not width —
 matching their own note that reaching #1 needs a different *base* model, and the
 soft mask is the one we have that they lack.
+
+## The p99 latency gate was wrong five times out of five
+
+Both distilled students were initially packaged **NOT-READY** on a p99 latency
+failure. Before believing that, I checked it against every submission we have
+actually made:
+
+| | local p50 → proj | local p99 → proj | **grader actual** | p99 over-shot |
+|---|---|---|---:|---:|
+| v011 | 28.00 → 29.8m | 41.58 → 44.2m | 30.2m | 1.46× |
+| v012 | 28.17 → 30.0m | 55.63 → 59.2m | 29.8m | 1.99× |
+| v013 | 27.96 → 29.7m | 48.21 → 51.3m | 28.6m | 1.79× |
+| v014 | 41.50 → 44.1m | 78.25 → 83.2m | 40.2m | 2.07× |
+| v015 | 27.75 → 29.5m | 47.71 → 50.8m | 30.5m | 1.66× |
+
+**p50 projects the grader within 5% every single time. p99 over-projects by
+1.5–2.1× every single time.** v014 is the case that mattered: the p99 gate marked
+it DO NOT SHIP at 83 min projected, and it ran in 40m12s and became our best public
+entry. dozken's NOTES independently record their own identical graph going from
+64m04s to *killed* within ten hours — the grader's variance dwarfs any local tail,
+and a p99 measured on a contended local box is noise.
+
+**The gate now tests p50 only.** p99 is still recorded, as a diagnostic. Repackaged
+afterwards, v016 and v017 both come back **STATUS: PASS**.
+
+| | params | p50 | grader p50 | % of budget |
+|---|---:|---:|---:|---:|
+| v016 | 192,258 | 28.0 µs/row | 29.8m | 50 % |
+| **v017** | **116,546** | **22.7 µs/row** | **24.1m** | **40 %** |
+
+This is the second time in this repo that a local latency reading would have
+discarded the best model available (the first was v004, which we submitted anyway and
+which scored 0.6446). Both times the estimate was pessimistic and the grader
+disagreed. The gate should have been p50-only from the start.
 
 ## Latency is a solved problem
 
