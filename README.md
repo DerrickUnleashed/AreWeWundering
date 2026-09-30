@@ -9,36 +9,36 @@ reference metric in `tools/metric_ref.py`.
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
-| 2 | **v020** | FIX loss + train+valid data | 0.681773 | Yet to package | -- | -- | -- |
-| 3 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
-| 4 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
-| 5 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
-| 6 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 7 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
-| 8 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 9 | **v019** | FIX loss: globally pooled | 0.678374 | Yet to package | -- | -- | -- |
-| 10 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
-| 11 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
-| 12 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
-| 13 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
-| 14 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 15 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
-| 16 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
-| 17 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
-| 18 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
-| 19 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 20 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 2 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
+| 3 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
+| 4 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
+| 5 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 6 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
+| 7 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
+| 8 | **v019** | FIX loss: globally pooled | 0.678374 | Ready to Submit | -- | 29m30s (49%) | -- |
+| 9 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
+| 10 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 11 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
+| 12 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 13 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 14 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 15 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 16 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
+| 17 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
+| 18 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 19 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
 
 ### Not ranked by `full_valid_wp`
 
-Real runs with no `full_valid_wp` of their own: still training (v018-v020), or a framework smoke test that was never a modelling result (v000). v000 does have a public score -- it was submitted to validate the submission path, not to compete.
+Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: still training (v021), a contaminated score that is not comparable with the rest (v020), or a framework smoke test that was never a modelling result (v000). v000 and v020 do have public-capable bundles; both are documented, neither is a submission candidate.
 
 | Ver | What it changed | best so far (subset) | Status | Public score |
 |---|---|---|---|---|
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
+| **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Do not ship (score contaminated) | -- |
 | **v021** | dozken's reset2k architecture, trained on... | -- | Yet to Train | -- |
 
 <!-- END GENERATED: leaderboard -->
