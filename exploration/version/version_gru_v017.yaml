@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v017
   parent: gru_v016
-  status: running
+  status: finished
 description: DISTILLATION STUDENT, SMALLER. Same recipe as v016 but 2x96 instead of
   2x128 -- 116,546 params against a 192,258-param teacher (0.61x).
 hypothesis: 'Distillation regularises, and dozken''s own results show the effect clearly:
@@ -89,15 +89,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 19889
+  best_val_wp: 0.6922027945267548
+  best_val_t0: 0.6886197234422096
+  best_val_t1: 0.6957858656113
+  full_valid_wp: 0.6818664717290095
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 4.1459
+  finished_utc: '2026-09-30T17:08:30Z'
 artifacts:
   log: exploration/logs/log_gru_v017.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v017
