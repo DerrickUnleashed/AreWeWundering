@@ -1,0 +1,239 @@
+{
+ "key": "gru_v015",
+ "packaged_utc": "2026-09-30T06:02:34Z",
+ "git_commit": "64e455837c9254d70c4d8be9f6b7c131a9e02699",
+ "config": {
+  "schema_version": 1,
+  "identity": {
+   "model": "gru",
+   "version": "v015",
+   "parent": "gru_v011",
+   "status": "planned"
+  },
+  "description": "v011's weights with v011's INFERENCE reset actually applied. v011 trained with state_reset=4000 but shipped state_reset=0, because the --export-only path read a top-level checkpoint key that is never written and silently defaulted to 0. Same weights, same training, correct serving regime.",
+  "hypothesis": "v011's +0.0058 (36 sigma) was measured under a TRAIN/SERVE MISMATCH, so its true value is unknown and could be higher or lower. The model was trained to expect its recurrent state to be zeroed every 4,000 rows; the submitted bundle never zeroed it, so every prediction from row 4,000 onward came from a state trajectory the model had never been trained under. Chunked-vs-row-by-row parity was 1.466 with the defect and 5.4e-06 without it, which is the size of the discrepancy. Two possibilities, and only a measurement distinguishes them: (a) the reset genuinely helps and the corrected model scores near or above 0.679986, meaning the reported gain was partly masked by serving the model wrong; (b) the reset does not matter and the score moves less than the +0.0003 noise floor, meaning the gain came entirely from the soft mask. Either outcome is worth knowing: (a) makes the reset a real lever worth optimising, (b) means v013's control run is the one that explains v011.",
+  "change_vs_parent": "NO TRAINING CHANGE. Identical weights to v011: same seed 1337, same 3-epoch cosine schedule, same soft mask, same state_reset 4000 in training, same architecture 2x128. The ONLY difference is at export: feature_stats.npz carries state_reset=4000 instead of 0, which is what solution.py reads at inference. This is a bug fix to the serving path, not a new experiment.\nWHY A NEW VERSION RATHER THAN FIXING v011 IN PLACE (AGENTS.md section 2.5 immutability): submissions/submission_gru_v011/ was actually uploaded and scored 0.6515. That record must stay intact and auditable -- a defective artifact that was submitted is exactly the kind of thing the immutability rule exists to preserve. v015 supersedes it with the same weights and a correct export.",
+  "data": {
+   "train_shards": "cache/train",
+   "valid_shards": "cache/valid",
+   "seq_len": 20000,
+   "warmup_steps": 99,
+   "target_clip": 2.0,
+   "train_sequences": null
+  },
+  "features": {
+   "normalisation": "none",
+   "signed_log_volumes": false,
+   "first_differences": [],
+   "cross_instrument": [],
+   "step_feature": false,
+   "clip_sigma": 0
+  },
+  "model": {
+   "arch": "gru",
+   "input_proj": 0,
+   "hidden": 128,
+   "layers": 2,
+   "dropout": 0.0,
+   "layernorm": false,
+   "head": "linear",
+   "param_count": null
+  },
+  "loss": {
+   "type": "seq_weighted_pearson",
+   "mask": "soft",
+   "aux_mse_weight": 0.05,
+   "target_clip": 2.0,
+   "mask_floor": 0.1,
+   "mask_model": "cache/train_scored.npy"
+  },
+  "optim": {
+   "name": "adamw",
+   "lr": 0.002,
+   "weight_decay": 0.01,
+   "betas": [
+    0.9,
+    0.99
+   ],
+   "schedule": "cosine",
+   "warmup_steps": 500,
+   "grad_clip": 1.0,
+   "ema_decay": 0.999,
+   "precision": "fp32"
+  },
+  "training": {
+   "chunk_len": 2000,
+   "burn_in": 99,
+   "batch_sequences": 16,
+   "max_steps": null,
+   "smoke_steps": 60,
+   "epochs": 3,
+   "seed": 1337,
+   "eval_every_steps": 2500,
+   "eval_subset_sequences": 200,
+   "device": "cpu",
+   "stateful": true,
+   "state_reset": 4000
+  },
+  "inference": {
+   "export": "onnx",
+   "opset": 17,
+   "ort_threads": 1,
+   "target_us_per_row": 68.5,
+   "state_reset": 4000
+  },
+  "results": {
+   "best_step": null,
+   "best_val_wp": null,
+   "best_val_t0": null,
+   "best_val_t1": null,
+   "full_valid_wp": null,
+   "latency_us_p50": 50.33,
+   "latency_us_p99": 90.75,
+   "train_hours": null,
+   "finished_utc": null
+  },
+  "artifacts": {
+   "log": "exploration/logs/log_gru_v015.log",
+   "checkpoint_dir": "exploration/checkpoints/checkpoint_gru_v015",
+   "submission_dir": "submissions/submission_gru_v015"
+  }
+ },
+ "checkpoint": {
+  "file": "best_001_step19889_val0.689479.pt",
+  "path": "exploration/checkpoints/checkpoint_gru_v015/best_001_step19889_val0.689479.pt",
+  "step": 19889,
+  "sha256": "4f1dd32f08ba833e5d17281f1b779f855c02987f5c6585ef1f73058da1e3ab63",
+  "train_time_metrics": {
+   "t0": 0.685205965598288,
+   "t1": 0.6937511116212582,
+   "weighted_pearson": 0.689478538609773,
+   "selected_rows": 374199,
+   "blocks": 200,
+   "metric_clip": [
+    -2.0,
+    2.0
+   ],
+   "metric_specification": "global_wp",
+   "aggregation": "mean of two target-wise global clipped Weighted Pearson correlations over all masked rows"
+  }
+ },
+ "scores": {
+  "t0": 0.713720846898587,
+  "t1": 0.760847593736298,
+  "weighted_pearson": 0.7372842203174425,
+  "selected_rows": 9110,
+  "rows_seen": 100000,
+  "us_per_row": 66.6,
+  "call_us_p50": 56.04,
+  "call_us_p99": 91.38,
+  "sequences": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "protocol": "5 validation sequences"
+ },
+ "latency": {
+  "budget_us_per_row": 91.37,
+  "target_us_per_row": 68.53,
+  "us_p50": 55.92,
+  "us_p99": 107.37,
+  "projected_min_p50": 36.7,
+  "projected_min_p99": 70.5,
+  "pass_p50_75pct": true,
+  "pass_p99_75pct": false,
+  "rows": 39400000,
+  "grader_slowdown": 1.62,
+  "grader_us_p50": 90.59,
+  "grader_us_p99": 173.94,
+  "grader_min_p50": 59.5,
+  "grader_min_p99": 114.2,
+  "grader_pct_budget_p50": 99.1,
+  "grader_target_us_local": 42.3,
+  "grader_safe": false
+ },
+ "gate": {
+  "contract": "PASS",
+  "determinism": "PASS",
+  "parity": "parity raw predictions : max |diff| = 1.615e-05 (tol 1e-03, float32 drift over 20k recurrent steps)  PASS | parity SCORE           : WP streaming 0.737284 vs offline 0.737284, |diff| = 2.152e-07 (tol 1e-04)  PASS | parity overall         : PASS",
+  "score": {
+   "t0": 0.713720846898587,
+   "t1": 0.760847593736298,
+   "weighted_pearson": 0.7372842203174425,
+   "selected_rows": 9110,
+   "rows_seen": 100000,
+   "us_per_row": 66.6,
+   "call_us_p50": 56.04,
+   "call_us_p99": 91.38,
+   "sequences": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "protocol": "5 validation sequences"
+  },
+  "latency": {
+   "budget_us_per_row": 91.37,
+   "target_us_per_row": 68.53,
+   "us_p50": 55.92,
+   "us_p99": 107.37,
+   "projected_min_p50": 36.7,
+   "projected_min_p99": 70.5,
+   "pass_p50_75pct": true,
+   "pass_p99_75pct": false,
+   "rows": 39400000,
+   "grader_slowdown": 1.62,
+   "grader_us_p50": 90.59,
+   "grader_us_p99": 173.94,
+   "grader_min_p50": 59.5,
+   "grader_min_p99": 114.2,
+   "grader_pct_budget_p50": 99.1,
+   "grader_target_us_local": 42.3,
+   "grader_safe": false
+  },
+  "size": {
+   "zip_bytes": 2156801,
+   "limit_bytes": 20971520,
+   "pass": true
+  },
+  "imports": [],
+  "latency_pass": false
+ },
+ "packages": {
+  "python": "3.11.9",
+  "numpy": "2.2.6",
+  "onnxruntime": "1.23.2",
+  "torch": "2.14.0"
+ },
+ "gate_python": "/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/bin/python",
+ "sha256": {
+  "train_script": "454a12e95338147f85f8a604b29e0735ac113449e72a16c08c872d29e3868ac8",
+  "solution_py": "e77148578204cac1a98a1d8401f51ce3e834d6a2d95ea14452be67c62a9d2440",
+  "model_onnx": "327f0eb5dd3869a0564551b15bceefe249a6268a254a7528b5e5d0ec159a694e",
+  "feature_stats_npz": "f1a50518fc9c4bb08f9274b04ca598fa410c7d2abb01ba11d341e820752ef497"
+ },
+ "zip": {
+  "file": "submission_gru_v015.zip",
+  "bytes": 2156801,
+  "root_entries": [
+   "best_001_step19889_val0.689479.pt",
+   "feature_stats.npz",
+   "model.onnx",
+   "solution.py"
+  ]
+ },
+ "notes": [
+  "included the 1.6 MB checkpoint for provenance",
+  "gate score measured on 5 validation sequences -- NOT the official full-validation number"
+ ],
+ "warnings": [],
+ "failures": [
+  "latency gate FAILED against the grader: 55.92 us/row local x 1.62 = 59.5 min at p50 (99.1% of the 60 min budget) and 114.2 min at p99. Local target is 42.3 us/row. DO NOT UPLOAD."
+ ],
+ "status": "NOT-READY"
+}
