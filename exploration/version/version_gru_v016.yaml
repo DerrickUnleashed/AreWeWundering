@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v016
   parent: gru_v011
-  status: running
+  status: finished
 description: DISTILLATION STUDENT. A fresh GRU 2x128 trained against the raw predictions
   of a masked teacher (v011/v015 weights, reset 4k) replayed over all 212M train rows,
   alongside the real labels.
@@ -100,15 +100,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 19889
+  best_val_wp: 0.6909373333838564
+  best_val_t0: 0.6876549756612984
+  best_val_t1: 0.6942196911064146
+  full_valid_wp: 0.6817534325358439
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.1505
+  finished_utc: '2026-09-30T17:11:50Z'
 artifacts:
   log: exploration/logs/log_gru_v016.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v016
