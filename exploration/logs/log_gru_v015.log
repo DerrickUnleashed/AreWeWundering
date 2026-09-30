@@ -1,0 +1,128 @@
+### new run, log opened 2026-09-30T11:31:50+0530
+==============================================================================
+command            : python exploration/models/train_gru_v015.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v015.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v015/best_001_step19889_val0.689479.pt
+timestamp          : 2026-09-30T11:31:50+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 64e455837c9254d70c4d8be9f6b7c131a9e02699
+seed               : 1337
+log                : exploration/logs/log_gru_v015.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v015
+  parent: gru_v011
+  status: planned
+description: v011's weights with v011's INFERENCE reset actually applied. v011 trained
+  with state_reset=4000 but shipped state_reset=0, because the --export-only path
+  read a top-level checkpoint key that is never written and silently defaulted to
+  0. Same weights, same training, correct serving regime.
+hypothesis: 'v011''s +0.0058 (36 sigma) was measured under a TRAIN/SERVE MISMATCH,
+  so its true value is unknown and could be higher or lower. The model was trained
+  to expect its recurrent state to be zeroed every 4,000 rows; the submitted bundle
+  never zeroed it, so every prediction from row 4,000 onward came from a state trajectory
+  the model had never been trained under. Chunked-vs-row-by-row parity was 1.466 with
+  the defect and 5.4e-06 without it, which is the size of the discrepancy. Two possibilities,
+  and only a measurement distinguishes them: (a) the reset genuinely helps and the
+  corrected model scores near or above 0.679986, meaning the reported gain was partly
+  masked by serving the model wrong; (b) the reset does not matter and the score moves
+  less than the +0.0003 noise floor, meaning the gain came entirely from the soft
+  mask. Either outcome is worth knowing: (a) makes the reset a real lever worth optimising,
+  (b) means v013''s control run is the one that explains v011.'
+change_vs_parent: 'NO TRAINING CHANGE. Identical weights to v011: same seed 1337,
+  same 3-epoch cosine schedule, same soft mask, same state_reset 4000 in training,
+  same architecture 2x128. The ONLY difference is at export: feature_stats.npz carries
+  state_reset=4000 instead of 0, which is what solution.py reads at inference. This
+  is a bug fix to the serving path, not a new experiment.
+
+  WHY A NEW VERSION RATHER THAN FIXING v011 IN PLACE (AGENTS.md section 2.5 immutability):
+  submissions/submission_gru_v011/ was actually uploaded and scored 0.6515. That record
+  must stay intact and auditable -- a defective artifact that was submitted is exactly
+  the kind of thing the immutability rule exists to preserve. v015 supersedes it with
+  the same weights and a correct export.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: 50.33
+  latency_us_p99: 90.75
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v015.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v015
+  submission_dir: submissions/submission_gru_v015
+
+==============================================================================
+device: cpu
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v015.py:538: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 1.431e-06
+exported inference artifacts from best_001_step19889_val0.689479.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v015
