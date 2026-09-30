@@ -15,7 +15,7 @@ reference metric in `tools/metric_ref.py`.
 | 5 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
 | 6 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
 | 7 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 8 | **v019** | FIX loss: globally pooled | 0.678374 | Ready to Submit | -- | 29m30s (49%) | -- |
+| 8 | **v019** | FIX loss: globally pooled | 0.678374 | Submitted | 0.6510 | 30m32s (51%) | 627 MB |
 | 9 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
 | 10 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
 | 11 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
