@@ -178,12 +178,57 @@ The two levers visible in their names are worth reading as a roadmap:
     one budget-sized student. Inference cost unchanged. This is the natural Phase 6
     move from the original roadmap and the larger of the two jumps left.
   - **Ensemble** — several models combined at inference, cost multiplied by the
-    member count. Only viable because the latency limit is not enforced, but worth
-    noting as now-feasible rather than assume it was always off the table.
+    member count. Their 2-graph ensemble was killed at 69m59s, so an ensemble has a real
+    ceiling and distillation is the only route past it.
 
-Note `distil160` ran **61m06s, over the stated 60-minute limit, and still scored**.
-The latency ceiling is evidently not enforced as a hard cut-off, which widens the
-budget for a distillation ensemble considerably.
+**The time limit is enforced, and the real kill is 70 minutes, not 60.** The docs say
+60, but dozken's 2-graph ensemble was killed at 69m59s. An earlier version of this
+file claimed the limit "is evidently not enforced", based on a 61m06s run that
+scored. That was wrong: 61m06s is comfortably inside a 70-minute kill. Nothing
+about the budget changed -- it is a 70-min hard wall with a 60-min documented
+target -- but the earlier claim would have justified planning against a phantom
+10 minutes of headroom.
+
+## What distil_ens actually is (from the author's own NOTES)
+
+Read from `2026-09-17_distil_ens/NOTES.md` and `2026-09-17_distil160/NOTES.md`.
+This is the most informative thing found outside our own runs, because it is the
+same problem solved with the latency wall biting.
+
+| model | graphs | held-out | params | outcome |
+|---|---:|---:|---:|---|
+| teacher = mean(reset2k, reset4k) | 2 | 0.6879 | 872k | **TIMEOUT 69m59s** |
+| distil_ens | 1 | 0.6879 | 436k | public 0.6585 (ours) |
+| distil160 (160 hidden) | 1 | **0.6888** | 314k | their best |
+| reset2k | 1 | 0.6864 | 436k | public 0.6569 (ours) |
+
+Distillation reproduced the 2-graph teacher in **one graph**, and the arithmetic
+confirms which model we actually submitted: 0.6879 - 0.0295 = 0.6584, we scored
+**0.6585**. Likewise 0.6864 - 0.0295 = 0.6570 against our **0.6569**. Their
+held-out to public offset is -0.0295, which now lets us predict our own public
+score from a local one.
+
+Four facts from those notes that shape our roadmap:
+
+1. **Averaging is exhausted.** Greedy forward selection over 12 checkpoints
+   saturates at 0.6887, only +0.0009 over the 2-member teacher and *not resolved*
+   (P 0.840). Their words: "our model pool has no more to give by averaging --
+   every member is the same family." This killed an ensembling plan before we spent
+   time on it.
+2. **Smaller students beat their own teachers.** distil160 (314k params) scored
+   0.6888 against a 0.6879 teacher, the usual distillation-regularisation effect.
+   Their next step is to distil again into hidden 128 at ~18 us/row.
+3. **Distillation is the only lever that decouples teacher cost from serving
+   cost.** The teacher may be arbitrarily slow because it never runs at inference.
+   That is why the 2-graph teacher is worth building even though it cannot ship.
+4. **Their teacher has no soft mask.** The reset lever we validated independently
+   is theirs too, but the P(is_scored) loss weighting is ours, and it was worth
+   +0.0058 (36 sigma) locally at zero inference cost. A teacher built from masked
+   models should start from a stronger teacher, and that strength propagates into
+   the student. **That is the axis to beat them on.**
+
+Their own stated reason for stopping: "reaching #1 needs a genuinely different BASE
+model, not more averaging." We already have one they lack.
 
 ## The next two experiments
 
@@ -211,6 +256,8 @@ DO NOT SHIP on a 47.2 min p50 projection and ran in 43m16s for 0.6446. The 1.62x
 slowdown factor calibrated from `gru_v000`'s 2x128 model is not safe to apply to
 anything wider, and a contended local p99 is not a hard blocker.
 
-Combined with dozken's `distil160` completing at 61m06s, past the stated limit,
-the practical conclusion is that inference budget is not the binding constraint on
-this problem -- model quality is.
+The one caveat is that a *larger* model can still hit the wall: dozken measured the
+same architecture going from 64m04s to killed within about ten hours, with memory
+flat at 627 MB throughout, so it is purely wall time. The practical conclusion is
+that model quality, not inference budget, is what limits this problem -- within the
+2x128 envelope we have been using all along.
