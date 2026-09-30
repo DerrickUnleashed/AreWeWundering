@@ -1,0 +1,127 @@
+### new run, log opened 2026-09-30T10:57:21+0530
+==============================================================================
+command            : python exploration/models/train_gru_v013.py --config exploration/version/version_gru_v013.yaml --device cpu
+timestamp          : 2026-09-30T10:57:21+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : c4b181b594b09909aabb9e0c7608d1d0b0d9428f
+seed               : 1337
+log                : exploration/logs/log_gru_v013.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v013
+  parent: gru_v011
+  status: smoke
+description: 'Single-variable follow-up to v011: identical except the soft mask is
+  removed. Keeps the periodic state reset at 4,000 and drops only the P(is_scored)
+  loss weighting.'
+hypothesis: v011 moved full_valid_wp from 0.674179 (3-seed mean) to 0.679986, +0.0058
+  at 36 sigma, but it changed the mask AND the reset together, so the gain is unattributed.
+  This run isolates them. If it lands near 0.674 the soft mask did the work and the
+  reset is inert; if near 0.680 the reset did the work and the mask is inert. Either
+  way we learn which lever the Phase B/C distillation teacher should be built from,
+  instead of attributing +0.0058 to the wrong mechanism.
+change_vs_parent: 'EXACTLY ONE change off gru_v011: loss.mask_model -> null, which
+  leaves soft_mask None in chunk_loss so every required row keeps unit weight. Unchanged:
+  training.state_reset and inference.state_reset stay at 4000, aux weighted-MSE 0.05,
+  EMA 0.999, architecture 2x128, seed 1337, 3-epoch cosine schedule. WHY IT MATTERS:
+  every downstream decision depends on the attribution, especially whether the distillation
+  teacher should be a pair of masked models (v011-like) or masked plus unmasked for
+  ensemble diversity.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: none
+  signed_log_volumes: false
+  first_differences: []
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 0
+model:
+  arch: gru
+  input_proj: 0
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: false
+  head: linear
+  param_count: 192258
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: null
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 2000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 59
+  best_val_wp: 0.011719681003958426
+  best_val_t0: -0.07323807295311241
+  best_val_t1: 0.09667743496102926
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.011
+  finished_utc: '2026-09-30T05:25:57Z'
+artifacts:
+  log: exploration/logs/log_gru_v013.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v013
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=0 in_dim=112 params=192,258
+max_steps derived: 6,630 steps/epoch x 3 epoch(s) = 19,890 steps over all 10,607 training sequences
+train sequences=10607  valid sequences=200  steps=19890
+step 0/19890 lr 4.00e-06 loss 1.165002 grad_norm 2.488 (1s)
+step 25/19890 lr 1.04e-04 loss 0.842303 grad_norm 3.670 (13s)
+step 50/19890 lr 2.04e-04 loss 0.869095 grad_norm 1.179 (25s)
+step 75/19890 lr 3.04e-04 loss 0.798572 grad_norm 1.540 (38s)
+step 100/19890 lr 4.04e-04 loss 0.669086 grad_norm 1.168 (50s)
+step 125/19890 lr 5.04e-04 loss 0.664603 grad_norm 0.923 (62s)
+step 150/19890 lr 6.04e-04 loss 0.745122 grad_norm 1.241 (75s)
+step 175/19890 lr 7.04e-04 loss 0.879454 grad_norm 1.050 (87s)
+step 200/19890 lr 8.04e-04 loss 0.788279 grad_norm 0.998 (99s)
+step 225/19890 lr 9.04e-04 loss 0.783857 grad_norm 2.199 (111s)
+step 250/19890 lr 1.00e-03 loss 0.951310 grad_norm 0.966 (124s)
+step 275/19890 lr 1.10e-03 loss 0.770578 grad_norm 1.012 (137s)
+step 300/19890 lr 1.20e-03 loss 0.764178 grad_norm 0.839 (150s)
