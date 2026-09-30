@@ -72,7 +72,7 @@
     "note": "BEST of ours. soft mask on P(is_scored) + state_reset=4000. Rank 1 locally AND publicly, so the local metric did transfer for an effect this size."
   },
   "_dozken": {
-    "note": "NOT ours. Downloaded from https://github.com/dozken/wunder/tree/main/challenge-3/submissions and submitted as-is. Recorded for reference only. All entries below are by the same author (dozken) but are SEPARATE submissions built on different levers.",
+    "note": "NOT ours. Downloaded from https://github.com/dozken/wunder/tree/main/challenge-3/submissions and submitted as-is. Recorded for reference only. All entries below are by the same author (dozken) but are SEPARATE submissions built on different levers. distil_ens and distil160 are SEPARATE submissions by the same author, not one artifact under two names; both are recorded separately above.",
     "reset2k": {
       "public_score": 0.6569,
       "grader_seconds": 3587,
@@ -83,13 +83,13 @@
       "note": "Periodic state reset at 2k steps -- the same lever as our v011, at half the period."
     },
     "distil160": {
-      "public_score": 0.6585,
-      "grader_seconds": 3666,
-      "memory_mb": 627,
+      "public_score": 0.6588,
+      "grader_seconds": 3316,
+      "memory_mb": 626,
       "rank": "27/100",
-      "uploaded_filename": "submission_distil_ens.zip",
+      "uploaded_filename": "submission_distil160.zip",
       "repo_label": "dozken/2026-09-17_distil160",
-      "note": "Current public leader. Ran 61m06s, i.e. 101.8% of the stated 60-minute limit, and still scored.",
+      "note": "GENUINE distil160, submitted 2026-09-30 10:27. GRU 160x2 proj64, 314,338 params. Beats distil_ens (0.6585, 435,714 params) at 55m16s instead of 61m06s: smaller, faster AND better, confirming the distillation-regularisation effect. Their NOTES projected ~0.659 from a 0.6888 held-out at -0.0295; the actual 0.6588 confirms that mapping to four decimals.",
       "caveat": "The uploaded filename (submission_distil_ens.zip) does not match the repo label (2026-09-17_distil160). dozken has BOTH a distillation submission (distil160) and a separate ensemble submission (distil_ens); they are different submissions, not the same artifact under two names. Which of the two the 0.6585 belongs to is UNRESOLVED -- it was scored from the file named distil_ens but annotated with the distil160 label."
     },
     "_distinction": {
@@ -97,6 +97,15 @@
       "distil160": "Distillation: train a teacher without the latency limit, distil its outputs into a budget-sized student. Single model at inference.",
       "distil_ens": "Ensemble: combine multiple models' predictions. Multiplies inference cost by the member count, which is why it needs the latency headroom.",
       "implication": "An ensemble is only viable because the 60-minute limit is evidently not enforced -- the leader entry ran 61m06s and still scored."
+    },
+    "distil_ens": {
+      "public_score": 0.6585,
+      "grader_seconds": 3666,
+      "memory_mb": 627,
+      "rank": "27/100",
+      "uploaded_filename": "submission_distil_ens.zip",
+      "repo_label": "dozken/2026-09-17_distil_ens",
+      "note": "THE ENTRY WE UPLOADED as submission_distil_ens.zip. It was annotated with the comment 'dozken/2026-09-17_distil160', which was WRONG -- it is distil_ens (GRU 192x2 proj64, 435,714 params), not distil160. Confirmed by duration (61m06s, consistent with the 436k model) and by score (0.6585 = their stated held-out 0.6879 minus the 0.0295 offset). Ran 61m06s, past the 60-min documented target but inside the 70-min hard kill."
     }
   }
 }
