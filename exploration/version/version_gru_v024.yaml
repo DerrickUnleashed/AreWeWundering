@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v024
   parent: gru_v022
-  status: running
+  status: finished
 description: Distilled student on dozken's architecture at v022's exact size (hidden
   160, 321,602 params), but trained with batch_sequences 64 instead of 16 -- the batch
   size his own notes cite. Same teacher, same model, same loss; the training regime
@@ -196,15 +196,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: 0.011362090985931113
-  best_val_t0: 0.09391937308048433
-  best_val_t1: -0.0711951911086221
-  full_valid_wp: null
+  best_step: 9944
+  best_val_wp: 0.6934397289431771
+  best_val_t0: 0.6920121170506383
+  best_val_t1: 0.694867340835716
+  full_valid_wp: 0.6848183811464089
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0136
-  finished_utc: '2026-10-01T09:14:56Z'
+  train_hours: 2.387
+  finished_utc: '2026-10-01T11:38:19Z'
 artifacts:
   log: exploration/logs/log_gru_v024.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v024
