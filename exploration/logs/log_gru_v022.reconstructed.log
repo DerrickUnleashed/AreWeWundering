@@ -1,0 +1,250 @@
+==============================================================================
+RECONSTRUCTED TRAINING LOG -- NOT THE ORIGINAL CANONICAL LOG
+==============================================================================
+
+This file was rebuilt from durable checkpoint state by
+tools/rebuild_log.py after the canonical log was orphaned by an
+accidental in-place file replacement while the run was live. The training
+run itself did not fail and lost no results.
+
+model            : gru
+version          : v022
+built (UTC)      : 2026-10-01T08:48:13Z
+built by         : macOS-27.0-arm64-arm-64bit  python 3.11.9
+source config    : exploration/version/version_gru_v022.yaml
+source history   : exploration/checkpoints/checkpoint_gru_v022/history.json
+source checkpoints: exploration/checkpoints/checkpoint_gru_v022/
+canonical log    : exploration/logs/log_gru_v022.log  (TRUNCATED -- left untouched as incident evidence)
+
+RECOVERED: config, parameter count, every periodic evaluation with its
+           step / WP / per-target WP / scored rows, which evaluation set
+           each new best, and the final full-validation scores.
+MISSING  : the per-step loss and grad_norm trace, the per-step learning
+           rate, and the launch-time reproducibility header (command,
+           host, package versions, git commit). Those existed only in the
+           orphaned bytes and are NOT reproduced here.
+
+Treat every number below as recovered-from-checkpoints, not as a verbatim
+record of what was printed during the run.
+
+==============================================================================
+CONFIG AS LOADED
+==============================================================================
+data:
+train_shards: cache/train
+valid_shards: cache/valid
+seq_len: 20000
+warmup_steps: 99
+target_clip: 2.0
+train_sequences: null
+features:
+normalisation: robust_zscore
+signed_log_volumes: false
+first_differences:
+- 0
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 8
+- 9
+- 10
+- 11
+- 12
+- 13
+- 14
+- 15
+- 16
+- 17
+- 18
+- 19
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 26
+- 27
+- 28
+- 29
+- 30
+- 31
+- 32
+- 33
+- 34
+- 35
+- 36
+- 37
+- 38
+- 39
+- 40
+- 41
+- 42
+- 43
+- 44
+- 45
+- 46
+- 47
+- 48
+- 49
+- 50
+- 51
+- 52
+- 53
+- 54
+- 55
+- 56
+- 57
+- 58
+- 59
+- 60
+- 61
+- 62
+- 63
+- 64
+- 65
+- 66
+- 67
+- 68
+- 69
+- 70
+- 71
+- 72
+- 73
+- 74
+- 75
+- 76
+- 77
+- 78
+- 79
+- 80
+- 81
+- 82
+- 83
+- 84
+- 85
+- 86
+- 87
+- 88
+- 89
+- 90
+- 91
+- 92
+- 93
+- 94
+- 95
+- 96
+- 97
+- 98
+- 99
+- 100
+- 101
+- 102
+- 103
+- 104
+- 105
+- 106
+- 107
+- 108
+- 109
+- 110
+- 111
+cross_instrument: []
+step_feature: false
+clip_sigma: 10
+model:
+arch: gru
+input_proj: 64
+hidden: 160
+layers: 2
+dropout: 0.0
+layernorm: true
+head: mlp
+param_count: 321602
+loss:
+type: seq_weighted_pearson
+mask: soft
+aux_mse_weight: 0.05
+target_clip: 2.0
+mask_floor: 0.1
+mask_model: cache/train_scored.npy
+distill_weight: 0.5
+teacher_labels:
+- cache/teacher/teacher_dozken_reset2k.npy
+optim:
+name: adamw
+lr: 0.002
+weight_decay: 0.01
+betas:
+- 0.9
+- 0.99
+schedule: cosine
+warmup_steps: 500
+grad_clip: 1.0
+ema_decay: 0.999
+precision: fp32
+training:
+chunk_len: 1000
+burn_in: 99
+batch_sequences: 16
+max_steps: null
+smoke_steps: 60
+epochs: 3
+seed: 1337
+eval_every_steps: 2500
+eval_subset_sequences: 200
+device: cpu
+stateful: true
+state_reset: 2000
+inference:
+export: onnx
+opset: 17
+ort_threads: 1
+target_us_per_row: 68.5
+state_reset: 4000
+
+param_count      : 321602
+seed             : 1337
+status           : finished
+
+==============================================================================
+PERIODIC EVALUATIONS  (recovered from history.json)
+==============================================================================
+    step          wp          t0          t1        rows        wall  new best
+------------------------------------------------------------------------------
+    2499    0.679735    0.674851    0.684618     374,199      22m49s  yes
+    4999    0.685997    0.681601    0.690394     374,199      44m34s  yes
+    7499    0.688362    0.684341    0.692383     374,199    1h05m10s  yes
+    9999    0.689244    0.686387    0.692102     374,199    1h25m52s  yes
+   12499    0.691129    0.687424    0.694834     374,199    1h45m31s  yes
+   14999    0.691227    0.687268    0.695185     374,199    2h05m04s  yes
+   17499    0.691871    0.688343    0.695399     374,199    2h24m42s  yes
+   19999    0.692246    0.689686    0.694806     374,199    2h44m11s  yes
+   22499    0.691432    0.688921    0.693943     374,199    3h03m47s  
+   24999    0.692399    0.689986    0.694812     374,199    3h23m17s  yes
+   27499    0.693002    0.690558    0.695446     374,199    3h42m48s  yes
+   29999    0.692896    0.690282    0.695511     374,199    4h02m20s  
+   32499    0.693036    0.690933    0.695138     374,199    4h21m52s  yes
+   34999    0.693561    0.691565    0.695556     374,199    4h41m22s  yes
+   37499    0.693550    0.691558    0.695541     374,199    5h00m56s  
+   39776    0.693611    0.691692    0.695530     374,199    5h18m50s  yes
+------------------------------------------------------------------------------
+
+==============================================================================
+FINAL RESULTS  (recovered from the version yaml)
+==============================================================================
+best_step           : 39776
+best_val_wp         : 0.693611
+best_val_t0         : 0.691692
+best_val_t1         : 0.695530
+full_valid_wp       : 0.685228
+train_hours         : 5.442800
+finished_utc        : 2026-10-01T01:31:34Z
+
+==============================================================================
+END OF RECONSTRUCTION
+==============================================================================
