@@ -179,5 +179,19 @@
     "memory_mb": 627,
     "submitted_utc": "2026-09-30T19:32Z",
     "note": "THE CONTAMINATION TEST. v020 trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so its local full_valid_wp of 0.681773 was measured on 89% of its own training data and sat within 0.0001 of v017's clean 0.681866, implying a tie. The public score is 0.6513, which is NOT a tie: it is 0.0027 BELOW v017's 0.6540 and level with v011 (0.6515) and v019 (0.6510). So the apparent local gain from training on train+valid was entirely contamination, and the real effect of adding 15.8% more data was NEGATIVE. Its local->public offset is -0.0305, outside the -0.0279+-0.0016 measured across the eight clean submissions, which is the signature of an inflated local score. This is the empirical proof that the contaminated number could not be trusted."
+  },
+  "v022": {
+    "public_score": 0.6565,
+    "grader_seconds": 3046,
+    "memory_mb": 631,
+    "submitted_utc": "2026-10-01T14:41Z",
+    "note": "OUR BEST. Distilled student on dozken's architecture (hidden 160, 321,602 params) trained against his reset2k model replayed as exact teacher labels. 50m46s = 85% of the 60-min budget, and it COMPLETED, which is the evidence that our 75% margin is too strict. Public 0.6565 beats v017's 0.6540 by +0.0025 and v021's 0.6505 by +0.0060, both in the direction the local metric predicted. Local 0.685228 with a -0.0287 offset, consistent with the eight-submission mean of -0.0279 (spread 0.0016). This confirms distilling his model transfers ~+0.0025 of real public score on top of our previous best."
+  },
+  "v021": {
+    "public_score": 0.6505,
+    "grader_seconds": 3332,
+    "memory_mb": 634,
+    "submitted_utc": "2026-10-01T14:41Z",
+    "note": "dozken's architecture on our data, no teacher, 435,714 params. 55m32s = 93% of budget and it also completed, giving a second data point in the band our 75% gate rejects. Public 0.6505 is our WORST of the recent series and matches the local prediction exactly: local 0.678575 was 0.001412 (-4.5 sigma) below v011, and v011 scored 0.6515, so 0.6505 is the expected place for it. The architecture alone does not help."
   }
 }
