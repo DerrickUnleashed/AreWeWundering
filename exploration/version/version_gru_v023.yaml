@@ -1,0 +1,210 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v023
+  parent: gru_v022
+  status: running
+description: 'Distilled student on dozken''s architecture at hidden 128 -- 225,922
+  params, 51.8% of his 435,943-param teacher, against v022''s 73.8%. Same teacher,
+  same loss, same schedule; the student size is the only change. Also the latency-safe
+  size: v022 at 46.83 us/row already projects to 83% of the time budget, and this
+  should roughly halve that.'
+hypothesis: The distillation gain is COMPRESSION-DEPENDENT, and both data points say
+  so. v017 was 61% of its teacher and landed 0.001880 ABOVE it. v022 is 74% of its
+  teacher and landed 0.004940 BELOW it. More compression means more distillation regularisation,
+  so a more compressed student should land closer to the teacher's 0.690168 -- or
+  above it. If the hypothesis holds, v023 beats v022 while being materially cheaper
+  to serve. If it fails, compression is not the axis and the remaining 0.0049 has
+  to come from the teacher's training recipe instead.
+change_vs_parent: hidden 160 -> 128 only (321,602 -> 225,922 params). Everything else
+  identical to v022.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: 225922
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 0.5
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 59
+  best_val_wp: -0.12802088574555295
+  best_val_t0: 0.014607298070274857
+  best_val_t1: -0.27064906956138074
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0065
+  finished_utc: '2026-10-01T09:14:05Z'
+artifacts:
+  log: exploration/logs/log_gru_v023.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v023
+  submission_dir: null
