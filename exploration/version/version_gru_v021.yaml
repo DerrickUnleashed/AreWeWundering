@@ -3,27 +3,23 @@ identity:
   model: gru
   version: v021
   parent: gru_v017
-  status: running
-description: dozken's reset2k architecture, trained on our own data. 2x192 GRU with
-  a 64-unit GELU+LayerNorm input projection over concat[normalised, first differences]
-  (224), a skip from that projection into a 256-unit MLP head, and periodic state
-  reset every 2,000 rows. 435,714 params, matching the public 0.6569 model structurally
-  but with none of its weights.
-hypothesis: Our base is 0.0054 behind his at the base (v011 0.6515 vs his 0.6569)
-  while we gained MORE from distillation than he did (+0.0027 vs +0.0019), so the
-  deficit is entirely in the base architecture, not in the distillation process. His
-  base is 435k params at 92-100% of the latency budget; ours is 192k at 43-52%. If
-  capacity and these three structural additions (input projection, projection-to-readout
+  status: finished
+description: dozken's reset2k architecture, trained on our own data. 2x192 GRU with a 64-unit GELU+LayerNorm
+  input projection over concat[normalised, first differences] (224), a skip from that projection into
+  a 256-unit MLP head, and periodic state reset every 2,000 rows. 435,714 params, matching the public
+  0.6569 model structurally but with none of its weights.
+hypothesis: Our base is 0.0054 behind his at the base (v011 0.6515 vs his 0.6569) while we gained MORE
+  from distillation than he did (+0.0027 vs +0.0019), so the deficit is entirely in the base architecture,
+  not in the distillation process. His base is 435k params at 92-100% of the latency budget; ours is 192k
+  at 43-52%. If capacity and these three structural additions (input projection, projection-to-readout
   skip, MLP head) are the cause, this closes the gap using only our own data.
-change_vs_parent: 'Architecture, plus chunk_len 2000 -> 1000 so it is required. StatefulBatchStream
-  refuses state_reset <= chunk_len: a reset landing on every chunk boundary would
-  discard all carried state and leave the model with no memory beyond one chunk. His
-  reset period is 2,000, so chunk_len must be smaller; 1,000 divides 20,000 and puts
-  the reset every 2 chunks, keeping one chunk of carry. It is also the chunk size
-  his own notes cite. Otherwise: hidden 96->192, input_proj 0->64, linear head ->
-  LayerNorm + 192-unit GELU MLP over concat[h2, projection], first_differences []->all
-  112 columns, normalisation none->robust_zscore clip_sigma 10, state_reset 4000->2000.
-  Loss, optimiser and data unchanged.'
+change_vs_parent: 'Architecture, plus chunk_len 2000 -> 1000 so it is required. StatefulBatchStream refuses
+  state_reset <= chunk_len: a reset landing on every chunk boundary would discard all carried state and
+  leave the model with no memory beyond one chunk. His reset period is 2,000, so chunk_len must be smaller;
+  1,000 divides 20,000 and puts the reset every 2 chunks, keeping one chunk of carry. It is also the chunk
+  size his own notes cite. Otherwise: hidden 96->192, input_proj 0->64, linear head -> LayerNorm + 192-unit
+  GELU MLP over concat[h2, projection], first_differences []->all 112 columns, normalisation none->robust_zscore
+  clip_sigma 10, state_reset 4000->2000. Loss, optimiser and data unchanged.'
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -200,16 +196,16 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: 0.06407637972618684
-  best_val_t0: 0.06534948663246483
-  best_val_t1: 0.06280327281990884
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.0095
-  finished_utc: '2026-09-30T20:02:37Z'
+  best_step: 39776
+  best_val_wp: 0.6889651205904606
+  best_val_t0: 0.685397258233324
+  best_val_t1: 0.6925329829475972
+  full_valid_wp: 0.6785746253248877
+  latency_us_p50: 55.21
+  latency_us_p99: 93.37
+  train_hours: 5.8148
+  finished_utc: '2026-10-01T01:51:36Z'
 artifacts:
   log: exploration/logs/log_gru_v021.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v021
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v021
