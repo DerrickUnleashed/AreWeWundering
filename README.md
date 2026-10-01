@@ -8,7 +8,7 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v022** | dozken arch + his teacher | 0.685228 | Ready to Submit (latency marginal, 83% of budget) | -- | 49m48s (83%) | -- |
+| 1 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
 | 2 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
 | 3 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
 | 4 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
@@ -16,7 +16,7 @@ reference metric in `tools/metric_ref.py`.
 | 6 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
 | 7 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
 | 8 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 9 | **v021** | dozken arch, no teacher | 0.678575 | Do not ship (clean but below our own base) | -- | 58m42s (98%) | -- |
+| 9 | **v021** | dozken arch, no teacher | 0.678575 | Submitted | 0.6505 | 55m32s (93%) | 634 MB |
 | 10 | **v019** | FIX loss: globally pooled | 0.678374 | Submitted | 0.6510 | 30m32s (51%) | 627 MB |
 | 11 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
 | 12 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
@@ -41,6 +41,8 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 |---|---|---|---|---|
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
+| **v023** | Distilled student on dozken's architecture... | -0.128021 | Training | -- |
+| **v024** | Distilled student on dozken's architecture... | 0.011362 | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
