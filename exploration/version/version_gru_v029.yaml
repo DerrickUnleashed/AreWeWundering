@@ -1,0 +1,215 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v029
+  parent: gru_v023
+  status: running
+description: 'Distilled student on dozken''s architecture at hidden 128 (225,922 params)
+  -- v023''s exact recipe, with the DISTILLATION TERM REWEIGHTED towards the teacher''s
+  tail. Nothing else changes: same teacher, same hidden size, same loss elsewhere,
+  same schedule, same seed.'
+hypothesis: 'The teacher term is currently weighted by the metric weight abs(clip(y)),
+  which already favours large-abs(y) rows but does so only LINEARLY and only via the
+  LABEL. The metric is extraordinarily tail-concentrated (measured: the top 0.5% of
+  scored rows hold 11.8% of sum abs(y), the top 5% hold 69.6%), so if the teacher''s
+  advantage lives in its extremes then a term weighted by abs(clip(teacher)) should
+  transfer MORE of it than a term weighted by abs(y). Prediction: a real gain over
+  v023 on identical rows. The prior here is genuinely uncertain -- this could equally
+  be a wash, because the metric is a correlation and reweighting between rows mostly
+  re-weights WHICH correlation is estimated rather than improving any of them. A wash
+  would be informative: it would say teacher weighting is saturated and the remaining
+  gap to the leaderboard is not a loss-shaping problem at all.'
+change_vs_parent: 'Adds loss.distill_tail_gamma = 2.0 and nothing else. gamma=0 reproduces
+  v023 bit-identically (verified: loss diff 0.00e+00, both with and without the distill
+  term active), so this isolates the weighting and nothing else.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: 225922
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 0.5
+  distill_tail_gamma: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 59
+  best_val_wp: -0.12746121358055562
+  best_val_t0: 0.01528988607977963
+  best_val_t1: -0.27021231324089084
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0164
+  finished_utc: '2026-10-01T19:52:47Z'
+artifacts:
+  log: exploration/logs/log_gru_v029.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v029
+  submission_dir: null
