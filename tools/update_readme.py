@@ -62,6 +62,8 @@ DESCRIPTIONS: dict[str, str] = {
     'v020': 'FIX loss + train+valid data',
     'v021': "dozken arch, no teacher",
     'v022': 'dozken arch + his teacher',
+    'v023': 'distil, smaller (52% of teacher)',
+    'v024': 'distil, batch 64 (his recipe)',
 }
 
 
