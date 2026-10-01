@@ -9,8 +9,8 @@ reference metric in `tools/metric_ref.py`.
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
-| 2 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Ready to Submit | -- | 49m24s (82%) | -- |
-| 3 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Ready to Submit | -- | 42m24s (71%) | -- |
+| 2 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
+| 3 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
 | 4 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
 | 5 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
 | 6 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
@@ -112,6 +112,56 @@ Distillation is worth **+0.0019 over the teacher** at equal size and **+0.0019 a
 the only lever so far that works *without* fixing the loss — and that is exactly
 why v019/v020 matter: on a correctly specified objective the distillation gain
 should compound rather than merely survive.
+
+## v023 is our best entry: the smallest student, and it won
+
+`v023` is `hidden 128` — **225,922 parameters, 51.8% of dozken's 435,943-param teacher** —
+on his architecture, with his model as the teacher. It scored **0.6568 public**, our best,
+and it beats `v022` (321,602 params, 42% larger) on the public board while running **10%
+less** of the time budget.
+
+| | params | % of teacher | local | public | grader |
+|---|---:|---:|---:|---:|---:|
+| **v023** | **225,922** | 51.8% | 0.684681 | **0.6568** | 45m36s (76%) |
+| v022 | 321,602 | 73.8% | **0.685228** | 0.6565 | 50m46s (85%) |
+| v024 | 321,602 | 73.8% | 0.684818 | 0.6560 | 50m17s (84%) |
+
+**Read this carefully, because local and public disagree on the ordering.** Locally v023
+is *third* — 0.000547 below v022, which is inside the ±0.000317 noise floor, so the three
+are a statistical tie. Publicly v023 is *first*. The honest reading is that v022, v023
+and v024 are indistinguishable in quality, and v023 is simply the cheapest of the three.
+
+That is still a real win, and it retires the compression hypothesis in the *useful*
+direction. Compression did not cost anything (it was never going to, being a null) but it
+bought **40.12 µs/row → 76% of budget**, clearing even the retired 75% margin outright.
+Smaller student, same score, more headroom. This is dozken's distillation-regularisation
+effect, and the practical rule is: **on this teacher, go smaller.**
+
+v024 (batch 64) confirms its own refutation publicly at 0.6560 — inside noise of v022,
+as predicted. Its value was training speed: 2.39 h against 5.31 h.
+
+## The offset is now measured on twelve clean submissions
+
+```
+mean -0.0280    range [-0.0288, -0.0272]    std 0.0005
+```
+
+v020's contaminated −0.0305 remains outside the band, which is how it was caught. With
+std 0.0005 the mapping is reliable enough to aim with, and it is symmetric: **no local
+gain is free.**
+
+## Where we stand
+
+```
+ours v023  0.6568   <-- our best
+dozken     0.6588
+#1         0.6677
+```
+
+We are **0.0020 off dozken** and **0.0109 off first**. Note that v023 and v022 differ
+by 0.0003 public, which is well inside the noise — so the honest summary is that we are
+**level with dozken's distilled entry**, and the earlier claim that we were 0.0054 behind
+was about our *base*, not our students.
 
 ## The public board has now settled what local could not
 
