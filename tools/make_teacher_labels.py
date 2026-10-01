@@ -64,18 +64,34 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def build_model(cfg: dict):
-    """Reconstruct the torch module from the version yaml (no checkpoint needed)."""
+def import_module(cfg: dict):
+    """Load the version's training script so FeatureTransform and GRUModel exist.
+
+    Split out from build_model because the model's input width has to come from the
+    transform, and the transform class lives in this module -- so import first,
+    construct the transform, then construct the model. Doing both in one call is
+    circular.
+    """
     import importlib.util
     script = ROOT / 'exploration' / 'models' / f"train_{cfg['identity']['model']}_{cfg['identity']['version']}.py"
     spec = importlib.util.spec_from_file_location(f"mod_{cfg['identity']['version']}", script)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    m = mod.GRUModel(N_FEATURES, hidden=cfg['model']['hidden'],
+    return mod
+
+
+def build_model(cfg: dict, mod, in_dim: int = N_FEATURES):
+    """Reconstruct the torch module from the version yaml (no checkpoint needed).
+
+    `in_dim` MUST be the transform's output width rather than N_FEATURES. Versions
+    from v021 onward take first_differences over all 112 columns, so the transform
+    emits 224 and passing the raw 112 fails with a size mismatch on proj.weight.
+    """
+    m = mod.GRUModel(in_dim, hidden=cfg['model']['hidden'],
                      layers=cfg['model']['layers'],
-                     input_proj=cfg['model']['input_proj'],
+                     input_proj=cfg['model'].get('input_proj') or 0,
                      dropout=cfg['model'].get('dropout', 0.0))
-    return m, mod
+    return m
 
 
 class Transform:
@@ -96,6 +112,10 @@ class Transform:
 
     def batch(self, X: np.ndarray) -> np.ndarray:
         return self.t.batch(X)
+
+    def dim(self) -> int:
+        """Width the model must accept: levels + any configured extra blocks."""
+        return self.t.dim()
 
 
 # ===== SECTION: DATA =====
@@ -201,7 +221,14 @@ def main():
     print(f'member {args.version}: {ck.name}', flush=True)
 
     st = torch.load(ck, map_location=args.device, weights_only=False)
-    model, mod = build_model(cfg)
+    stats_path = ck_dir / 'feature_stats.npz'
+    if not stats_path.exists():
+        sys.exit(f'missing {stats_path}; run the trainer with --export-only first')
+    # Build the transform FIRST so the model's input width comes from the transform,
+    # not from a hardcoded N_FEATURES.
+    mod = import_module(cfg)
+    transform = Transform(mod, stats_path)
+    model = build_model(cfg, mod, in_dim=transform.dim())
     model.load_state_dict(st['model'])
     model.to(args.device).eval()
     n_params = sum(p.numel() for p in model.parameters())
@@ -214,10 +241,6 @@ def main():
         sys.exit(f'--chunk {chunk} must divide the member chunk_len '
                  f'{cfg["training"]["chunk_len"]}')
 
-    stats = ck_dir / 'feature_stats.npz'
-    if not stats.exists():
-        sys.exit(f'missing {stats}; run the trainer with --export-only first')
-    transform = Transform(mod, stats)
 
     out_dir = ROOT / args.out
     out_dir.mkdir(parents=True, exist_ok=True)
