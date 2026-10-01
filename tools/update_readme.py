@@ -60,6 +60,8 @@ DESCRIPTIONS: dict[str, str] = {
     'v018': 'soft mask + state reset 10k',
     'v019': 'FIX loss: globally pooled',
     'v020': 'FIX loss + train+valid data',
+    'v021': "dozken arch, no teacher",
+    'v022': 'dozken arch + his teacher',
 }
 
 
@@ -178,8 +180,15 @@ def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
             # its score is contaminated by training on the validation set. The
             # packager's verdict is a necessary condition, not a sufficient one,
             # so an explicit 'Do not ship' in metadata wins over 'Ready to Submit'.
+            # v020 is contaminated AND unshippable; v021 is clean but a regression.
+            # The label has to say which, or the table misattributes v021's problem.
             if meta.get('status') == 'PASS-BUT-DO-NOT-SUBMIT':
-                return ('Do not ship (score contaminated)', '--',
+                why = ('score contaminated' if meta.get('full_valid_score_contaminated')
+                       else 'clean but below our own base')
+                return (f'Do not ship ({why})', '--',
+                        _proj_dur(lat.get('grader_min_p50'), lat.get('grader_pct_budget_p50')), '--')
+            if meta.get('status') == 'PASS-BUT-GATE-MARGINAL':
+                return ('Ready to Submit (latency marginal, 83% of budget)', '--',
                         _proj_dur(lat.get('grader_min_p50'), lat.get('grader_pct_budget_p50')), '--')
             if lat.get('grader_safe'):
                 return ('Ready to Submit', '--',
@@ -301,10 +310,9 @@ def build_tables() -> str:
     if unranked:
         out += ['### Not ranked by `full_valid_wp`', '',
                 'Rows that cannot be ranked on `full_valid_wp`, each for a stated '
-                'reason: still training (v021), a contaminated score that is not '
-                'comparable with the rest (v020), or a framework smoke test that was '
-                'never a modelling result (v000). v000 and v020 do have public-capable '
-                'bundles; both are documented, neither is a submission candidate.', '',
+                'reason: a contaminated score that is not comparable with the rest '
+                '(v020), or a framework smoke test that was never a modelling result '
+                '(v000). Both have bundles; neither is a submission candidate.', '',
                 '| Ver | What it changed | best so far (subset) | Status | Public score |',
                 '|---|---|---|---|---|']
         for v, desc, bv, status, pub, st in unranked:
