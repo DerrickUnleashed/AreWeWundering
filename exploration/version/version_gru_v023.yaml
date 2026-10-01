@@ -3,21 +3,18 @@ identity:
   model: gru
   version: v023
   parent: gru_v022
-  status: running
-description: 'Distilled student on dozken''s architecture at hidden 128 -- 225,922
-  params, 51.8% of his 435,943-param teacher, against v022''s 73.8%. Same teacher,
-  same loss, same schedule; the student size is the only change. Also the latency-safe
-  size: v022 at 46.83 us/row already projects to 83% of the time budget, and this
-  should roughly halve that.'
-hypothesis: The distillation gain is COMPRESSION-DEPENDENT, and both data points say
-  so. v017 was 61% of its teacher and landed 0.001880 ABOVE it. v022 is 74% of its
-  teacher and landed 0.004940 BELOW it. More compression means more distillation regularisation,
-  so a more compressed student should land closer to the teacher's 0.690168 -- or
-  above it. If the hypothesis holds, v023 beats v022 while being materially cheaper
-  to serve. If it fails, compression is not the axis and the remaining 0.0049 has
-  to come from the teacher's training recipe instead.
-change_vs_parent: hidden 160 -> 128 only (321,602 -> 225,922 params). Everything else
-  identical to v022.
+  status: finished
+description: 'Distilled student on dozken''s architecture at hidden 128 -- 225,922 params, 51.8% of his
+  435,943-param teacher, against v022''s 73.8%. Same teacher, same loss, same schedule; the student size
+  is the only change. Also the latency-safe size: v022 at 46.83 us/row already projects to 83% of the
+  time budget, and this should roughly halve that.'
+hypothesis: The distillation gain is COMPRESSION-DEPENDENT, and both data points say so. v017 was 61%
+  of its teacher and landed 0.001880 ABOVE it. v022 is 74% of its teacher and landed 0.004940 BELOW it.
+  More compression means more distillation regularisation, so a more compressed student should land closer
+  to the teacher's 0.690168 -- or above it. If the hypothesis holds, v023 beats v022 while being materially
+  cheaper to serve. If it fails, compression is not the axis and the remaining 0.0049 has to come from
+  the teacher's training recipe instead.
+change_vs_parent: hidden 160 -> 128 only (321,602 -> 225,922 params). Everything else identical to v022.
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -195,16 +192,16 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.12802088574555295
-  best_val_t0: 0.014607298070274857
-  best_val_t1: -0.27064906956138074
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.0065
-  finished_utc: '2026-10-01T09:14:05Z'
+  best_step: 39776
+  best_val_wp: 0.6944892507973381
+  best_val_t0: 0.692535451882688
+  best_val_t1: 0.6964430497119882
+  full_valid_wp: 0.6846810112881669
+  latency_us_p50: 40.12
+  latency_us_p99: 64.17
+  train_hours: 4.114
+  finished_utc: '2026-10-01T13:21:54Z'
 artifacts:
   log: exploration/logs/log_gru_v023.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v023
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v023
