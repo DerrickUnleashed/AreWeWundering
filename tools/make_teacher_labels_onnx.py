@@ -66,7 +66,8 @@ def sha256(path: Path) -> str:
 
 def _worker(job):
     """Replay a contiguous block of sequences into a slice of the output file."""
-    (onnx_path, shard, out_path, lo, hi, state_reset, threads) = job
+    (onnx_path, shard, out_path, feat_path, feat_dim, feature,
+     lo, hi, state_reset, threads) = job
     opts = ort.SessionOptions()
     opts.intra_op_num_threads = threads
     opts.inter_op_num_threads = 1
@@ -75,6 +76,10 @@ def _worker(job):
     opts.add_session_config_entry('session.intra_op.allow_spinning', '0')
     sess = ort.InferenceSession(onnx_path, sess_options=opts,
                                 providers=['CPUExecutionProvider'])
+    # resolve the feature's position by NAME: appending an output changes the session's
+    # output order, and a hardcoded index silently reads the wrong tensor
+    names = [o.name for o in sess.get_outputs()]
+    fidx = names.index(feature) if feature else None
 
     meta = sess.get_modelmeta().custom_metadata_map or {}
     reset = int(meta.get('state_reset', state_reset) or 0)
@@ -82,11 +87,13 @@ def _worker(job):
     X = np.load(Path(shard) / 'X.npy', mmap_mode='r')
     idx = np.load(Path(shard) / 'seq_index.npy')
     out = np.load(out_path, mmap_mode='r+')
+    fout = np.load(feat_path, mmap_mode='r+') if feat_path else None
 
     n_rows_done = 0
     for i in range(lo, hi):
         a, b = int(idx[i]), int(idx[i + 1])
         buf = np.empty((b - a, 2), dtype=np.float16)
+        fbuf = np.empty((b - a, feat_dim), dtype=np.float16) if fout is not None else None
         h0 = np.zeros((1, 1, 192), np.float32)
         h1 = np.zeros((1, 1, 192), np.float32)
         prev = np.zeros((1, N_FEATURES), np.float32)
@@ -95,10 +102,15 @@ def _worker(job):
                 h0 = np.zeros((1, 1, 192), np.float32)
                 h1 = np.zeros((1, 1, 192), np.float32)
             row = np.asarray(X[a + r], dtype=np.float32).reshape(1, N_FEATURES)
-            pred, h0, h1, prev = sess.run(
+            res = sess.run(
                 None, {'features': row, 'state_0': h0, 'state_1': h1, 'prev': prev})
+            pred, h0, h1, prev = res[0], res[1], res[2], res[3]
             buf[r] = pred[0]
+            if fout is not None:
+                fbuf[r] = res[fidx]
         out[a:b] = buf
+        if fout is not None:
+            fout[a:b] = fbuf
         n_rows_done += b - a
     out.flush()
     return lo, hi, n_rows_done
@@ -107,10 +119,44 @@ def _worker(job):
 # ===== SECTION: MAIN =====
 
 
+def expose_z(src: Path, dst: Path) -> None:
+    """Copy the teacher graph with its 64-wide projection output `z` exposed.
+
+    Feature distillation needs an intermediate, not just the 2-dim output. `z` is the
+    only one whose width matches our student: the teacher's GRU hidden is 192 and ours
+    is 128/160/285, so h1/h2 would need an adapter, while z is 64 on both sides.
+    Appending an output is the whole change -- the graph itself is untouched, so the
+    prediction is bit-identical.
+    """
+    import onnx
+    from onnx import TensorProto, helper
+    m = onnx.load(str(src))
+    if 'z' not in {o.name for o in m.graph.output}:
+        m.graph.output.append(helper.make_tensor_value_info('z', TensorProto.FLOAT, None))
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    onnx.save(m, str(dst))
+    o = ort.SessionOptions()
+    o.intra_op_num_threads = 1
+    s = ort.InferenceSession(str(dst), sess_options=o,
+                             providers=['CPUExecutionProvider'])
+    print(f'wrote {dst}  outputs: {[x.name for x in s.get_outputs()]}')
+    X = np.load(ROOT / 'cache/valid/X.npy', mmap_mode='r')
+    x = np.asarray(X[100:101], dtype=np.float32).reshape(1, 112)
+    r = s.run(None, {'features': x,
+                     'state_0': np.zeros((1, 1, 192), np.float32),
+                     'state_1': np.zeros((1, 1, 192), np.float32),
+                     'prev': np.zeros((1, 112), np.float32)})
+    d = dict(zip([y.name for y in s.get_outputs()], r))
+    assert d['z'].shape == (1, 64), d['z'].shape
+    print(f"  z {d['z'].shape}  prediction {d['prediction'][0].round(6)}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--onnx', default='submissions/submission_dozken_6569/reset2k.onnx')
+    ap.add_argument('--prepare-z', action='store_true',
+                    help='write a copy of the graph with z exposed as an output, then exit')
     ap.add_argument('--shard', default='cache/train')
     ap.add_argument('--out', default='cache/teacher')
     ap.add_argument('--tag', default='dozken_reset2k')
@@ -119,8 +165,21 @@ def main():
                     help='ORT intra-op threads per worker (1 is fastest at batch 1)')
     ap.add_argument('--limit', type=int, default=None,
                     help='replay only the first N sequences (for a smoke test)')
+    ap.add_argument('--feature', default=None,
+                    help='also write this graph OUTPUT alongside the prediction, for '
+                         'feature distillation. e.g. --feature z writes the 64-wide '
+                         'input-projection activation, the only teacher intermediate '
+                         'whose width matches our student (teacher hidden 192 vs ours '
+                         '128/160/285, so h1/h2 do not line up).')
     args = ap.parse_args()
 
+    if args.prepare_z:
+        expose_z(ROOT / args.onnx, ROOT / 'cache/teacher/dozken_with_z.onnx')
+        return 0
+    if args.feature:
+        # the caller must already have run --prepare-z and point --onnx at it
+        assert (ROOT / args.onnx).exists(), (
+            f'{args.onnx} missing; run with --prepare-z first')
     onnx_path = str((ROOT / args.onnx).resolve())
     shard = ROOT / args.shard
     out_dir = ROOT / args.out
@@ -155,8 +214,22 @@ def main():
     # so no two processes ever touch the same rows and no locking is needed.
     n_workers = max(1, min(args.workers, n_seq))
     edges = np.linspace(0, n_seq, n_workers + 1).astype(int)
-    jobs = [(onnx_path, str(shard), str(out_npy), int(edges[i]), int(edges[i + 1]),
-             state_reset, args.threads) for i in range(n_workers) if edges[i] < edges[i + 1]]
+    feat_npy, feat_dim = None, 0
+    if args.feature:
+        feat_npy = out_dir / f'teacher_{args.tag}_{args.feature}.npy'
+        o2 = ort.SessionOptions()
+        o2.intra_op_num_threads = 1
+        s2 = ort.InferenceSession(onnx_path, sess_options=o2,
+                                  providers=['CPUExecutionProvider'])
+        feat_dim = next(x.shape[-1] for x in s2.get_outputs() if x.name == args.feature)
+        print(f'  feature     : {args.feature} ({feat_dim} dims) -> {feat_npy.name}', flush=True)
+        f = np.lib.format.open_memmap(feat_npy, mode='w+', dtype=np.float16,
+                                      shape=(total_rows, feat_dim))
+        del f
+    jobs = [(onnx_path, str(shard), str(out_npy),
+             str(feat_npy) if feat_npy else None, feat_dim, args.feature,
+             int(edges[i]), int(edges[i + 1]), state_reset, args.threads)
+            for i in range(n_workers) if edges[i] < edges[i + 1]]
 
     t0 = time.time()
     done_rows = 0
