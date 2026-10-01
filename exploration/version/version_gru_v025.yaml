@@ -1,0 +1,212 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v025
+  parent: gru_v023
+  status: running
+description: 'v023''s exact recipe (hidden 128, 225,922 params, his architecture,
+  his model as teacher) with his FULL training schedule: batch 64 and 5 epochs instead
+  of 3. Two variables changed from v023, both from his notes, and both now affordable
+  because batch 64 trains 2.2x faster than batch 16.'
+hypothesis: The one lever we have never combined with distillation is EPOCH COUNT
+  on top of his cited batch size. v022/v023 ran 3 epochs; his notes say 5. Everything
+  else is v023, which is our best entry (0.6568 public) and which the public board
+  showed is TIED with the 42%-larger v022, so student size is settled and is not where
+  the remaining 0.0109 to 0.6677 lives. This tests whether training LONGER on the
+  same teacher closes any of it, at a cost of ~2.5 h rather than the ~8 h it would
+  have taken before the batch-64 speedup.
+change_vs_parent: batch_sequences 16 -> 64 and epochs 3 -> 5. Same hidden 128, same
+  teacher, same loss, same chunk_len 1000, same state_reset 2000. Two variables, both
+  from his cited recipe, deliberately combined rather than split because this is the
+  last cheap test of that recipe end to end and the latency headroom now makes it
+  affordable in a single run.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: 225922
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 0.5
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 64
+  max_steps: null
+  smoke_steps: 60
+  epochs: 5
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 59
+  best_val_wp: -0.12241172038849811
+  best_val_t0: 0.021453693895816826
+  best_val_t1: -0.26627713467281305
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0115
+  finished_utc: '2026-10-01T17:40:11Z'
+artifacts:
+  log: exploration/logs/log_gru_v025.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v025
+  submission_dir: null
