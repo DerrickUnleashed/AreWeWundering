@@ -193,5 +193,19 @@
     "memory_mb": 634,
     "submitted_utc": "2026-10-01T14:41Z",
     "note": "dozken's architecture on our data, no teacher, 435,714 params. 55m32s = 93% of budget and it also completed, giving a second data point in the band our 75% gate rejects. Public 0.6505 is our WORST of the recent series and matches the local prediction exactly: local 0.678575 was 0.001412 (-4.5 sigma) below v011, and v011 scored 0.6515, so 0.6505 is the expected place for it. The architecture alone does not help."
+  },
+  "v023": {
+    "public_score": 0.6568,
+    "grader_seconds": 2736,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-01T22:05Z",
+    "note": "OUR BEST. The SMALLEST distilled student yet: hidden 128, 225,922 params = 51.8% of dozken's 435,943-param teacher, trained on his architecture with his reset2k model as the teacher. It scored ABOVE v022 (0.6565) which has 42% more parameters (321,602), and it runs in 45m36s = 76% of the budget against v022's 50m46s = 85%. Locally v023 was 0.000547 BELOW v022 (inside the 0.000317 noise floor, so the two were a statistical tie) and publicly v023 is 0.0003 above. So: the two are tied in truth, and v023 is the better artifact -- fewer params, 10% less runtime, and it cleared the old 75% latency gate outright at 40.12 us/row. This is the distillation-regularisation effect dozken reports, and it means the compression axis was NOT wasted after all: smaller costs nothing and buys latency headroom."
+  },
+  "v024": {
+    "public_score": 0.656,
+    "grader_seconds": 3017,
+    "memory_mb": 631,
+    "submitted_utc": "2026-10-01T22:06Z",
+    "note": "batch 64, v022's exact size. 0.6560 public against v022's 0.6565, i.e. -0.0005, which is inside the noise. Confirms batch 64 is neither better nor worse than batch 16 -- the refutation stands. Its value was speed: 2.39h of training instead of 5.31h for the same score. Runs 50m17s = 84% of budget."
   }
 }
