@@ -218,11 +218,11 @@ results:
   best_val_t0: 0.6713831330745148
   best_val_t1: 0.6844792823250664
   full_valid_wp: 0.6604145384583081
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 53.25
+  latency_us_p99: 103.08
   train_hours: 6.002
   finished_utc: '2026-10-02T16:51:18Z'
 artifacts:
   log: exploration/logs/log_gru_v033.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v033
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v033
