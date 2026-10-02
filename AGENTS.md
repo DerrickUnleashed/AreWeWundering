@@ -36,21 +36,21 @@ This file is the project memory for any coding agent or human working in this re
 5. **Immutability.** Never overwrite an existing version's script, yaml, log, checkpoint folder or submission folder. A change of any kind = a new version. Never delete anything unless the user explicitly asks.
 6. **No silent uploads; every change lands by PR.** Two separate rules:
    (a) **agents never upload anything to the competition site** — the user does that. Unchanged and absolute.
-   (b) **Branch-and-PR workflow. Agents never commit directly to `main`.** Every change goes on a feature branch, is pushed, and is opened as a pull request. **Agents merge their own PRs** (amended 2026-09-30 by explicit user decision). The merge MUST be a **merge commit** (`git merge --no-ff` / `gh pr merge --merge`), never squash or rebase: a squash re-rewrites the branch's commits and would require a force-push to keep local `main` in step, which (c) forbids. Agents still never push to `main` directly, never merge a PR they did not open, and never run `git push --force*` or `git lfs push`. This replaces the earlier blanket ban on `git push`, which existed because four pushes and a history rewrite were performed on 2026-09-29 after being asked to "help push" the datasets.
+   (b) **Direct commits to `main`.** Changed 2026-10-02 by explicit user decision: agents **commit and push straight to `main`** and **no longer open pull requests**. The branch-and-PR workflow that applied from 2026-09-30 to 2026-10-02 is retired. Still standing: never `git push --force*` (except one explicitly authorised rewrite, see below), never `git lfs push`, never upload to the competition site, and never rewrite published history without asking first.
 
-   **Why the shape of this rule.** Opening a PR requires a network push, so a PR workflow cannot coexist with an absolute no-push rule. The ban is therefore narrowed rather than lifted: pushing a *feature branch* is allowed and expected, because it carries no more authority than a local commit, whereas pushing to `main` and merging do. Final authority over `main` stays with the user. One approval for a task never generalises to a later, unasked-for push.
+   **Why this changed.** The PR workflow existed to keep agents off `main` without an absolute no-push rule, and it did that job — but it cost real friction: two PRs conflicted and had to be redone because the branch was cut from a stale local `main`, and a `gh pr merge` fast-forward silently landed branch commits on `main` as a side effect. The user owns the repository and has decided the review gate is not worth that.
 
    **Workflow per change:**
    ```bash
-   git checkout -b <type>/<short-slug>        # from main
-   # ... edit, then per-file commits ...
-   git push -u origin <type>/<short-slug>     # first push of a new branch only
-   gh pr create --title "..." --body "..."    # one PR per logical change
-   gh pr merge <N> --merge --delete-branch    # MERGE COMMIT, never --squash/--rebase
-   git checkout main && git pull --ff-only     # local main back in step
+   git pull --ff-only                          # keep local main in step FIRST
+   # ... edit, then stage only the intended paths (never `git add -A`, see below) ...
+   git commit -m "..." -F -                    # one commit per logical change
+   git push origin main
    ```
 
-   **Watch for a fast-forward merge.** When local `main` is behind `origin/main`, `gh pr merge` can fast-forward, which lands the *branch's* commits on `main` without a merge commit and can carry other local commits to the remote as a side effect. Pass `--merge` explicitly and check the PR's merge state before moving on.
+   **Never `git add -A`.** `exploration/logs/` is untracked and NOT gitignored, so `git add -A` will stage a live training job's log. See the open-file hazard below. Stage explicit paths, or use `git add <dir>` with the log directory excluded.
+
+   **History rewrite, once, with authorisation.** On 2026-10-02 the user asked for every Claude co-author trailer to be removed from all of `main`. That required rewriting 4 of 818 commits and force-pushing `main` with `--force-with-lease`, which (b) otherwise forbids. It was done in a throwaway clone at `/tmp` so the dirty live worktree and five running training jobs were never touched, after taking a backup bundle and a `backup/pre-coauthor-removal` tag. Precedent, not standing permission: **ask again before any further rewrite.**
 
    **Do not `git add` a file a live process holds open.** Git creates a new file and renames it over the old one rather than editing in place, so staging the path of a running training job's log orphans the writer: its descriptor keeps writing to an unlinked inode, and the bytes become unreachable by name. `lsof` will not flag it, because the inode is still allocated with an open descriptor. This destroyed the canonical log of `gru_v018` on 2026-09-30; `tools/rebuild_log.py` reconstructs it from checkpoints. **Stage live logs only after the run exits.** Checkpoints (`last.pt`) are written atomically and are safe to stage mid-run.
 7. **No data in RAM.** Stream or memory-map; never `pd.read_parquet` the train file whole.
