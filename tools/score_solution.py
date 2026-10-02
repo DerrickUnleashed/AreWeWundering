@@ -128,9 +128,20 @@ def offline_predict(offline_script, offline_config, offline_checkpoint, parquet_
     cfg = yaml.safe_load(Path(offline_config).read_text())
     st = torch.load(offline_checkpoint, map_location='cpu', weights_only=False)
     transform = mod.build_transform_from_stats(st['feature_stats'], cfg['features'])
+    # head_hidden MUST be threaded through, or any run that widened the head cannot be
+    # reconstructed here and the parity gate dies with a state_dict size mismatch.
+    # v034 (head_hidden 384) hit exactly that: the parity check produced no result at
+    # all and the bundle was written with gate.parity = null and status NOT-READY,
+    # which reads as "not verified" rather than "the verifier could not build the model".
+    # Read it from the CHECKPOINT's own config first so it tracks whatever the run
+    # actually trained, falling back to the yaml only if the checkpoint predates it.
+    _ck_cfg = st.get('config') or {}
+    _head = ((_ck_cfg.get('model') or {}).get('head_hidden')
+             or cfg['model'].get('head_hidden') or 192)
     model = mod.GRUModel(st['feature_dim'], hidden=cfg['model']['hidden'],
                          layers=cfg['model']['layers'],
-                         input_proj=cfg['model'].get('input_proj') or 0)
+                         input_proj=cfg['model'].get('input_proj') or 0,
+                         head_hidden=_head)
     model.load_state_dict(st['model'])
     model.eval()
     out = {}
