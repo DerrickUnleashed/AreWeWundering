@@ -15,7 +15,7 @@ reference metric in `tools/metric_ref.py`.
 | 5 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
 | 6 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Submitted | 0.6580 | 46m07s (77%) | 628 MB |
 | 7 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | TIMED OUT on grader | no score | 69m57s (117%) | 646 MB |
-| 8 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | Yet to package | -- | -- | -- |
+| 8 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | TIMED OUT on grader | no score | 69m57s (117%) | 643 MB |
 | 9 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
 | 10 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
 | 11 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
@@ -51,6 +51,7 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 | **v030** | v028's exact recipe and architecture with... | -- | Training | -- |
 | **v031** | v028's exact recipe and architecture with... | -- | Training | -- |
 | **v032** | v028's exact recipe -- same architecture,... | -- | Training | -- |
+| **v033** | A deliberately DIVERSE ensemble member, not... | -0.127666 | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -767,3 +768,38 @@ still builds a bit-exact single graph, verified `0.000e+00`. It is the ensemblin
 that failed, not the fusing. The single-graph fusion remains the thing that makes a
 *genuinely* diverse pair shippable where dozken's two-session version timed out — it
 just has nothing to carry yet.
+
+## Capacity is now settled by the grader, not just by us
+
+`v027` was uploaded and **timed out at 69m57s** — the same second as `v026`.
+
+| ver | params | hidden | local | outcome |
+|---|---:|---:|---:|---|
+| v023 | 225,922 | 128 | 0.684681 | runs in 46m52s (78%) |
+| v026 | 871,977 | 285 | 0.684335 | **TIMEOUT** 69m57s |
+| v027 | 1,742,717 | 415 | 0.683058 | **TIMEOUT** 69m57s |
+
+Two timeouts landing on **the same second** identifies that as the platform's kill
+point rather than either model's natural runtime. So neither timeout tells us how far
+over budget they were — only that they are over. dozken independently records a ~70
+minute hard limit and lost an ensemble of his own at 69m59s.
+
+The conclusion is now on firmer ground than before, because the two lines of evidence
+agreed *before* either was uploaded:
+
+- **Locally**, the score falls monotonically with size — 0.684681 → 0.684335 →
+  0.683058 — so 4× the teacher is 10.2σ *below* a half-size student.
+- **On the grader**, both oversized models cannot finish, while the 225,922-param one
+  runs in 78% of budget.
+
+Neither line alone would have been decisive, since a bad local score could be noise and
+a timeout could be a flaky platform. Together they close the question: **the student
+should stay around 225k parameters.** Everything above roughly 450k is unshippable
+here, which is also why `v023`'s compression finding mattered so much — it was not
+merely free, it was the only affordable size.
+
+One loose end, recorded honestly: v027 was uploaded from the *incomplete* bundle
+committed in `8ba7a50` (no `metadata.json`, zip missing the provenance checkpoint).
+The missing checkpoint is a provenance artifact and does not affect serving, so the
+timeout remains a valid measurement of the model rather than an artifact of the
+partial build.
