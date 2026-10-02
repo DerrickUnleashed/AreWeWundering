@@ -240,5 +240,14 @@
     "submitted_utc": "2026-10-02T13:51Z",
     "uploaded_filename": "submission_gru_v025.zip",
     "note": "OUR SECOND BEST, and the most informative submission we have made -- not because of its rank but because of its OFFSET. Local full_valid_wp 0.684438 (a -1.5 sigma regression on v023) but public 0.6580, which BEATS v023's 0.6568 by +0.0012. The offset is -0.026438 against -0.028264 +/- 0.000419 for the five 3-epoch runs: +0.001826, or +4.4 sigma. The control is unusually clean: v024 is the IDENTICAL recipe at 3 epochs and sits normally at -0.028818, so batch 64 is exonerated and epochs is the only structural difference. Against v024 the shift is +0.002380. CONSEQUENCE: the local-to-public offset is NOT a constant, it moves with training length, and full_valid_wp is therefore a BIASED selector across different epoch counts -- biased against the longer run. v025 was ranked a regression locally and was nearly discarded on that basis. It also ran 46m07s = 77% of budget, so the longer schedule costs nothing to serve. This directly motivates v032: v028's recipe (best local, distill_weight 1.0) at 5 epochs, predicting 0.6585 + 0.0024 = 0.6609 if the epoch effect composes."
+  },
+  "v027": {
+    "public_score": null,
+    "grader_seconds": 4197,
+    "memory_mb": 643,
+    "submitted_utc": "2026-10-02T14:56Z",
+    "uploaded_filename": "submission_gru_v027.zip",
+    "outcome": "SCORE:TIMEOUT",
+    "note": "TIMED OUT at 69m57s, 643 MB. Uploaded from the INCOMPLETE bundle committed earlier in 8ba7a50 (no metadata.json, zip missing the provenance checkpoint) -- the missing checkpoint is a provenance artifact and does not affect serving, so the timeout is a valid measurement of the model rather than an artifact of the partial build. THE INFORMATIVE PART: v027 ran 69m57s and v026 ran 69m57s -- identical to the second. That is the platform's kill point, not either model's natural runtime, so neither timeout tells us how far over budget they were, only that they are over. dozken's notes independently record a ~70 min hard limit and losing an ensemble at 69m59s. v027 at 1,742,717 params is ~2x v026's 871,977 and both are unshippable; the capacity result now rests on a grader TIMEOUT rather than only on a local score being 10.2 sigma low. Note the local scores already said this was the worst model in the batch, so the two lines of evidence agreed before this was uploaded."
   }
 }
