@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v026
   parent: gru_v023
-  status: running
+  status: finished
 description: 'v023''s exact recipe and architecture at 2x the largest model we have
   ever built: hidden 285, 871,977 params against v023''s 225,922 and against 435,943
   for dozken''s reset2k (the biggest thing we have run). Same 2-layer GRU, same 64-unit
@@ -203,16 +203,16 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: 0.14352905826327442
-  best_val_t0: 0.21814887659107668
-  best_val_t1: 0.06890923993547214
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.0156
-  finished_utc: '2026-10-01T18:00:16Z'
+  best_step: 39776
+  best_val_wp: 0.6935891352498231
+  best_val_t0: 0.6906709232110504
+  best_val_t1: 0.696507347288596
+  full_valid_wp: 0.6843349540117464
+  latency_us_p50: 124.17
+  latency_us_p99: 208.17
+  train_hours: 10.8763
+  finished_utc: '2026-10-02T04:59:21Z'
 artifacts:
   log: exploration/logs/log_gru_v026.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v026
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v026
