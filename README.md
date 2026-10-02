@@ -9,37 +9,38 @@ reference metric in `tools/metric_ref.py`.
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
-| 2 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
-| 3 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
-| 4 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Ready to Submit | -- | 49m30s (82%) | -- |
-| 5 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
-| 6 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
-| 7 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
-| 8 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
-| 9 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Submitted | 0.6580 | 46m07s (77%) | 628 MB |
-| 10 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | TIMED OUT on grader | no score | 69m57s (117%) | 646 MB |
-| 11 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | TIMED OUT on grader | no score | 69m57s (117%) | 643 MB |
-| 12 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
-| 13 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
-| 14 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
-| 15 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
-| 16 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 17 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
-| 18 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 19 | **v021** | dozken arch, no teacher | 0.678575 | Submitted | 0.6505 | 55m32s (93%) | 634 MB |
-| 20 | **v019** | FIX loss: globally pooled | 0.678374 | Submitted | 0.6510 | 30m32s (51%) | 627 MB |
-| 21 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
-| 22 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
-| 23 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
-| 24 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
-| 25 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 26 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
-| 27 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
-| 28 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
-| 29 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
-| 30 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 31 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
-| 32 | **v033** | A deliberately DIVERSE ensemble member, not... | 0.660415 | Submitted | 0.6274 | 47m22s (79%) | 628 MB |
+| 2 | **v032** | v028's exact recipe -- same architecture,... | 0.687219 | Ready to Submit | -- | 42m30s (71%) | -- |
+| 3 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
+| 4 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
+| 5 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Ready to Submit | -- | 49m30s (82%) | -- |
+| 6 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
+| 7 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
+| 8 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
+| 9 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
+| 10 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Submitted | 0.6580 | 46m07s (77%) | 628 MB |
+| 11 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | TIMED OUT on grader | no score | 69m57s (117%) | 646 MB |
+| 12 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | TIMED OUT on grader | no score | 69m57s (117%) | 643 MB |
+| 13 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
+| 14 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
+| 15 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
+| 16 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
+| 17 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 18 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
+| 19 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
+| 20 | **v021** | dozken arch, no teacher | 0.678575 | Submitted | 0.6505 | 55m32s (93%) | 634 MB |
+| 21 | **v019** | FIX loss: globally pooled | 0.678374 | Submitted | 0.6510 | 30m32s (51%) | 627 MB |
+| 22 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
+| 23 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 24 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
+| 25 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 26 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 27 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 28 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 29 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
+| 30 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
+| 31 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 32 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 33 | **v033** | A deliberately DIVERSE ensemble member, not... | 0.660415 | Submitted | 0.6274 | 47m22s (79%) | 628 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
@@ -52,7 +53,6 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 |---|---|---|---|---|
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
-| **v032** | v028's exact recipe -- same architecture,... | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -1122,3 +1122,51 @@ bundle is sound; only the verifier was broken.
 Note the bundle's `metadata.json` still records the null parity and NOT-READY, because
 bundles are immutable and re-packaging the same version is not allowed. The verified
 result lives here instead.
+
+## v032 is the epoch answer, half in — and it is packaged and ready
+
+`v032` = v028's exact recipe at **5 epochs instead of 3**. It finished at
+**full_valid_wp 0.687219**, which is **+0.000708 over v028 at +4.5σ** — the same
+architecture, the same `distill_weight` 1.0, one scalar changed.
+
+| ver | recipe | local | public | offset |
+|---|---|---:|---:|---:|
+| v028 | 3 epochs, distill 1.0 | 0.686510 | 0.6585 | −0.028010 |
+| v031 | 3 epochs, distill 2.0 | 0.687376 | 0.6587 | −0.028676 |
+| **v032** | **5 epochs, distill 1.0** | **0.687219** | **unsubmitted** | **?** |
+| v025 | 5 epochs, distill 0.5 | 0.684438 | 0.6580 | **−0.026438** |
+
+**Half the answer is in.** Longer training is worth **+0.000708 on local validation** —
+a real effect, +4.5σ, and the first time epochs has moved local score in our favour.
+
+**The other half is the interesting one and only submitting can answer it.** v025 was
+*also* 5 epochs, and it carried an offset of −0.026438 — **+0.0024 better than the
+3-epoch band**, at +4.4σ, invisible to local validation. That is the largest
+public-score effect we have found, larger than any architecture or loss result.
+
+- If v032 inherits it: **~0.6616** (0.6585 + 0.0007 local + 0.0024 offset)
+- If it does not: **~0.6592**
+
+This is the cleanest remaining experiment in the project: one upload, one scalar already
+known locally, and a binary answer about whether the epoch effect is a property of
+*training length* or was specific to v025's lower distillation weight. The two levers
+either compose or they interact, and we have never found out which.
+
+### Bundle: `submissions/submission_gru_v032/submission_gru_v032.zip` — all gates PASS
+
+| gate | result |
+|---|---|
+| contract | **PASS** |
+| determinism | **PASS** |
+| parity | **PASS** — 4.888e-06 vs 1e-03 tolerance |
+| size | **PASS** — 2.42 MB of 20 MB |
+| latency | **PASS** — 39.92 µs/row → 42.5 min, **70.8% of budget** |
+
+This is the first bundle whose latency passed **outright with no anchor needed**, because
+the box was finally idle. That is worth noting for what it confirms: the 1.62× grader
+factor is accurate when the p50 is taken on a quiet machine. v028's actual grader rate
+was 71.4 µs/row, and an idle local measurement scaled by 1.62 lands within ~1% of that.
+Every misprediction this session came from contention, not from the factor.
+
+Parity also ran at all — which it could not do for v034 before the `head_hidden` fix in
+`tools/score_solution.py`. Same verifier, same session, both problems visible.
