@@ -1,0 +1,309 @@
+### new run, log opened 2026-10-03T00:49:46+0530
+==============================================================================
+command            : python exploration/models/train_gru_v038.py --config exploration/version/version_gru_v038.yaml
+timestamp          : 2026-10-03T00:49:46+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : c108358a4b7426aefab3a32e068dba4fa701a40f
+seed               : 1337
+log                : exploration/logs/log_gru_v038.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v038
+  parent: gru_v031
+  status: planned
+description: 'v031''s exact recipe with ONE change: AdamW weight_decay 0.01 -> 0.03.
+  Model, teacher, distill_weight, schedule, LR and seed all unchanged.'
+hypothesis: "A direct test of the DIAGNOSIS behind three failed capacity runs. Bigger\
+  \ models lost monotonically -- head -3.2 sigma, hidden 285 -13.7, hidden 415 -21.7.\
+  \ The standard reading is that extra capacity here is absorbed as overfitting rather\
+  \ than used. If that reading is right, more regularisation should HELP at the current\
+  \ size, and we have never tested it: weight_decay has sat at 0.01 and dropout at\
+  \ 0.0 since v011.\n\n  This is the one experiment that could make the capacity results\
+  \ look different rather than just confirming them. If heavier decay improves 225,922\
+  \ params, then the trunk widenings were unregularised rather than wrong, and v026/v027\
+  \ might be recoverable. If it does nothing, the capacity losses were not an overfitting\
+  \ signature at all and the diagnosis in those three commit messages is wrong.\n\n\
+  \  3x is large enough to see an effect and small enough to stay in the regime AdamW\
+  \ handles well. dropout is deliberately NOT also changed -- two knobs at once would\
+  \ make a null unreadable."
+change_vs_parent: optim.weight_decay 0.01 -> 0.03 only. dropout stays 0.0 so this
+  isolates the decay term.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.03
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v038.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v038
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=64 in_dim=224 params=225,922
+max_steps derived: 13,259 steps/epoch x 3 epoch(s) = 39,777 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 1 member(s), 212,140,000 rows, weight 2.0
+train sequences=10607  valid sequences=200  steps=39777
+step 0/39777 lr 4.00e-06 loss 2.650547 grad_norm 7.283 (1s)
+step 25/39777 lr 1.04e-04 loss 2.394614 grad_norm 6.368 (14s)
+step 50/39777 lr 2.04e-04 loss 1.553853 grad_norm 4.087 (29s)
+step 75/39777 lr 3.04e-04 loss 1.302245 grad_norm 3.621 (46s)
+step 100/39777 lr 4.04e-04 loss 1.278683 grad_norm 5.362 (61s)
+step 125/39777 lr 5.04e-04 loss 1.111330 grad_norm 2.643 (76s)
+step 150/39777 lr 6.04e-04 loss 0.839506 grad_norm 2.212 (93s)
+step 175/39777 lr 7.04e-04 loss 1.034229 grad_norm 2.825 (110s)
+step 200/39777 lr 8.04e-04 loss 0.981603 grad_norm 2.747 (128s)
+step 225/39777 lr 9.04e-04 loss 0.763981 grad_norm 2.010 (146s)
+step 250/39777 lr 1.00e-03 loss 0.785557 grad_norm 2.385 (164s)
+step 275/39777 lr 1.10e-03 loss 0.733286 grad_norm 1.836 (183s)
+step 300/39777 lr 1.20e-03 loss 0.861692 grad_norm 2.253 (201s)
+step 325/39777 lr 1.30e-03 loss 1.144676 grad_norm 4.486 (219s)
+step 350/39777 lr 1.40e-03 loss 0.843667 grad_norm 1.831 (238s)
+step 375/39777 lr 1.50e-03 loss 0.755982 grad_norm 1.667 (256s)
+step 400/39777 lr 1.60e-03 loss 0.979527 grad_norm 2.451 (275s)
+step 425/39777 lr 1.70e-03 loss 0.735113 grad_norm 1.286 (295s)
+step 450/39777 lr 1.80e-03 loss 0.844556 grad_norm 1.391 (313s)
+step 475/39777 lr 1.90e-03 loss 0.572596 grad_norm 1.741 (330s)
+step 500/39777 lr 2.00e-03 loss 0.807292 grad_norm 2.105 (348s)
+step 525/39777 lr 2.00e-03 loss 0.691631 grad_norm 1.183 (366s)
+step 550/39777 lr 2.00e-03 loss 0.704772 grad_norm 1.459 (384s)
+step 575/39777 lr 2.00e-03 loss 0.589742 grad_norm 1.554 (401s)
+step 600/39777 lr 2.00e-03 loss 0.686816 grad_norm 1.495 (418s)
+step 625/39777 lr 2.00e-03 loss 0.833773 grad_norm 1.657 (436s)
+step 650/39777 lr 2.00e-03 loss 0.859656 grad_norm 2.726 (453s)
+step 675/39777 lr 2.00e-03 loss 0.590123 grad_norm 1.613 (470s)
+step 700/39777 lr 2.00e-03 loss 0.608514 grad_norm 1.399 (487s)
+step 725/39777 lr 2.00e-03 loss 0.526471 grad_norm 1.436 (504s)
+step 750/39777 lr 2.00e-03 loss 0.729259 grad_norm 1.911 (521s)
+step 775/39777 lr 2.00e-03 loss 0.587290 grad_norm 0.856 (538s)
+step 800/39777 lr 2.00e-03 loss 0.903292 grad_norm 3.424 (556s)
+step 825/39777 lr 2.00e-03 loss 0.830080 grad_norm 1.703 (573s)
+step 850/39777 lr 2.00e-03 loss 0.675133 grad_norm 0.913 (591s)
+step 875/39777 lr 2.00e-03 loss 0.935700 grad_norm 1.445 (608s)
+step 900/39777 lr 2.00e-03 loss 0.796233 grad_norm 1.219 (624s)
+step 925/39777 lr 2.00e-03 loss 0.570972 grad_norm 0.612 (641s)
+step 950/39777 lr 2.00e-03 loss 0.489561 grad_norm 1.464 (658s)
+step 975/39777 lr 2.00e-03 loss 0.871440 grad_norm 1.915 (674s)
+step 1000/39777 lr 2.00e-03 loss 0.960242 grad_norm 3.533 (691s)
+step 1025/39777 lr 2.00e-03 loss 0.674636 grad_norm 1.250 (708s)
+step 1050/39777 lr 2.00e-03 loss 0.733008 grad_norm 1.220 (724s)
+step 1075/39777 lr 2.00e-03 loss 0.688731 grad_norm 1.141 (740s)
+step 1100/39777 lr 2.00e-03 loss 0.573074 grad_norm 1.221 (758s)
+step 1125/39777 lr 2.00e-03 loss 0.630805 grad_norm 1.950 (774s)
+step 1150/39777 lr 2.00e-03 loss 0.714214 grad_norm 1.104 (790s)
+step 1175/39777 lr 2.00e-03 loss 0.652328 grad_norm 1.166 (806s)
+step 1200/39777 lr 2.00e-03 loss 0.676799 grad_norm 0.953 (823s)
+step 1225/39777 lr 2.00e-03 loss 0.652922 grad_norm 0.870 (839s)
+step 1250/39777 lr 2.00e-03 loss 0.812108 grad_norm 1.862 (856s)
+step 1275/39777 lr 2.00e-03 loss 0.674566 grad_norm 2.185 (873s)
+step 1300/39777 lr 2.00e-03 loss 0.605137 grad_norm 0.800 (889s)
+step 1325/39777 lr 2.00e-03 loss 0.739588 grad_norm 1.582 (905s)
+step 1350/39777 lr 2.00e-03 loss 0.626337 grad_norm 1.078 (921s)
+step 1375/39777 lr 2.00e-03 loss 0.492047 grad_norm 0.809 (938s)
+step 1400/39777 lr 2.00e-03 loss 0.801415 grad_norm 1.471 (954s)
+step 1425/39777 lr 2.00e-03 loss 0.604620 grad_norm 1.439 (970s)
+step 1450/39777 lr 2.00e-03 loss 0.717691 grad_norm 1.578 (985s)
+step 1475/39777 lr 2.00e-03 loss 0.660513 grad_norm 0.717 (1001s)
+step 1500/39777 lr 2.00e-03 loss 0.572091 grad_norm 1.242 (1016s)
+step 1525/39777 lr 2.00e-03 loss 0.649390 grad_norm 1.329 (1032s)
+step 1550/39777 lr 2.00e-03 loss 0.725455 grad_norm 0.908 (1048s)
+step 1575/39777 lr 2.00e-03 loss 0.606858 grad_norm 1.065 (1065s)
+step 1600/39777 lr 2.00e-03 loss 0.526460 grad_norm 1.172 (1082s)
+step 1625/39777 lr 2.00e-03 loss 0.661309 grad_norm 1.464 (1098s)
+step 1650/39777 lr 2.00e-03 loss 0.579469 grad_norm 1.213 (1115s)
+step 1675/39777 lr 2.00e-03 loss 0.507782 grad_norm 1.496 (1132s)
+step 1700/39777 lr 2.00e-03 loss 0.535316 grad_norm 1.284 (1148s)
+step 1725/39777 lr 2.00e-03 loss 0.541294 grad_norm 1.282 (1165s)
+step 1750/39777 lr 2.00e-03 loss 0.669692 grad_norm 1.647 (1181s)
+step 1775/39777 lr 1.99e-03 loss 0.624684 grad_norm 1.299 (1199s)
+step 1800/39777 lr 1.99e-03 loss 0.632941 grad_norm 1.139 (1215s)
+step 1825/39777 lr 1.99e-03 loss 0.669750 grad_norm 1.478 (1230s)
+step 1850/39777 lr 1.99e-03 loss 0.567684 grad_norm 0.960 (1248s)
+step 1875/39777 lr 1.99e-03 loss 0.525406 grad_norm 0.826 (1268s)
+step 1900/39777 lr 1.99e-03 loss 0.685887 grad_norm 1.630 (1288s)
