@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v027
   parent: gru_v026
-  status: running
+  status: finished
 description: 'v026 at 2x again: hidden 415, 1,742,717 params. That is 2.00x v026 (871,977),
   4.00x the 435,943-param teacher, and 4.00x the largest model we ran before v026.
   Everything else identical to v026 and v023: same architecture, same teacher, same
@@ -199,15 +199,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.016985767094678153
-  best_val_t0: -0.17982881502251538
-  best_val_t1: 0.14585728083315908
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.692283229379454
+  best_val_t0: 0.6888155388769163
+  best_val_t1: 0.6957509198819917
+  full_valid_wp: 0.6830584352537985
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0282
-  finished_utc: '2026-10-01T18:35:46Z'
+  train_hours: 14.41
+  finished_utc: '2026-10-02T09:00:30Z'
 artifacts:
   log: exploration/logs/log_gru_v027.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v027
