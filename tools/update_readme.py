@@ -159,6 +159,17 @@ def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
     say what is shippable.
     """
     entry = lb.get(v)
+    if entry and entry.get('outcome') == 'SCORE:TIMEOUT':
+        # A real grader TIMEOUT outranks every local verdict, including a passing
+        # gate and including a margin flag. v026 sat at "Ready to Submit (latency
+        # unverified)" in this table right up until it was uploaded and killed at
+        # 69m57s. If the grader has spoken, the table must say so.
+        secs = entry.get('grader_seconds')
+        dur = fmt_mmss(secs)
+        if secs:
+            dur += f' ({secs / 3600 * 100:.0f}%)'
+        mem = f"{entry['memory_mb']} MB" if entry.get('memory_mb') else '--'
+        return 'TIMED OUT on grader', 'no score', dur, mem
     if entry and entry.get('public_score') is not None:
         secs = entry.get('grader_seconds')
         dur = fmt_mmss(secs)
