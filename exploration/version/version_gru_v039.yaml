@@ -1,0 +1,209 @@
+schema_version: 1
+identity:
+  model: gru
+  version: v039
+  parent: gru_v031
+  status: planned
+description: >-
+  v031's exact recipe with a BETTER TEACHER. Student unchanged: hidden 128, input_proj 64, distill_weight 2.0, 3 epochs, same architecture and seed. Only the distillation targets change.
+hypothesis: >-
+  The teacher's quality is the one input to distillation we have never varied, and a strictly better one is on disk. Our current teacher is dozken's reset2k at 0.6864 local. His two-graph loss-diverse ensemble of reset2k + reset4k is 0.6879, which is 0.0015 better, and it is free at inference because a teacher never runs at serving time.
+
+    TeacherStore already averages multiple label files on read, so pointing loss.teacher_labels at both members reproduces his raw-mean ensemble exactly with no change to the training script. His solution.py confirms the average is raw (scale = 1/len(graphs), no z-scoring), which matters because the metric clips at +/-2.
+
+    The honest prior is POOR and stated as such. dozken's distil_ens scored 0.6585 against his distil160's 0.6588, so on his pair a better teacher did not beat a worse one through compression. The visible reason is that his student already sat at the compression sweet spot, leaving no gap for the teacher's extra 0.0015 to close.
+
+    Our student is somewhere different: 225,922 params at 0.687376 against a 0.6864 teacher, so it has ALREADY OVERTAKEN the single-model teacher. That is new -- none of dozken's students beat their own teacher locally. Whether that means there is headroom for a better teacher, or that the student has extracted everything extractable, is exactly the question. Worth one run, not worth assuming.
+change_vs_parent: >-
+  loss.teacher_labels gains a second member so TeacherStore averages dozken's reset2k and reset4k into his 0.6879 ensemble. Student architecture, distill_weight, schedule and seed all unchanged.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+  - cache/teacher/teacher_dozken_reset4k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+artifacts:
+  log: exploration/logs/log_gru_v039.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v039
+  submission_dir: null
