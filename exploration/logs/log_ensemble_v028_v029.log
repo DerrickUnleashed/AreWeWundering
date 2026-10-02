@@ -1,0 +1,67 @@
+### ensemble scoring, log opened 2026-10-02T10:31:23+00:00
+==============================================================================
+command           : tools/score_ensemble.py --members v028,v029
+                     --out cache/teacher/ens_v028_v029_valid.npy
+host              : macOS-27.0-arm64-arm-64bit  python 3.11.9
+git commit        : a88c3c0ee701a6ef812a3227decc4c7cb2d1deb3
+numpy / onnxrt    : 2.2.6 / 1.23.2
+members           : v028,v029
+sequences         : all 1873  (OFFICIAL full-validation number)
+chunk             : 1000
+state_reset       : 4000, from feature_stats; state cleared every 4000 rows and on
+                    warm-up rows too, exactly as serving does
+metric            : tools/metric_ref.py global_wp on the real need_prediction AND
+                    is_scored mask -> 3,528,273 scored rows, directly comparable
+                    to every full_valid_wp in the README table
+NOTE              : this run PREDATES the header+tee patch to score_ensemble.py.
+                    The body below is the process's real stdout, unmodified. The
+                    header above was reconstructed afterwards and the timestamp is
+                    approximate. The tool now writes this file itself.
+==============================================================================
+
+  members      : ['v028', 'v029']
+  sequences    : 1873 of 1873  (OFFICIAL full-validation number)
+  state_reset  : 4000
+    seq 200/1873   316.9s  eta 2651.1s
+    seq 400/1873   664.2s  eta 2446.0s
+    seq 600/1873   994.3s  eta 2109.5s
+    seq 800/1873  1324.6s  eta 1776.6s
+    seq 1000/1873  1657.4s  eta 1446.9s
+    seq 1200/1873  1988.8s  eta 1115.4s
+    seq 1400/1873  2325.7s  eta  785.8s
+    seq 1600/1873  2739.5s  eta  467.4s
+    seq 1800/1873  3154.5s  eta  127.9s
+
+  scored rows  : 3,528,273
+
+  v028 alone             t0 0.682239  t1 0.690660  MEAN 0.686449
+  v029 alone             t0 0.679674  t1 0.689322  MEAN 0.684498
+  MEAN of 2              t0 0.681808  t1 0.690743  MEAN 0.686275
+
+  ensemble gain over best member: -0.000174
+  dozken measured +0.0056 at P(>0)=1.000 for a loss-diverse pair.
+  our 2-sigma noise floor is  +/-0.000317
+  wrote cache/teacher/ens_v028_v029_valid.npy
+
+=== interpretation, added after the run ===
+
+HARNESS VALIDATION: each member reproduces its own recorded full_valid_wp to
+within 6e-5 (v028: 0.686449 vs 0.686510) and 2e-4 (v029: 0.684498 vs 0.684683),
+which is float32 drift over 20,000 recurrent steps. So the -0.000174 below is a
+real measurement and not a pipeline artifact.
+
+RESULT: NULL. The 2-member mean lands 0.000174 BELOW v028 alone, well inside the
++/-0.000317 noise floor. dozken measured +0.0056 at P(>0)=1.000 for a loss-diverse
+pair, so this is a refutation rather than an uninformative null.
+
+WHY, and it is not mysterious. Our two members are not actually diverse.
+Their scores differ by 0.00195; his differ by 0.0041. More decisively, v029
+differs from v028 only by gamma=2.0 tail-weighting on the DISTILL term, and that
+was already measured as a dead null in its own right (+0.000002, idea 5). A knob
+that provably does nothing cannot manufacture ensemble diversity. We applied his
+mechanism -- members trained with different losses -- to two members whose losses
+were, in effect, the same.
+
+LESSON: a loss-diverse ensemble requires members whose individual optimisation
+genuinely diverges. It is not enough to vary a hyper-parameter; the variation has
+to show up in the member scores.
