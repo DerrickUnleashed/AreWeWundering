@@ -725,3 +725,45 @@ distinguishable one.
 
 The parameter count is unchanged, so latency is inherited from v028: nothing about
 this costs anything to serve.
+
+## The loss-diverse ensemble: refuted, and the reason is the interesting part
+
+`tools/score_ensemble.py` scored **v028 + v029** on all 1,873 sequences — 3,528,273
+scored rows, the official number, reference metric, raw-mean (never z-scored).
+
+| | t0 | t1 | MEAN | vs recorded |
+|---|---:|---:|---:|---|
+| v028 alone | 0.682239 | 0.690660 | **0.686449** | 0.686510 (Δ 6e-5) |
+| v029 alone | 0.679674 | 0.689322 | 0.684498 | 0.684683 (Δ 2e-4) |
+| **MEAN of 2** | 0.681808 | 0.690743 | 0.686275 | **−0.000174** |
+
+**The harness validates itself.** Each member reproduces its own recorded
+`full_valid_wp` to 6e-5 and 2e-4 — float32 drift over 20,000 recurrent steps — so the
+−0.000174 is a real measurement, not a pipeline artifact.
+
+**The result is a null**: −0.000174, well inside the ±0.000317 noise floor, against
+dozken's **+0.0056 at P(>0)=1.000**. That is a refutation, not an uninformative null.
+
+### Why — and this is the transferable part
+
+**Our two members were not actually diverse.** Their scores differ by 0.00195; his
+differ by 0.0041. More decisively: v029 differs from v028 *only* by `gamma=2.0`
+tail-weighting on the distill term — and **that was already measured as a dead null
+in its own right** (+0.000002, idea 5).
+
+A knob that provably does nothing cannot manufacture ensemble diversity. We applied
+his mechanism — members trained with *different losses* — to two members whose
+losses were, in effect, the same. The ensemble faithfully averaged two near-copies
+and landed exactly where averaging near-copies lands.
+
+**The lesson:** a loss-diverse ensemble needs members whose individual optimisation
+*genuinely diverges*, evidenced by a real spread in their member scores. Varying a
+hyper-parameter is not enough. If we revisit this, the diversity has to be designed
+in and verified by member score spread *before* the ensemble is scored — not
+assumed from a differing config.
+
+The fusion tooling is unaffected and remains correct: `tools/build_ensemble_graph.py`
+still builds a bit-exact single graph, verified `0.000e+00`. It is the ensembling
+that failed, not the fusing. The single-graph fusion remains the thing that makes a
+*genuinely* diverse pair shippable where dozken's two-session version timed out — it
+just has nothing to carry yet.
