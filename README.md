@@ -8,8 +8,8 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Ready to Submit (latency anchored on v028) | -- | 46m52s (78%) | -- |
-| 2 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Ready to Submit (latency anchored on v028) | -- | 46m52s (78%) | -- |
+| 1 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m38s (76%) | 628 MB |
+| 2 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
 | 3 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
 | 4 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
 | 5 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
@@ -38,6 +38,7 @@ reference metric in `tools/metric_ref.py`.
 | 28 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
 | 29 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
 | 30 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 31 | **v033** | A deliberately DIVERSE ensemble member, not... | 0.660415 | Yet to package | -- | -- | -- |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
@@ -51,7 +52,6 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
 | **v032** | v028's exact recipe -- same architecture,... | -- | Training | -- |
-| **v033** | A deliberately DIVERSE ensemble member, not... | -0.127666 | Training | -- |
 | **v034** | v028's exact recipe with the ONE axis that... | -0.119622 | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
@@ -70,38 +70,41 @@ table above, and the disagreements are the interesting part:
 
 | Rank | Ver | full_valid_wp | Public score | vs best | Grader | Outcome |
 |---:|---|---:|---:|---:|---:|---|
-| 1 | **v028** | 0.686510 | **0.6585** | +0.0000 | 46m52s (78%) | scored |
-| 2 | **v025** | 0.684438 | **0.6580** | -0.0005 | 46m07s (77%) | scored |
-| 3 | **v029** | 0.684683 | **0.6568** | -0.0017 | 44m27s (74%) | scored |
-| 4 | **v023** | 0.684681 | **0.6568** | -0.0017 | 45m36s (76%) | scored |
-| 5 | **v022** | 0.685228 | **0.6565** | -0.0020 | 50m46s (85%) | scored |
-| 6 | **v024** | 0.684818 | **0.6560** | -0.0025 | 50m17s (84%) | scored |
-| 7 | **v016** | 0.681753 | **0.6541** | -0.0044 | 30m56s (52%) | scored |
-| 8 | **v017** | 0.681866 | **0.6540** | -0.0045 | 25m37s (43%) | scored |
-| 9 | **v018** | 0.680603 | **0.6518** | -0.0067 | 29m21s (49%) | scored |
-| 10 | **v014** | 0.679676 | **0.6517** | -0.0068 | 40m12s (67%) | scored |
-| 11 | **v015** | -- | **0.6515** | -0.0070 | 30m31s (51%) | scored |
-| 12 | **v011** | 0.679986 | **0.6515** | -0.0070 | 30m12s (50%) | scored |
-| 13 | **v020** | 0.681773 | **0.6513** | -0.0072 | 29m52s (50%) | scored |
-| 14 | **v012** | 0.678784 | **0.6512** | -0.0073 | 29m47s (50%) | scored |
-| 15 | **v019** | 0.678374 | **0.6510** | -0.0075 | 30m32s (51%) | scored |
-| 16 | **v021** | 0.678575 | **0.6505** | -0.0080 | 55m32s (93%) | scored |
-| 17 | **v013** | 0.676198 | **0.6490** | -0.0095 | 28m36s (48%) | scored |
-| 18 | **v009** | 0.674456 | **0.6483** | -0.0102 | 39m52s (66%) | scored |
-| 19 | **v007** | 0.674258 | **0.6481** | -0.0104 | 42m16s (70%) | scored |
-| 20 | **v005** | 0.674037 | **0.6481** | -0.0104 | 36m56s (62%) | scored |
-| 21 | **v006** | 0.674149 | **0.6475** | -0.0110 | 35m32s (59%) | scored |
-| 22 | **v008** | 0.674445 | **0.6473** | -0.0112 | 41m17s (69%) | scored |
-| 23 | **v003** | 0.673711 | **0.6457** | -0.0128 | 30m57s (52%) | scored |
-| 24 | **v004** | 0.672206 | **0.6446** | -0.0139 | 43m16s (72%) | scored |
-| 25 | **v002** | 0.674350 | **0.6435** | -0.0150 | 35m02s (58%) | scored |
-| 26 | **v010** | 0.670696 | **0.6427** | -0.0158 | 34m37s (58%) | scored |
-| 27 | **v001** | 0.674315 | **0.6416** | -0.0169 | 34m02s (57%) | scored |
+| 1 | **v031** | 0.687376 | **0.6587** | +0.0000 | 45m38s (76%) | scored |
+| 2 | **v030** | 0.686919 | **0.6585** | -0.0002 | 47m11s (79%) | scored |
+| 3 | **v028** | 0.686510 | **0.6585** | -0.0002 | 46m52s (78%) | scored |
+| 4 | **v025** | 0.684438 | **0.6580** | -0.0007 | 46m07s (77%) | scored |
+| 5 | **v029** | 0.684683 | **0.6568** | -0.0019 | 44m27s (74%) | scored |
+| 6 | **v023** | 0.684681 | **0.6568** | -0.0019 | 45m36s (76%) | scored |
+| 7 | **v022** | 0.685228 | **0.6565** | -0.0022 | 50m46s (85%) | scored |
+| 8 | **v024** | 0.684818 | **0.6560** | -0.0027 | 50m17s (84%) | scored |
+| 9 | **v016** | 0.681753 | **0.6541** | -0.0046 | 30m56s (52%) | scored |
+| 10 | **v017** | 0.681866 | **0.6540** | -0.0047 | 25m37s (43%) | scored |
+| 11 | **v018** | 0.680603 | **0.6518** | -0.0069 | 29m21s (49%) | scored |
+| 12 | **v014** | 0.679676 | **0.6517** | -0.0070 | 40m12s (67%) | scored |
+| 13 | **v015** | -- | **0.6515** | -0.0072 | 30m31s (51%) | scored |
+| 14 | **v011** | 0.679986 | **0.6515** | -0.0072 | 30m12s (50%) | scored |
+| 15 | **v020** | 0.681773 | **0.6513** | -0.0074 | 29m52s (50%) | scored |
+| 16 | **v012** | 0.678784 | **0.6512** | -0.0075 | 29m47s (50%) | scored |
+| 17 | **v019** | 0.678374 | **0.6510** | -0.0077 | 30m32s (51%) | scored |
+| 18 | **v021** | 0.678575 | **0.6505** | -0.0082 | 55m32s (93%) | scored |
+| 19 | **v013** | 0.676198 | **0.6490** | -0.0097 | 28m36s (48%) | scored |
+| 20 | **v009** | 0.674456 | **0.6483** | -0.0104 | 39m52s (66%) | scored |
+| 21 | **v007** | 0.674258 | **0.6481** | -0.0106 | 42m16s (70%) | scored |
+| 22 | **v005** | 0.674037 | **0.6481** | -0.0106 | 36m56s (62%) | scored |
+| 23 | **v006** | 0.674149 | **0.6475** | -0.0112 | 35m32s (59%) | scored |
+| 24 | **v008** | 0.674445 | **0.6473** | -0.0114 | 41m17s (69%) | scored |
+| 25 | **v003** | 0.673711 | **0.6457** | -0.0130 | 30m57s (52%) | scored |
+| 26 | **v004** | 0.672206 | **0.6446** | -0.0141 | 43m16s (72%) | scored |
+| 27 | **v002** | 0.674350 | **0.6435** | -0.0152 | 35m02s (58%) | scored |
+| 28 | **v010** | 0.670696 | **0.6427** | -0.0160 | 34m37s (58%) | scored |
+| 29 | **v001** | 0.674315 | **0.6416** | -0.0171 | 34m02s (57%) | scored |
 
 | Ver | full_valid_wp | Public score | Grader | Outcome |
 |---|---:|---|---:|---|
 | **v026** | 0.684335 | **no score** | 69m57s (117%) | **SCORE:TIMEOUT** |
 | **v027** | 0.683058 | **no score** | 69m57s (117%) | **SCORE:TIMEOUT** |
+| **v033** | 0.660415 | **no score** | -- | **not submitted** |
 
 v026 (871,977 params) and v027 (1,742,717 params) are the two largest
 models this project ever built. Both were uploaded and both were killed by
@@ -926,3 +929,90 @@ strict" — it is that it is **only as good as the p50 it was given**.
 
 Both bundles pass every other gate: contract, determinism, parity (max |diff|
 3.3e-06 and 2.9e-06 against a 1e-03 tolerance), and size at 2.42 MB of 20 MB.
+
+## v031 is our best entry — but read the attenuation before celebrating (2026-10-02)
+
+The distillation-weight sweep completed and both new bundles were submitted. **v031
+is our best public score at 0.6587**, and the sweep was monotone across all four points.
+
+| ver | distill_weight | local | vs v028 | public | vs v028 | grader |
+|---|---:|---:|---:|---:|---:|---|
+| v023 | 0.5 | 0.684681 | −0.001829 | 0.6568 | −0.0017 | 45m36s |
+| v028 | 1.0 | 0.686510 | baseline | 0.6585 | baseline | 46m52s |
+| v030 | 1.5 | 0.686919 | +0.000408 | 0.6585 | **+0.0000** | 47m11s |
+| **v031** | **2.0** | **0.687376** | **+0.000865** | **0.6587** | **+0.0002** | 45m41s |
+
+### The local curve is promising and the public curve is flat
+
+v030's local gain of +0.000408 transferred as **exactly zero**. v031's +0.000865
+transferred as +0.0002 — an **attenuation of 4.3×**. Against a public-split noise floor
+of order 0.0005, **v031, v030 and v028 are a statistical tie on the leaderboard.**
+
+So the honest reading is: the sweep is real on local validation (+5.5σ for v031) and
+nearly worthless on the board that decides the prize. Two readings, and we cannot yet
+distinguish them:
+
+1. **We are approaching the teacher's ceiling.** dozken's teacher is 0.690168 local and
+   v031 is at 0.687376 — most of the way there. Further distillation weight has less
+   left to absorb, which would mean 3.0 and 4.0 are not worth running.
+2. **The public split is a small sample.** 1,970 test sequences against 1,873
+   validation sequences, and the two differ by a fixed ~0.028 offset. A +0.0009 local
+   gain can simply be invisible at that resolution.
+
+The practical answer is that the *next* distillation-weight probe is far less
+attractive than it looked this morning, and I would not spend two runs on it before
+v032 reports.
+
+### The measured-anchor rule is now validated three ways, not argued
+
+| run | packager said | anchor predicted | **actual** | gate error | anchor error |
+|---|---:|---:|---:|---:|---:|
+| v028 | 72.1 min | 46.9 min | **46.9 min** | +25.2 min | **+0.03 min** |
+| v030 | 62.1 min | 46.9 min | **47.2 min** | +14.9 min | **−0.28 min** |
+| v031 | 63.9 min | 46.9 min | **45.7 min** | +18.2 min | **+1.22 min** |
+
+Three predictions, three completions, no timeouts, worst error 1.22 minutes. Both
+bundles were marked `NOT-READY` by the gate and **both shipped fine**. This is the
+clearest result of the session, and it cost nothing: the fix was to stop trusting a
+local p50 measured on a busy box.
+
+### The offset held for these two
+
+v030 at −0.028419 and v031 at −0.028676 both sit inside the 3-epoch band of
+−0.028264 ± 0.000419. So the mapping did **not** drift — which retroactively sharpens
+the v025 finding: the +4.4σ outlier was specific to **longer training**, not a general
+slow erosion of the local→public relationship. That is testable, and v032 tests it.
+
+## v033 falsified its own precondition, and that is the run working
+
+`v033` finished at **full_valid_wp 0.660415 — 170σ below v028.** Its yaml predicted it
+would land "within a few sigma of v028" and made that the explicit condition for the
+ensemble being worth running. **It missed by two orders of magnitude.**
+
+What was right and what was wrong:
+
+- **The diversity mechanism was real and verified.** Per-lane offsets spread −3..3 cost
+  the global loss 0.276 and the per-sequence loss 0.069 — a 4× difference — while one
+  *shared* offset cost both 0.195 identically, which is correct since a shared bias is
+  not re-centreable. The two objectives genuinely disagree.
+- **The magnitude was not viable.** dozken's working pair had a **0.0041** spread
+  between members. This would need **0.027**. Per-sequence pooling cost far more than
+  his did: ~0.004 in his hands, 0.027 in ours.
+
+So the ensemble it was built for is off the table. Not submitted, not packaged — there
+is no case for shipping a model 170σ down. Recorded here rather than buried, because
+the run did exactly what a falsifiable hypothesis is for: it set a precondition, the
+precondition failed, and that was discovered by running it rather than by reasoning.
+
+## Where we stand
+
+```
+ours v031  0.6587   <-- our best
+ours v030  0.6585
+ours v028  0.6585
+dozken     0.6588   (distil160)
+#1         0.6677
+```
+
+**0.0090 off first**, and 0.0001 behind dozken. v025's epoch finding is still the most
+promising open thread — v032 reports within the hour and tests it directly.
