@@ -8,7 +8,7 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m38s (76%) | 628 MB |
+| 1 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
 | 2 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
 | 3 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
 | 4 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Yet to package | -- | -- | -- |
@@ -70,7 +70,7 @@ table above, and the disagreements are the interesting part:
 
 | Rank | Ver | full_valid_wp | Public score | vs best | Grader | Outcome |
 |---:|---|---:|---:|---:|---:|---|
-| 1 | **v031** | 0.687376 | **0.6587** | +0.0000 | 45m38s (76%) | scored |
+| 1 | **v031** | 0.687376 | **0.6587** | +0.0000 | 45m41s (76%) | scored |
 | 2 | **v030** | 0.686919 | **0.6585** | -0.0002 | 47m11s (79%) | scored |
 | 3 | **v028** | 0.686510 | **0.6585** | -0.0002 | 46m52s (78%) | scored |
 | 4 | **v025** | 0.684438 | **0.6580** | -0.0007 | 46m07s (77%) | scored |
