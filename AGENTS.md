@@ -63,7 +63,15 @@ This file is the project memory for any coding agent or human working in this re
 
    **History rewrite, once, with authorisation.** On 2026-10-02 the user asked for every Claude co-author trailer to be removed from all of `main`. That required rewriting 4 of 818 commits and force-pushing `main` with `--force-with-lease`, which (b) otherwise forbids. It was done in a throwaway clone at `/tmp` so the dirty live worktree and five running training jobs were never touched, after taking a backup bundle and a `backup/pre-coauthor-removal` tag. Precedent, not standing permission: **ask again before any further rewrite.**
 
-   **Do not `git add` a file a live process holds open.** Git creates a new file and renames it over the old one rather than editing in place, so staging the path of a running training job's log orphans the writer: its descriptor keeps writing to an unlinked inode, and the bytes become unreachable by name. `lsof` will not flag it, because the inode is still allocated with an open descriptor. This destroyed the canonical log of `gru_v018` on 2026-09-30; `tools/rebuild_log.py` reconstructs it from checkpoints. **Stage live logs only after the run exits.** Checkpoints (`last.pt`) are written atomically and are safe to stage mid-run.
+   **Staging a file a live process holds open is SAFE. Replacing it is not.** Corrected 2026-10-02: the previous version of this rule banned staging a live log outright, which was overbroad, and it was nearly obeyed for the wrong reason.
+
+   The real mechanism: the training logger's `Tee` opens the file once in `__init__` and holds that descriptor for the whole run, so anything that *replaces the file at that path* leaves the writer appending to an unlinked inode. The bytes stay allocated and reachable through the descriptor, so `lsof` will not flag it, but they are unreachable *by name* — which is what destroyed the canonical log of `gru_v018` on 2026-09-30.
+
+   What is safe: `git add` and `git commit`. These write only the index and the object store; they never touch the working tree. Verified directly on 2026-10-02 by holding a descriptor open across a commit and then writing again — the post-commit bytes landed on the same inode and the file was untouched.
+
+   What is destructive: `git checkout`, `git restore`, `git stash` and `git pull` when they must materialise a *different* version of that path. That is what the gru_v018 loss was — a branch switch, mid-run.
+
+   So: **commit a running job's log freely** (it is a useful snapshot, and mid-run logs are already committed for v025-v029). **Never let a checkout/stash/pull materialise a different version of a path a live process is writing.** If one is about to, back the file up first. `tools/rebuild_log.py` reconstructs a lost log from checkpoints. Checkpoints (`last.pt`, `history.json`) are written atomically and are safe to stage and safe to check out.
 7. **No data in RAM.** Stream or memory-map; never `pd.read_parquet` the train file whole.
 8. **Reproducibility.** Every run records seed, config (yaml), git commit if available, package versions, hardware, and the exact command in its log header.
 9. **Don't touch organiser files:** `utils.py`, `requirements.txt`, `baseline/`, `datasets/`, `docs/`.
