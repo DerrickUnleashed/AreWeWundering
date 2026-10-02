@@ -1,0 +1,311 @@
+### new run, log opened 2026-10-03T00:49:46+0530
+==============================================================================
+command            : python exploration/models/train_gru_v036.py --config exploration/version/version_gru_v036.yaml
+timestamp          : 2026-10-03T00:49:46+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : c108358a4b7426aefab3a32e068dba4fa701a40f
+seed               : 1337
+log                : exploration/logs/log_gru_v036.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v036
+  parent: gru_v031
+  status: smoke
+description: 'v031''s exact recipe with ONE change: input_proj 64 -> 96, so the 224-wide
+  transformed row is compressed 2.3x instead of 3.5x. Recurrent trunk untouched at
+  hidden 128.'
+hypothesis: "THIS IS NOT A CAPACITY EXPERIMENT, and that is the whole point. Every\
+  \ recurrence-widening result says extra parameters get absorbed as overfitting.\
+  \ But the input projection is a different animal: at 64 units it is a 3.5x BOTTLENECK\
+  \ on the 224-wide level-plus-difference row, and a bottleneck destroys information\
+  \ rather than merely adding variance.\n\n  dozken's audit put a number on it --\
+  \ \"the 224->64 projection destroying ~0.014 WP of linearly available signal\" --\
+  \ and then measured it at -0.0032 on his chunk4k recipe. That does not settle it\
+  \ for us, because chunk4k is a recipe his own data shows is HARMFUL under Global\
+  \ WP (-0.0370 vs reset4k), making it the wrong substrate to measure a projection\
+  \ change on. We have never varied input_proj on OUR recipe.\n\n  It is also nearly\
+  \ free where the trunk was not: the projection is 6.4% of per-row compute, so widening\
+  \ it 1.5x costs about 3% latency, against the 2x-4x that blew the budget for v026\
+  \ and v027.\n\n  Prediction: if the bottleneck hypothesis is right this GAINS where\
+  \ added recurrence lost, because it feeds the recurrence more signal without giving\
+  \ it more parameters to overfit with. Flat or negative joins head_hidden and hidden\
+  \ on the closed-capacity list."
+change_vs_parent: model.input_proj 64 -> 96 only. Recurrent trunk, distill_weight,
+  schedule and seed all unchanged.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 96
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: 251682
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 59
+  best_val_wp: 0.026730855551968566
+  best_val_t0: 0.20574014950803168
+  best_val_t1: -0.15227843840409455
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0067
+  finished_utc: '2026-10-02T19:18:38Z'
+artifacts:
+  log: exploration/logs/log_gru_v036.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v036
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=96 in_dim=224 params=251,682
+max_steps derived: 13,259 steps/epoch x 3 epoch(s) = 39,777 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 1 member(s), 212,140,000 rows, weight 2.0
+train sequences=10607  valid sequences=200  steps=39777
+step 0/39777 lr 4.00e-06 loss 2.902715 grad_norm 8.015 (1s)
+step 25/39777 lr 1.04e-04 loss 2.456931 grad_norm 7.302 (14s)
+step 50/39777 lr 2.04e-04 loss 1.334949 grad_norm 2.534 (30s)
+step 75/39777 lr 3.04e-04 loss 1.210551 grad_norm 3.593 (46s)
+step 100/39777 lr 4.04e-04 loss 1.207373 grad_norm 4.656 (62s)
+step 125/39777 lr 5.04e-04 loss 1.096447 grad_norm 2.372 (77s)
+step 150/39777 lr 6.04e-04 loss 0.810383 grad_norm 1.780 (94s)
+step 175/39777 lr 7.04e-04 loss 1.019785 grad_norm 2.499 (112s)
+step 200/39777 lr 8.04e-04 loss 0.959227 grad_norm 2.412 (131s)
+step 225/39777 lr 9.04e-04 loss 0.760894 grad_norm 1.897 (149s)
+step 250/39777 lr 1.00e-03 loss 0.746864 grad_norm 2.074 (168s)
+step 275/39777 lr 1.10e-03 loss 0.732846 grad_norm 1.675 (187s)
+step 300/39777 lr 1.20e-03 loss 0.813170 grad_norm 1.991 (205s)
+step 325/39777 lr 1.30e-03 loss 1.090078 grad_norm 4.057 (223s)
+step 350/39777 lr 1.40e-03 loss 0.852092 grad_norm 1.762 (242s)
+step 375/39777 lr 1.50e-03 loss 0.816023 grad_norm 1.876 (261s)
+step 400/39777 lr 1.60e-03 loss 0.964784 grad_norm 2.265 (281s)
+step 425/39777 lr 1.70e-03 loss 0.748585 grad_norm 1.314 (300s)
+step 450/39777 lr 1.80e-03 loss 0.819311 grad_norm 1.295 (318s)
+step 475/39777 lr 1.90e-03 loss 0.592937 grad_norm 1.819 (336s)
+step 500/39777 lr 2.00e-03 loss 0.800331 grad_norm 2.002 (353s)
+step 525/39777 lr 2.00e-03 loss 0.716691 grad_norm 1.495 (372s)
+step 550/39777 lr 2.00e-03 loss 0.638627 grad_norm 1.263 (391s)
+step 575/39777 lr 2.00e-03 loss 0.604847 grad_norm 1.876 (408s)
+step 600/39777 lr 2.00e-03 loss 0.654018 grad_norm 1.305 (426s)
+step 625/39777 lr 2.00e-03 loss 0.825309 grad_norm 1.729 (443s)
+step 650/39777 lr 2.00e-03 loss 0.865227 grad_norm 2.789 (461s)
+step 675/39777 lr 2.00e-03 loss 0.573172 grad_norm 1.377 (477s)
+step 700/39777 lr 2.00e-03 loss 0.592484 grad_norm 1.493 (495s)
+step 725/39777 lr 2.00e-03 loss 0.518773 grad_norm 1.214 (512s)
+step 750/39777 lr 2.00e-03 loss 0.712757 grad_norm 1.417 (529s)
+step 775/39777 lr 2.00e-03 loss 0.570374 grad_norm 0.810 (547s)
+step 800/39777 lr 2.00e-03 loss 0.953703 grad_norm 4.075 (564s)
+step 825/39777 lr 2.00e-03 loss 0.876290 grad_norm 1.628 (582s)
+step 850/39777 lr 2.00e-03 loss 0.678507 grad_norm 0.962 (600s)
+step 875/39777 lr 2.00e-03 loss 0.979958 grad_norm 1.873 (617s)
+step 900/39777 lr 2.00e-03 loss 0.795467 grad_norm 1.128 (634s)
+step 925/39777 lr 2.00e-03 loss 0.586992 grad_norm 0.834 (651s)
+step 950/39777 lr 2.00e-03 loss 0.468176 grad_norm 0.939 (667s)
+step 975/39777 lr 2.00e-03 loss 0.833524 grad_norm 1.502 (684s)
+step 1000/39777 lr 2.00e-03 loss 0.973463 grad_norm 4.393 (701s)
+step 1025/39777 lr 2.00e-03 loss 0.672066 grad_norm 1.511 (719s)
+step 1050/39777 lr 2.00e-03 loss 0.735104 grad_norm 1.313 (735s)
+step 1075/39777 lr 2.00e-03 loss 0.663151 grad_norm 0.657 (752s)
+step 1100/39777 lr 2.00e-03 loss 0.590337 grad_norm 1.150 (769s)
+step 1125/39777 lr 2.00e-03 loss 0.618790 grad_norm 2.272 (785s)
+step 1150/39777 lr 2.00e-03 loss 0.737292 grad_norm 1.367 (801s)
+step 1175/39777 lr 2.00e-03 loss 0.650647 grad_norm 1.224 (818s)
+step 1200/39777 lr 2.00e-03 loss 0.687515 grad_norm 1.366 (835s)
+step 1225/39777 lr 2.00e-03 loss 0.679298 grad_norm 1.047 (852s)
+step 1250/39777 lr 2.00e-03 loss 0.795065 grad_norm 1.966 (868s)
+step 1275/39777 lr 2.00e-03 loss 0.668813 grad_norm 2.495 (885s)
+step 1300/39777 lr 2.00e-03 loss 0.621249 grad_norm 0.834 (901s)
+step 1325/39777 lr 2.00e-03 loss 0.772175 grad_norm 2.305 (918s)
+step 1350/39777 lr 2.00e-03 loss 0.624785 grad_norm 1.188 (935s)
+step 1375/39777 lr 2.00e-03 loss 0.479822 grad_norm 0.935 (952s)
+step 1400/39777 lr 2.00e-03 loss 0.776338 grad_norm 1.206 (967s)
+step 1425/39777 lr 2.00e-03 loss 0.577411 grad_norm 1.476 (983s)
+step 1450/39777 lr 2.00e-03 loss 0.686580 grad_norm 1.927 (999s)
+step 1475/39777 lr 2.00e-03 loss 0.665131 grad_norm 0.826 (1015s)
+step 1500/39777 lr 2.00e-03 loss 0.585920 grad_norm 1.470 (1031s)
+step 1525/39777 lr 2.00e-03 loss 0.643113 grad_norm 1.363 (1047s)
+step 1550/39777 lr 2.00e-03 loss 0.707612 grad_norm 1.197 (1064s)
+step 1575/39777 lr 2.00e-03 loss 0.628808 grad_norm 1.512 (1081s)
+step 1600/39777 lr 2.00e-03 loss 0.507837 grad_norm 1.032 (1097s)
+step 1625/39777 lr 2.00e-03 loss 0.662308 grad_norm 1.115 (1114s)
+step 1650/39777 lr 2.00e-03 loss 0.547920 grad_norm 1.132 (1132s)
+step 1675/39777 lr 2.00e-03 loss 0.521532 grad_norm 1.789 (1148s)
+step 1700/39777 lr 2.00e-03 loss 0.538904 grad_norm 1.197 (1165s)
+step 1725/39777 lr 2.00e-03 loss 0.499758 grad_norm 1.617 (1182s)
+step 1750/39777 lr 2.00e-03 loss 0.668091 grad_norm 1.501 (1200s)
+step 1775/39777 lr 1.99e-03 loss 0.610882 grad_norm 1.362 (1216s)
+step 1800/39777 lr 1.99e-03 loss 0.588263 grad_norm 0.974 (1232s)
+step 1825/39777 lr 1.99e-03 loss 0.641784 grad_norm 0.929 (1250s)
+step 1850/39777 lr 1.99e-03 loss 0.558607 grad_norm 1.046 (1271s)
