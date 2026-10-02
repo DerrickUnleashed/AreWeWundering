@@ -1039,3 +1039,36 @@ One incidental benefit of packaging it: it produced the first latency measuremen
 taken on a *quiet* machine for this architecture — 53.25 µs/row against the 58–60 µs
 measured under load, which is the last independent confirmation that contention, not
 the model, was inflating our numbers all along.
+
+## Capacity is closed on every axis we can afford to test (v034)
+
+`v034` doubled the MLP head — `head_hidden` 192 → 384, 225,922 → 263,362 params
+(+16.5%). It was the one place where "make it bigger" was affordable: the head is 16.7%
+of per-row compute against the trunk's 83.3%, so this cost ~17% latency where widening
+`hidden` cost 2× to 4× and blew straight through the budget.
+
+**It made things worse: 0.686000, which is 0.000510 below v028 at −3.2σ.**
+
+| ver | change | params | full_valid_wp | vs v028 | σ |
+|---|---|---:|---:|---:|---:|
+| v028 | baseline | 225,922 | 0.686510 | — | — |
+| **v034** | **head 192 → 384** | **263,362** | **0.686000** | **−0.000510** | **−3.2** |
+| v026 | hidden 128 → 285 | 871,977 | 0.684335 | −0.002175 | −13.7 |
+| v027 | hidden 128 → 415 | 1,742,717 | 0.683058 | −0.003452 | −21.7 |
+
+So the answer to "we have 14 minutes of budget left, can we make it bigger?" is now
+measured rather than assumed: **no, and it does not matter where you spend it.** Three
+axes, three regressions, monotonically worse with size. The yaml had predicted that a
+null was plausible and that a worse result "would be consistent and expected" — which is
+what happened, and it is why the hypothesis was written down before the run rather than
+after.
+
+Combined with v026 and v027, every form of extra capacity we can afford to test has made
+the model worse. The useful conclusion is not just "don't widen" — it is that **the
+225,922-parameter size is not a compromise forced by the latency budget. It is the
+optimum.** v023's compression finding was not merely free, it was load-bearing.
+
+This also settles the direction of the remaining time. The two levers that have ever
+moved this model are both *smaller-scope* changes — how hard we distil (v031, +5.5σ)
+and how long we train (v025's offset anomaly, still being tested by v032). Neither adds
+parameters.
