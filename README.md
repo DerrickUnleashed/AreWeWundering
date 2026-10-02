@@ -13,7 +13,7 @@ reference metric in `tools/metric_ref.py`.
 | 3 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
 | 4 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
 | 5 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
-| 6 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Do not ship | -- | 62m18s (104%) | -- |
+| 6 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Submitted | 0.6580 | 46m07s (77%) | 628 MB |
 | 7 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | TIMED OUT on grader | no score | 69m57s (117%) | 646 MB |
 | 8 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | Yet to package | -- | -- | -- |
 | 9 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
@@ -50,6 +50,7 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
 | **v030** | v028's exact recipe and architecture with... | -- | Training | -- |
 | **v031** | v028's exact recipe and architecture with... | -- | Training | -- |
+| **v032** | v028's exact recipe -- same architecture,... | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -675,3 +676,52 @@ called v028 NOT-READY at a projected 120% and v028 ran at 78% and scored our bes
 
 The actionable rule is narrow and worth stating: **a contended p50 is not a
 measurement.** Re-measure idle or do not gate.
+
+## The offset is not a constant, and it moved us 0.0018 (2026-10-02)
+
+`v025` scored **0.6580 public** — and that is the most informative result in the
+table, not because of its rank but because of its **offset**.
+
+| ver | local | public | offset | epochs | batch |
+|---|---:|---:|---:|---:|---:|
+| v022 | 0.685228 | 0.6565 | −0.028728 | 3 | 16 |
+| v023 | 0.684681 | 0.6568 | −0.027881 | 3 | 16 |
+| v024 | 0.684818 | 0.6560 | −0.028818 | 3 | 64 |
+| **v025** | **0.684438** | **0.6580** | **−0.026438** | **5** | 64 |
+| v028 | 0.686510 | 0.6585 | −0.028010 | 3 | 16 |
+| v029 | 0.684683 | 0.6568 | −0.027883 | 3 | 16 |
+
+Five 3-epoch runs share −0.028264 ± 0.000419. v025 sits at **+4.4σ** from that.
+
+**The control is unusually clean.** v024 is the *identical* recipe to v025 at 3
+epochs and sits normally at −0.028818. So batch 64 is exonerated, and training
+length is the only structural difference. Measured against v024 specifically, the
+shift is **+0.002380**.
+
+### What this does to how we select models
+
+**`full_valid_wp` is a biased selector across different epoch counts, and the bias
+runs against the longer run.** v025 was a −1.5σ local *regression* and was nearly
+discarded on that reading — it then beat v023 publicly by **+0.0012**. Local
+selection did not merely fail to find the win, it actively mis-ranked it.
+
+Everything we concluded about epochs before this was measured on local score alone
+and is therefore suspect in a specific direction. Notably v010 ("6 epochs not 3")
+was rejected locally at 0.670696 — that verdict deserves re-examination, and the
+honest reading is that we do not currently know whether it was wrong.
+
+### Acting on it
+
+`v032` = **v028's exact recipe at 5 epochs**. v028 has the best local score in the
+project (0.686510, +11.5σ) and carries the standard offset; v025 shows a +0.0024
+public uplift from training longer. If the two compose, the prediction is
+**0.6585 + 0.0024 = 0.6609**, against a 0.6677 leader we currently sit 0.0092 back.
+
+The hypothesis is written to be falsifiable rather than merely hopeful: if `v032`
+lands at v028's 0.6585, the epoch effect did not transfer to this recipe, which
+would mean the shift was specific to v025's *lower* distillation weight — and the
+two levers would interact rather than add. That is a real possibility and a
+distinguishable one.
+
+The parameter count is unchanged, so latency is inherited from v028: nothing about
+this costs anything to serve.
