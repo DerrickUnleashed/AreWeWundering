@@ -50,6 +50,17 @@ This file is the project memory for any coding agent or human working in this re
 
    **Never `git add -A`.** `exploration/logs/` is untracked and NOT gitignored, so `git add -A` will stage a live training job's log. See the open-file hazard below. Stage explicit paths, or use `git add <dir>` with the log directory excluded.
 
+   **(c) One commit per changed file.** Added 2026-10-02 by explicit user decision. When a change touches several files, each one gets its **own commit** — never a single commit bundling them. Stage exactly one path, commit, then stage the next:
+
+   ```bash
+   git add <path/to/one/file> && git commit -F -
+   git add <path/to/another/file> && git commit -F -
+   ```
+
+   **Why.** Bundled commits make `git log` and `git blame` useless for reconstructing why a file says what it says, and they make a mistake in one file impossible to revert without reverting the others. This bites hardest on generated files: `tools/update_readme.py` rewrites `README.md` and a bundle's `metadata.json` in the same run, and those two changes are unrelated — the table is a report, the metadata is the record for one specific artifact. They must be revertible independently.
+
+   Practical consequence: a commit message should describe **one file's** change, and must not claim to cover files it does not contain.
+
    **History rewrite, once, with authorisation.** On 2026-10-02 the user asked for every Claude co-author trailer to be removed from all of `main`. That required rewriting 4 of 818 commits and force-pushing `main` with `--force-with-lease`, which (b) otherwise forbids. It was done in a throwaway clone at `/tmp` so the dirty live worktree and five running training jobs were never touched, after taking a backup bundle and a `backup/pre-coauthor-removal` tag. Precedent, not standing permission: **ask again before any further rewrite.**
 
    **Do not `git add` a file a live process holds open.** Git creates a new file and renames it over the old one rather than editing in place, so staging the path of a running training job's log orphans the writer: its descriptor keeps writing to an unlinked inode, and the bytes become unreachable by name. `lsof` will not flag it, because the inode is still allocated with an open descriptor. This destroyed the canonical log of `gru_v018` on 2026-09-30; `tools/rebuild_log.py` reconstructs it from checkpoints. **Stage live logs only after the run exits.** Checkpoints (`last.pt`) are written atomically and are safe to stage mid-run.
