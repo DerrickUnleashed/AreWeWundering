@@ -223,5 +223,14 @@
     "submitted_utc": "2026-10-02T13:51Z",
     "uploaded_filename": "submission_gru_v029.zip",
     "note": "IDEA 5, tail-weighted distillation, and a clean public confirmation of a local null. The distillation term was reweighted by abs(clip(teacher)) instead of the metric weight abs(clip(y)) (gamma=2.0, with gamma=0 verified bit-identical to the parent). Locally it moved full_valid_wp by +0.000002 -- +0.0 sigma, dead flat. Publicly it scored 0.6568, identical to v023's 0.6568 to four decimals. So the null replicates outside the validation set, which is the strongest form of this evidence available. Retires idea 5: teacher weighting is saturated, and the remaining 0.0092 gap to the leader is NOT a loss-shaping problem. Ran 44m27s = 74% of the fastest of the new runs, so idea 5 is also the cheapest of the three to have run."
+  },
+  "v026": {
+    "public_score": null,
+    "grader_seconds": 4197,
+    "memory_mb": 646,
+    "submitted_utc": "2026-10-02T13:51Z",
+    "uploaded_filename": "submission_gru_v026.zip",
+    "outcome": "SCORE:TIMEOUT",
+    "note": "TIMED OUT at 69m57s = 116.6% of the 3600s limit, so no score was ever computed. This is a real and useful reading: our local projection said 132.1 min (220%), and the truth was 70.0 min. The 1.62x grader factor HOLDS -- the error was ours. v026's contended local p50 was 124.17 us/row, which implies a quiet local of ~65.8 us/row once the 1.62x is applied to the observed 106.5 us/row grader rate. Contention, not the model, produced the bad number. The 4x-capacity probe v027 was correctly never submitted: at 1,742,717 params it is ~2x v026's compute and would have needed ~140 min. TIMEOUT also settles the last open question on v026's bundled latency reading, which had been marked NOT-READY for projecting 220% -- it would have been a genuine failure, and the gate was directionally right even though the magnitude was wrong."
   }
 }
