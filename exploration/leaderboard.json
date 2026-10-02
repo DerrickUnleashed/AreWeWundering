@@ -267,10 +267,11 @@
     "note": "distill_weight 1.5. Local 0.686919 (+0.000408 over v028, +2.6 sigma). Public 0.6585 -- IDENTICAL to v028, so the local gain transferred as exactly zero. Third independent confirmation of the measured-anchor rule: packager projected 62.1 min NOT-READY, anchor predicted 46m52s, actual 47m11s. Both new models sit inside the 3-epoch offset band of -0.028264 +/- 0.000419 (v030 -0.028419, v031 -0.028676), so the offset HELD here. That matters because it means the v025 anomaly is specific to longer training rather than a general drift in the mapping."
   },
   "v033": {
-    "public_score": null,
-    "grader_seconds": null,
-    "memory_mb": null,
-    "outcome": "not submitted",
-    "note": "FALSIFIED ITS OWN PRECONDITION. full_valid_wp 0.660415 -- 170 sigma BELOW v028, where this run's own yaml predicted 'within a few sigma of v028' and made that the explicit condition for the ensemble being worth running. Per-sequence pooling costs far more than expected: dozken's comparable per-sequence-loss model lost only ~0.004 to the globally-pooled one, ours lost 0.027. This run was built to create genuine ensemble diversity after v028+v029 was refuted at -0.000174, and the diversity MECHANISM was verified real (per-lane offsets cost the global loss 0.276 and the per-sequence loss 0.069, a 4x difference, while a single shared offset cost both 0.195 identically). The mechanism was right and the magnitude was not viable: dozken's working pair had a 0.0041 spread between members, this would need a 0.027 spread. An equal-weight mean of a 0.687 model and a 0.660 model is unlikely to help. NOT submitted and NOT packaged -- no case for shipping a model 170 sigma down. The lesson is recorded rather than buried: the yaml set a falsifiable precondition, the precondition failed, and that is the run doing its job."
+    "public_score": 0.6274,
+    "grader_seconds": 2842,
+    "memory_mb": 628,
+    "outcome": null,
+    "note": "OUR WORST SCORED ENTRY, and the most instructive failure in the project. full_valid_wp 0.660415 -> public 0.6274, an offset of -0.033015 against a 3-epoch band of -0.028264 +/- 0.000419. That is -0.004751 beyond the band, -11.3 sigma. MECHANISM: this was the per-SEQUENCE-pooling run. Under that objective every sequence is re-centred against itself, so the model learns a per-sequence level invariance. The scorer is a GLOBAL weighted Pearson -- one correlation pooled over every scored row -- where a per-sequence level offset is NOT free. The objective taught an invariance the metric does not reward, and it cost 0.0047 of public score BEYOND what local validation predicted. This is the second independent reason the global objective is correct: dozken's own log records the same inversion when the organisers swapped the metric on 2026-09-15 (his per-sequence model 0.6598 -> 0.6823 while the globally-pooled one went 0.6671 -> 0.6704), and we have now measured the cost directly. It also retires the ensemble idea for good. v033 was built to be a genuinely diverse partner for v028 after v028+v029 was refuted at -0.000174, and its diversity mechanism was verified real. But a partner scoring 0.6274 against v031's 0.6587 cannot help in an equal-weight mean. The diversity was real and the magnitude was never viable.",
+    "submitted_utc": "2026-10-02T23:11Z"
   }
 }
