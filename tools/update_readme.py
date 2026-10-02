@@ -31,6 +31,20 @@ BUNDLES = ROOT / 'submissions'
 
 BEGIN = '<!-- BEGIN GENERATED: leaderboard -->'
 END = '<!-- END GENERATED: leaderboard -->'
+# A SECOND generated block, ranked by the PUBLIC score rather than by full_valid_wp.
+# The first table is the selection signal and has to stay ordered by local WP, but the
+# two orderings genuinely disagree -- v022 has the 2nd-best local score and the 5th-best
+# public one, and v025 is a local regression that is our 2nd-best public result -- so a
+# reader who only ever sees the local ranking is being shown a misleading picture of
+# where we actually stand on the board that decides the prize.
+# These marker strings must NOT be prefixed by BEGIN/END. re.sub(BEGIN .*? END) is
+# global, and if BEGIN_PUB merely STARTED with BEGIN then the public block looked like
+# a second start marker, got paired with some much later END, and swallowed the region
+# between -- re-inserting build_tables() output there and duplicating ~3,500 lines into
+# README.md. The write "succeeded" and the file looked plausible. Hence the deliberately
+# different wording rather than a suffix of the same phrase.
+BEGIN_PUB = '<!-- BEGIN GENERATED: public-score ranking -->'
+END_PUB = '<!-- END GENERATED: public-score ranking -->'
 
 # Versions are DISCOVERED, not listed. A hardcoded dict silently omitted every
 # version added after it was written -- v012, v013, v014 and v015 all trained,
@@ -337,6 +351,74 @@ def build_tables() -> str:
     return '\n'.join(out)
 
 
+def render_public():
+    """Rank every submission by its PUBLIC score, with the timeouts shown as failures.
+
+    Kept separate from the main table because the two rankings disagree, and only one
+    of them is the board that decides the prize. A timeout appears here rather than
+    being dropped: v026 and v027 are the two largest models we ever built, they were
+    uploaded, and the grader killed both at 69m57s. Listing them by what they would
+    have scored locally would misrepresent them; listing what actually happened does
+    not.
+    """
+    out = [BEGIN_PUB, '',
+           '### Ranked by public (leaderboard) score', '',
+           'This is the ranking that counts for the prize. It does **not** agree with the',
+           'table above, and the disagreements are the interesting part:', '',
+           '- **v022** has the 2nd-best `full_valid_wp` (0.685228) and only the 5th-best',
+           '  public score. Our local metric overrates it.',
+           '- **v025** is a local *regression* against v023 (-1.5 sigma) and our 2nd-best',
+           '  public result. The local metric underrates it.',
+           '',
+           '| Rank | Ver | full_valid_wp | Public score | vs best | Grader | Outcome |',
+           '|---:|---|---:|---:|---:|---:|---|']
+    scored, failed = [], []
+    lb = load_leaderboard()          # LEADERBOARD is a PATH; this is the parsed dict
+    for v in sorted(k for k in lb if k.startswith('v')):
+        e = lb[v]
+        y = ROOT / 'exploration' / 'version' / f'version_gru_{v}.yaml'
+        loc = None
+        if y.exists():
+            try:
+                loc = (yaml.safe_load(y.read_text()).get('results') or {}).get('full_valid_wp')
+            except Exception:
+                loc = None
+        secs = e.get('grader_seconds')
+        dur = fmt_mmss(secs) + (f' ({secs / 3600 * 100:.0f}%)' if secs else '')
+        pub = e.get('public_score')
+        if e.get('outcome') == 'SCORE:TIMEOUT' or pub is None:
+            failed.append((v, loc, dur, e.get('outcome') or 'not submitted',
+                           e.get('grader_seconds')))
+        elif v == 'v000':
+            continue   # framework smoke test, never a modelling result
+        else:
+            scored.append((pub, v, loc, dur))
+    scored.sort(reverse=True)
+    if scored:
+        best = scored[0][0]
+        for i, (pub, v, loc, dur) in enumerate(scored, 1):
+            l = f'{loc:.6f}' if loc else '--'
+            out.append(f'| {i} | **{v}** | {l} | **{pub:.4f}** | {pub - best:+.4f} | {dur} | scored |')
+        out.append('')
+    if failed:
+        out += ['| Ver | full_valid_wp | Public score | Grader | Outcome |',
+                '|---|---:|---|---:|---|']
+        for v, loc, dur, outcome, secs in failed:
+            l = f'{loc:.6f}' if loc else '--'
+            out.append(f'| **{v}** | {l} | **no score** | {dur} | **{outcome}** |')
+        out += ['',
+                'v026 (871,977 params) and v027 (1,742,717 params) are the two largest',
+                'models this project ever built. Both were uploaded and both were killed by',
+                'the grader at 69m57s, so neither has a score at all. They are listed',
+                'here rather than omitted because they are the clearest evidence for the',
+                'capacity result: locally their scores were 2.2 and 10.2 sigma BELOW v028,',
+                'and on the grader neither could finish. Two independent lines agreeing',
+                'is why the conclusion is that the student should stay near 225k params.']
+    out.append('')
+    out.append(END_PUB)
+    return '\n'.join(out)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--check', action='store_true',
@@ -355,8 +437,17 @@ def main() -> int:
     if BEGIN not in text or END not in text:
         sys.exit(f'{README} is missing the GENERATED markers; add them by hand once')
 
+    # TWO independent substitutions, one per generated block. Doing this as a single
+    # substitution whose replacement contained BOTH blocks meant the pre-existing public
+    # block was never consumed, so each run appended another copy -- it grew by one
+    # duplicate per invocation while the write still reported success.
+    if BEGIN_PUB not in text or END_PUB not in text:
+        print(f'{README} has no {BEGIN_PUB} marker; adding it after {END}')
+        text = text.replace(END, END + '\n\n' + render_public(), 1)
     new = re.sub(re.escape(BEGIN) + r'.*?' + re.escape(END),
                  lambda _: build_tables(), text, flags=re.S)
+    new = re.sub(re.escape(BEGIN_PUB) + r'.*?' + re.escape(END_PUB),
+                 lambda _: render_public(), new, flags=re.S)
 
     if new == text:
         print('README.md is up to date')
