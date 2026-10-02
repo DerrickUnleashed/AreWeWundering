@@ -249,5 +249,28 @@
     "uploaded_filename": "submission_gru_v027.zip",
     "outcome": "SCORE:TIMEOUT",
     "note": "TIMED OUT at 69m57s, 643 MB. Uploaded from the INCOMPLETE bundle committed earlier in 8ba7a50 (no metadata.json, zip missing the provenance checkpoint) -- the missing checkpoint is a provenance artifact and does not affect serving, so the timeout is a valid measurement of the model rather than an artifact of the partial build. THE INFORMATIVE PART: v027 ran 69m57s and v026 ran 69m57s -- identical to the second. That is the platform's kill point, not either model's natural runtime, so neither timeout tells us how far over budget they were, only that they are over. dozken's notes independently record a ~70 min hard limit and losing an ensemble at 69m59s. v027 at 1,742,717 params is ~2x v026's 871,977 and both are unshippable; the capacity result now rests on a grader TIMEOUT rather than only on a local score being 10.2 sigma low. Note the local scores already said this was the worst model in the batch, so the two lines of evidence agreed before this was uploaded."
+  },
+  "v031": {
+    "public_score": 0.6587,
+    "grader_seconds": 2738,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-02T21:40Z",
+    "uploaded_filename": "submission_gru_v031.zip",
+    "note": "OUR BEST. distill_weight 2.0. Local full_valid_wp 0.687376, +0.000865 over v028 at +5.5 sigma, the fourth point on a sweep monotone across all four (0.684681 / 0.686510 / 0.686919 / 0.687376 for 0.5 / 1.0 / 1.5 / 2.0). Public 0.6587. LATENCY: ran 45m41s = 76% of budget and COMPLETED. The packager had marked this bundle NOT-READY on a projected 63.9 min; the measured-anchor rule predicted 46m52s from the identical v028 graph. The anchor was right and the gate was wrong -- now a three-way validation rather than an argument. CAUTION ON THE HEADLINE: the local gain over v028 was +0.000865 but the public gain was only +0.0002, an attenuation of 4.3x. v030's +0.000408 local became exactly +0.0000 public. Against a public-split noise floor of order 0.0005, v031 / v030 / v028 are a statistical TIE on the leaderboard. v031 is nominally first, but the distillation-weight sweep bought far less public score than its local curve promised."
+  },
+  "v030": {
+    "public_score": 0.6585,
+    "grader_seconds": 2831,
+    "memory_mb": 629,
+    "submitted_utc": "2026-10-02T21:40Z",
+    "uploaded_filename": "submission_gru_v030.zip",
+    "note": "distill_weight 1.5. Local 0.686919 (+0.000408 over v028, +2.6 sigma). Public 0.6585 -- IDENTICAL to v028, so the local gain transferred as exactly zero. Third independent confirmation of the measured-anchor rule: packager projected 62.1 min NOT-READY, anchor predicted 46m52s, actual 47m11s. Both new models sit inside the 3-epoch offset band of -0.028264 +/- 0.000419 (v030 -0.028419, v031 -0.028676), so the offset HELD here. That matters because it means the v025 anomaly is specific to longer training rather than a general drift in the mapping."
+  },
+  "v033": {
+    "public_score": null,
+    "grader_seconds": null,
+    "memory_mb": null,
+    "outcome": "not submitted",
+    "note": "FALSIFIED ITS OWN PRECONDITION. full_valid_wp 0.660415 -- 170 sigma BELOW v028, where this run's own yaml predicted 'within a few sigma of v028' and made that the explicit condition for the ensemble being worth running. Per-sequence pooling costs far more than expected: dozken's comparable per-sequence-loss model lost only ~0.004 to the globally-pooled one, ours lost 0.027. This run was built to create genuine ensemble diversity after v028+v029 was refuted at -0.000174, and the diversity MECHANISM was verified real (per-lane offsets cost the global loss 0.276 and the per-sequence loss 0.069, a 4x difference, while a single shared offset cost both 0.195 identically). The mechanism was right and the magnitude was not viable: dozken's working pair had a 0.0041 spread between members, this would need a 0.027 spread. An equal-weight mean of a 0.687 model and a 0.660 model is unlikely to help. NOT submitted and NOT packaged -- no case for shipping a model 170 sigma down. The lesson is recorded rather than buried: the yaml set a falsifiable precondition, the precondition failed, and that is the run doing its job."
   }
 }
