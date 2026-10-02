@@ -1170,3 +1170,69 @@ Every misprediction this session came from contention, not from the factor.
 
 Parity also ran at all — which it could not do for v034 before the `head_hidden` fix in
 `tools/score_solution.py`. Same verifier, same session, both problems visible.
+
+## Five new experiments (2026-10-03)
+
+All single-variable against **v031** (`distill_weight` 2.0, 0.687376 local / 0.6587
+public, our best). Four are running, one is waiting on data.
+
+| ver | lever | change | params | tests |
+|---|---|---|---:|---|
+| v035 | **size DOWN** | hidden 128 → 96 | 148,674 | the only capacity direction never tried |
+| v036 | **bottleneck UP** | `input_proj` 64 → 96 | 251,682 | information loss, not capacity |
+| v037 | **schedule** | epochs 3 → 8 | 225,922 | do the two winners compose? |
+| v038 | **regularisation** | weight_decay 0.01 → 0.03 | 225,922 | is the capacity loss overfitting? |
+| v039 | **teacher** | + dozken's 0.6879 ensemble | 225,922 | the one distillation input never varied |
+
+### Why these five, given what has already failed
+
+Capacity going **up** is closed — head −3.2σ, hidden 285 −13.7σ, hidden 415 −21.7σ, all
+monotone. Tail-weighting the teacher term is a dead null. Loss-diverse ensembling is
+refuted twice. So the five above were chosen to attack the failures from directions we
+have *not* walked, rather than to retry them louder.
+
+**v035 — every capacity experiment went up, and we have never gone down.** There is one
+precedent and it points this way: v022 (321,602) and v023 (225,922) shared
+`distill_weight` 0.5, and locally v022 was 0.000547 *better* while publicly v023 was
+0.0003 *better* and 10% faster. One submission each, so weak — but it is the only
+direction with a positive sign, and it also buys latency.
+
+**v036 — this is not a capacity experiment, which is the point.** At `input_proj` 64 the
+224-wide level-plus-difference row is compressed **3.5×**. A bottleneck destroys
+information; extra recurrent parameters add variance. dozken's audit put a number on it
+("~0.014 WP of linearly available signal") and then measured −0.0032 — but on his
+`chunk4k` recipe, which his own data shows is *harmful* under Global WP (−0.0370). Wrong
+substrate. Never varied on ours. And it costs ~3% latency, since the projection is 6.4% of
+per-row compute.
+
+**v038 — the one experiment that could make the capacity results look different.** If
+bigger models lose because they overfit, more regularisation should help at the current
+size. `weight_decay` has sat at 0.01 and `dropout` at 0.0 since v011. If heavier decay
+helps, the trunk widenings were *unregularised* rather than wrong and v026/v027 may be
+recoverable. If it does nothing, the overfitting diagnosis in those three commits is
+wrong. Either outcome is informative; that is why it is in the set.
+
+**v039 — the teacher's quality is the one distillation input never varied.** Ours is
+dozken's reset2k at 0.6864; his loss-diverse ensemble of reset2k + reset4k is **0.6879**,
+and a teacher never runs at inference so it is free. The prior is poor and recorded as
+such: his `distil_ens` (0.6585) *lost* to his `distil160` (0.6588). But his student already
+sat at the compression sweet spot, whereas **our student has overtaken its own teacher**
+(0.687376 vs 0.6864) — which none of his did. Whether that means headroom for a better
+teacher or that everything extractable is extracted is exactly the question.
+
+### v039 is blocked on data, and a watcher handles it
+
+Its teacher needs a causal, stateful replay of all 212M train rows through `reset4k.onnx`
+— a couple of hours. `tools/watch_and_launch_v039.sh` waits for that, verifies the output
+is complete (shape, finiteness, and sequence-leading canary rows that an interrupted
+replay would leave zero), and only then launches v039. It does not need an averaged label
+file, because `TeacherStore` already averages multiple members on read and the yaml lists
+both.
+
+### What none of these can measure
+
+The **epoch offset effect**. v025 and v032 are both 5-epoch runs and v025 carried an
+offset +0.0024 better than the 3-epoch band — invisible to local validation by
+construction. v037 (8 epochs) will move the *local* number and we still will not know
+whether the public mapping moved with it. **v032 is packaged and unanswered**; submitting
+it remains the single highest-information action available.
