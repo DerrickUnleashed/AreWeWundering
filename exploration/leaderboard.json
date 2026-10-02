@@ -252,11 +252,11 @@
   },
   "v031": {
     "public_score": 0.6587,
-    "grader_seconds": 2738,
+    "grader_seconds": 2741,
     "memory_mb": 628,
     "submitted_utc": "2026-10-02T21:40Z",
     "uploaded_filename": "submission_gru_v031.zip",
-    "note": "OUR BEST. distill_weight 2.0. Local full_valid_wp 0.687376, +0.000865 over v028 at +5.5 sigma, the fourth point on a sweep monotone across all four (0.684681 / 0.686510 / 0.686919 / 0.687376 for 0.5 / 1.0 / 1.5 / 2.0). Public 0.6587. LATENCY: ran 45m41s = 76% of budget and COMPLETED. The packager had marked this bundle NOT-READY on a projected 63.9 min; the measured-anchor rule predicted 46m52s from the identical v028 graph. The anchor was right and the gate was wrong -- now a three-way validation rather than an argument. CAUTION ON THE HEADLINE: the local gain over v028 was +0.000865 but the public gain was only +0.0002, an attenuation of 4.3x. v030's +0.000408 local became exactly +0.0000 public. Against a public-split noise floor of order 0.0005, v031 / v030 / v028 are a statistical TIE on the leaderboard. v031 is nominally first, but the distillation-weight sweep bought far less public score than its local curve promised."
+    "note": "OUR BEST. distill_weight 2.0. Local full_valid_wp 0.687376, +0.000865 over v028 at +5.5 sigma, the fourth point on a sweep monotone across all four (0.684681 / 0.686510 / 0.686919 / 0.687376 for 0.5 / 1.0 / 1.5 / 2.0). Public 0.6587. LATENCY: ran 45m41s = 2741 s = 76% of budget and COMPLETED. The packager had marked this bundle NOT-READY on a projected 63.9 min; the measured-anchor rule predicted 46m52s from the identical v028 graph. The anchor was right and the gate was wrong -- now a three-way validation rather than an argument. CAUTION ON THE HEADLINE: the local gain over v028 was +0.000865 but the public gain was only +0.0002, an attenuation of 4.3x. v030's +0.000408 local became exactly +0.0000 public. Against a public-split noise floor of order 0.0005, v031 / v030 / v028 are a statistical TIE on the leaderboard. v031 is nominally first, but the distillation-weight sweep bought far less public score than its local curve promised."
   },
   "v030": {
     "public_score": 0.6585,
