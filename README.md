@@ -52,8 +52,66 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 | **v031** | v028's exact recipe and architecture with... | -- | Training | -- |
 | **v032** | v028's exact recipe -- same architecture,... | -- | Training | -- |
 | **v033** | A deliberately DIVERSE ensemble member, not... | -0.127666 | Training | -- |
+| **v034** | v028's exact recipe with the ONE axis that... | -0.119622 | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
+
+<!-- BEGIN GENERATED: public-score ranking -->
+
+### Ranked by public (leaderboard) score
+
+This is the ranking that counts for the prize. It does **not** agree with the
+table above, and the disagreements are the interesting part:
+
+- **v022** has the 2nd-best `full_valid_wp` (0.685228) and only the 5th-best
+  public score. Our local metric overrates it.
+- **v025** is a local *regression* against v023 (-1.5 sigma) and our 2nd-best
+  public result. The local metric underrates it.
+
+| Rank | Ver | full_valid_wp | Public score | vs best | Grader | Outcome |
+|---:|---|---:|---:|---:|---:|---|
+| 1 | **v028** | 0.686510 | **0.6585** | +0.0000 | 46m52s (78%) | scored |
+| 2 | **v025** | 0.684438 | **0.6580** | -0.0005 | 46m07s (77%) | scored |
+| 3 | **v029** | 0.684683 | **0.6568** | -0.0017 | 44m27s (74%) | scored |
+| 4 | **v023** | 0.684681 | **0.6568** | -0.0017 | 45m36s (76%) | scored |
+| 5 | **v022** | 0.685228 | **0.6565** | -0.0020 | 50m46s (85%) | scored |
+| 6 | **v024** | 0.684818 | **0.6560** | -0.0025 | 50m17s (84%) | scored |
+| 7 | **v016** | 0.681753 | **0.6541** | -0.0044 | 30m56s (52%) | scored |
+| 8 | **v017** | 0.681866 | **0.6540** | -0.0045 | 25m37s (43%) | scored |
+| 9 | **v018** | 0.680603 | **0.6518** | -0.0067 | 29m21s (49%) | scored |
+| 10 | **v014** | 0.679676 | **0.6517** | -0.0068 | 40m12s (67%) | scored |
+| 11 | **v015** | -- | **0.6515** | -0.0070 | 30m31s (51%) | scored |
+| 12 | **v011** | 0.679986 | **0.6515** | -0.0070 | 30m12s (50%) | scored |
+| 13 | **v020** | 0.681773 | **0.6513** | -0.0072 | 29m52s (50%) | scored |
+| 14 | **v012** | 0.678784 | **0.6512** | -0.0073 | 29m47s (50%) | scored |
+| 15 | **v019** | 0.678374 | **0.6510** | -0.0075 | 30m32s (51%) | scored |
+| 16 | **v021** | 0.678575 | **0.6505** | -0.0080 | 55m32s (93%) | scored |
+| 17 | **v013** | 0.676198 | **0.6490** | -0.0095 | 28m36s (48%) | scored |
+| 18 | **v009** | 0.674456 | **0.6483** | -0.0102 | 39m52s (66%) | scored |
+| 19 | **v007** | 0.674258 | **0.6481** | -0.0104 | 42m16s (70%) | scored |
+| 20 | **v005** | 0.674037 | **0.6481** | -0.0104 | 36m56s (62%) | scored |
+| 21 | **v006** | 0.674149 | **0.6475** | -0.0110 | 35m32s (59%) | scored |
+| 22 | **v008** | 0.674445 | **0.6473** | -0.0112 | 41m17s (69%) | scored |
+| 23 | **v003** | 0.673711 | **0.6457** | -0.0128 | 30m57s (52%) | scored |
+| 24 | **v004** | 0.672206 | **0.6446** | -0.0139 | 43m16s (72%) | scored |
+| 25 | **v002** | 0.674350 | **0.6435** | -0.0150 | 35m02s (58%) | scored |
+| 26 | **v010** | 0.670696 | **0.6427** | -0.0158 | 34m37s (58%) | scored |
+| 27 | **v001** | 0.674315 | **0.6416** | -0.0169 | 34m02s (57%) | scored |
+
+| Ver | full_valid_wp | Public score | Grader | Outcome |
+|---|---:|---|---:|---|
+| **v026** | 0.684335 | **no score** | 69m57s (117%) | **SCORE:TIMEOUT** |
+| **v027** | 0.683058 | **no score** | 69m57s (117%) | **SCORE:TIMEOUT** |
+
+v026 (871,977 params) and v027 (1,742,717 params) are the two largest
+models this project ever built. Both were uploaded and both were killed by
+the grader at 69m57s, so neither has a score at all. They are listed
+here rather than omitted because they are the clearest evidence for the
+capacity result: locally their scores were 2.2 and 10.2 sigma BELOW v028,
+and on the grader neither could finish. Two independent lines agreeing
+is why the conclusion is that the student should stay near 225k params.
+
+<!-- END GENERATED: public-score ranking -->
 
 ## Why most of this table is one statistical blob
 
@@ -182,6 +240,7 @@ selection signal.
 
 ```
 ours v028  0.6585   <-- our best
+ours v025  0.6580   our 2nd, and a local REGRESSION
 dozken     0.6588   (distil160)
 #1         0.6677
 ```
@@ -189,6 +248,15 @@ dozken     0.6588   (distil160)
 We are **level with dozken** (0.0003 behind his best) and **0.0092 off first**. That
 is up from 0.0109 off first at v023, and the whole of that gain came from one scalar:
 `distill_weight` 0.5 → 1.0.
+
+**v025 is the one to understand.** It is our second-best public result while being a
+−1.5σ local *regression*, and the reason is the offset finding below: at 5 epochs its
+offset moved +0.0024 in our favour. Anyone reading only the `full_valid_wp` table would
+have discarded it. Two runs did not, both scored above 0.658, and both cost nothing
+extra to serve (46m07s = 77% of budget).
+
+Full public ranking of all 27 scored submissions, including the two timeouts, is in the
+**Ranked by public (leaderboard) score** table below.
 
 ## Three results that closed open questions
 
