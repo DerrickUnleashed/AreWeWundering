@@ -1,4 +1,4 @@
-# Experiment ranking — v001 to v020
+# Experiment ranking — v001 to v029
 
 All scores are `full_valid_wp`: global weighted Pearson over every one of the
 1,873 validation sequences (3,528,273 scored rows), computed with the
@@ -118,11 +118,15 @@ the only lever so far that works *without* fixing the loss — and that is exact
 why v019/v020 matter: on a correctly specified objective the distillation gain
 should compound rather than merely survive.
 
-## v023 is our best entry: the smallest student, and it won
+## v023 was our best entry for a while: the smallest student, and it won
+
+> Superseded by **v028** (0.6585), which is this same architecture with
+> `distill_weight` 0.5 → 1.0. Kept because the size finding below is still the reason
+> v028 is cheap to serve.
 
 `v023` is `hidden 128` — **225,922 parameters, 51.8% of dozken's 435,943-param teacher** —
-on his architecture, with his model as the teacher. It scored **0.6568 public**, our best,
-and it beats `v022` (321,602 params, 42% larger) on the public board while running **10%
+on his architecture, with his model as the teacher. It scored **0.6568 public**, our best at
+the time, and it beats `v022` (321,602 params, 42% larger) on the public board while running **10%
 less** of the time budget.
 
 | | params | % of teacher | local | public | grader |
@@ -145,7 +149,7 @@ effect, and the practical rule is: **on this teacher, go smaller.**
 v024 (batch 64) confirms its own refutation publicly at 0.6560 — inside noise of v022,
 as predicted. Its value was training speed: 2.39 h against 5.31 h.
 
-## The offset is now measured on twelve clean submissions
+## The offset is now measured on fourteen clean submissions
 
 ```
 mean -0.0280    range [-0.0288, -0.0272]    std 0.0005
@@ -155,18 +159,60 @@ v020's contaminated −0.0305 remains outside the band, which is how it was caug
 std 0.0005 the mapping is reliable enough to aim with, and it is symmetric: **no local
 gain is free.**
 
+The two most recent submissions are the strongest evidence for it, because they are
+the first pair where a local prediction transferred almost exactly:
+
+| | local | public | offset | predicted Δ | delivered Δ |
+|---|---|---|---|---|---|
+| v028 | 0.686510 | **0.6585** | −0.028010 | +0.001829 | **+0.0017** |
+| v029 | 0.684683 | 0.6568 | −0.027883 | +0.000002 | **0.0000** |
+
+v028's offset lands on the mean of −0.0280 to the digit, and it was a +11.5σ local
+result that came back as +0.0017 public against +0.0018 predicted. v029 is the
+complementary case: a local null of +0.000002 came back as *exactly* zero, to four
+decimals. **A null replicates off the validation set too**, which is the result that
+makes the positives trustworthy — a metric that only reproduces your wins is not a
+selection signal.
+
 ## Where we stand
 
 ```
-ours v023  0.6568   <-- our best
-dozken     0.6588
+ours v028  0.6585   <-- our best
+dozken     0.6588   (distil160)
 #1         0.6677
 ```
 
-We are **0.0020 off dozken** and **0.0109 off first**. Note that v023 and v022 differ
-by 0.0003 public, which is well inside the noise — so the honest summary is that we are
-**level with dozken's distilled entry**, and the earlier claim that we were 0.0054 behind
-was about our *base*, not our students.
+We are **level with dozken** (0.0003 behind his best) and **0.0092 off first**. That
+is up from 0.0109 off first at v023, and the whole of that gain came from one scalar:
+`distill_weight` 0.5 → 1.0.
+
+## Three results that closed open questions
+
+**v028 — the distillation weight is the live lever.** Same architecture as v023,
+225,922 params, one number changed. +0.001829 local (+11.5σ against a 0.000317
+threshold) and +0.0017 public. Only two points on this curve have been sampled (0.5
+and 1.0) and it is the steepest thing we have found, so the obvious next step is 1.5
+and 2.0.
+
+**v026 and v027 — capacity is not the lever, now measured rather than assumed.** The
+student had never been larger than its teacher, so we tested it:
+
+| ver | hidden | params | full_valid_wp | vs v023 |
+|---|---|---|---|---|
+| v023 | 128 | 225,922 | 0.684681 | — |
+| v026 | 285 | 871,977 | 0.684335 | −2.2σ |
+| v027 | 415 | 1,742,717 | 0.683058 | −10.2σ |
+
+Monotonically **worse** as the model grows, and 4× the teacher scores 10σ below a
+half-size student. This matches dozken's own 872k ≈ 436k observation, but it is now
+measured on our architecture rather than inferred from his. The student/teacher size
+ratio is the thing that matters, and v023 already sits at the useful end of it.
+
+**v029 — idea 5 is a dead null, confirmed publicly.** Reweighting the distillation
+term by `abs(clip(teacher))` instead of the metric weight moved the local score by
++0.000002 and the public score by 0.0000. Teacher weighting is saturated, so **the
+remaining 0.0092 to the leader is not a loss-shaping problem** — which retires idea 5
+and points the search at the teacher and the schedule instead.
 
 ## The public board has now settled what local could not
 
@@ -514,10 +560,31 @@ disagreed. The gate should have been p50-only from the start.
 
 ## Latency is a solved problem
 
+> Read with the 2026-10-02 update below, which makes the same point harder.
+
 Worth recording because it was treated as a blocker all night and turned out not
 to be one. All 11 of our bundles finished, in **30m12s to 43m16s -- 50 % to 72 %
 of the 60-minute budget** -- including the five whose local gates had been
 measured under 7-way contention and marked "unverified".
+
+### And again on 2026-10-02, with a worse miss
+
+`v028` was packaged and marked **NOT-READY**: local p50 67.75 us/row, projected
+**72m06s = 120 % of budget**. It was submitted anyway and ran in **46m52s = 78 %**,
+completing normally. The projection over-shot by **35 %**, because the p50 was
+taken while `v027` was training on the same cores.
+
+`v029` is the same story in miniature: predicted 59m18s, ran 44m27s (74 %).
+
+This is now six submissions out of six where a contended local p50 **over**-projected.
+The pattern is consistent enough to act on:
+
+- **Never gate on a p50 taken while other work is running.** Re-measure idle, or
+  don't gate. The 1.62x factor compounds with contention instead of replacing it.
+- **A latency `NOT-READY` is not evidence the model is unshippable.** It is evidence
+  the *measurement* was bad. v028 was the best model in the project and the gate
+  said the opposite.
+- **p99 over-projects even harder and should not be read as a runtime estimate** at all.
 
 Every contended measurement **over**-projected. v005 measured 52.25 us/row under
 contention, projected 55.6 min, and actually took 36m56s. v004 was marked
