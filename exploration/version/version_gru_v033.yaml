@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v033
   parent: gru_v028
-  status: running
+  status: finished
 description: 'A deliberately DIVERSE ensemble member, not a candidate to ship alone.
   v028''s exact architecture, recipe, distill_weight 1.0 and teacher, with one change
   to the objective: loss.pool global -> per_sequence. Under global pooling every row
@@ -213,15 +213,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.12766612242428696
-  best_val_t0: 0.014268691669177448
-  best_val_t1: -0.26960093651775136
-  full_valid_wp: null
+  best_step: 4999
+  best_val_wp: 0.6779312076997905
+  best_val_t0: 0.6713831330745148
+  best_val_t1: 0.6844792823250664
+  full_valid_wp: 0.6604145384583081
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.012
-  finished_utc: '2026-10-02T10:50:59Z'
+  train_hours: 6.002
+  finished_utc: '2026-10-02T16:51:18Z'
 artifacts:
   log: exploration/logs/log_gru_v033.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v033
