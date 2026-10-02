@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v031
   parent: gru_v028
-  status: running
+  status: finished
 description: 'v028''s exact recipe and architecture with ONE change: loss.distill_weight
   1.0 -> 2.0. 225,922 params, hidden 128, same teacher, same schedule, same seed.
   Second and third points on the distillation-weight curve.'
@@ -199,15 +199,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.6966192730381718
+  best_val_t0: 0.6940308783720256
+  best_val_t1: 0.6992076677043181
+  full_valid_wp: 0.6873758769629523
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.9423
+  finished_utc: '2026-10-02T15:31:38Z'
 artifacts:
   log: exploration/logs/log_gru_v031.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v031
