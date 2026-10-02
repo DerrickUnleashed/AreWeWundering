@@ -11,7 +11,7 @@ reference metric in `tools/metric_ref.py`.
 | 1 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
 | 2 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
 | 3 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
-| 4 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Yet to package | -- | -- | -- |
+| 4 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Ready to Submit | -- | 49m30s (82%) | -- |
 | 5 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
 | 6 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
 | 7 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
@@ -39,7 +39,7 @@ reference metric in `tools/metric_ref.py`.
 | 29 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
 | 30 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
 | 31 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
-| 32 | **v033** | A deliberately DIVERSE ensemble member, not... | 0.660415 | Ready to Submit | -- | 56m36s (94%) | -- |
+| 32 | **v033** | A deliberately DIVERSE ensemble member, not... | 0.660415 | Submitted | 0.6274 | 47m22s (79%) | 628 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
@@ -99,12 +99,12 @@ table above, and the disagreements are the interesting part:
 | 27 | **v002** | 0.674350 | **0.6435** | -0.0152 | 35m02s (58%) | scored |
 | 28 | **v010** | 0.670696 | **0.6427** | -0.0160 | 34m37s (58%) | scored |
 | 29 | **v001** | 0.674315 | **0.6416** | -0.0171 | 34m02s (57%) | scored |
+| 30 | **v033** | 0.660415 | **0.6274** | -0.0313 | 47m22s (79%) | scored |
 
 | Ver | full_valid_wp | Public score | Grader | Outcome |
 |---|---:|---|---:|---|
 | **v026** | 0.684335 | **no score** | 69m57s (117%) | **SCORE:TIMEOUT** |
 | **v027** | 0.683058 | **no score** | 69m57s (117%) | **SCORE:TIMEOUT** |
-| **v033** | 0.660415 | **no score** | -- | **not submitted** |
 
 v026 (871,977 params) and v027 (1,742,717 params) are the two largest
 models this project ever built. Both were uploaded and both were killed by
@@ -1072,3 +1072,53 @@ This also settles the direction of the remaining time. The two levers that have 
 moved this model are both *smaller-scope* changes — how hard we distil (v031, +5.5σ)
 and how long we train (v025's offset anomaly, still being tested by v032). Neither adds
 parameters.
+
+## v033 scored 0.6274 — the offset broke, and that is the real result
+
+| | local | public | offset |
+|---|---:|---:|---:|
+| v033 | 0.660415 | **0.6274** | **−0.033015** |
+| 3-epoch band | — | — | −0.028264 ± 0.000419 |
+
+That is **−0.004751 beyond the band, at −11.3σ.** It is our worst scored entry, and it
+is the most instructive failure in the project.
+
+**Mechanism.** v033 was the per-**sequence**-pooling run. Under that objective every
+sequence is re-centred against itself, so the model learns a per-sequence level
+invariance. The scorer is a **global** weighted Pearson — one correlation pooled over
+every scored row — where a per-sequence level offset is *not* free. The objective taught
+an invariance the metric does not reward, and it cost **0.0047 of public score beyond
+what local validation predicted.**
+
+This is the second independent confirmation that the global objective is the right one.
+dozken's log records the same inversion when the organisers swapped the metric on
+2026-09-15 — his per-sequence model went 0.6598 → 0.6823 while the globally-pooled one
+went 0.6671 → 0.6704 — and we have now measured the cost directly rather than inferring
+it.
+
+**It also retires the ensemble idea for good.** v033 was built to be a genuinely diverse
+partner after v028+v029 was refuted at −0.000174, and its diversity *mechanism* was
+verified real. But a partner scoring 0.6274 against v031's 0.6587 cannot help an
+equal-weight mean. The diversity was real; the magnitude never was.
+
+## A verifier bug worth recording: v034's parity gate silently produced nothing
+
+Packaging v034 wrote `gate.parity = null` and `status: NOT-READY`. Every other gate
+passed. The cause was **our own tooling**, not the model: `tools/score_solution.py`'s
+`offline_predict()` rebuilt `GRUModel` without passing `head_hidden`, so it built a
+192-wide head and raised a `state_dict` size mismatch on any run that widened the head.
+The parity check died, and the bundle recorded "not verified" rather than "the verifier
+could not build the model".
+
+That distinction matters. I had already plumbed `head_hidden` through **both**
+construction sites in `train_gru_v034.py` precisely so train and serve could not
+diverge — and then missed the third site, the scorer. One line of plumbing per site, and
+missing one produces a silent null instead of a loud failure.
+
+After the fix, v034's parity **PASSES**: raw predictions agree to **4.232e-06** against
+a 1e-03 tolerance, and the streaming and offline WP scores agree to **1.936e-08**. So the
+bundle is sound; only the verifier was broken.
+
+Note the bundle's `metadata.json` still records the null parity and NOT-READY, because
+bundles are immutable and re-packaging the same version is not allowed. The verified
+result lives here instead.
