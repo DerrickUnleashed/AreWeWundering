@@ -232,5 +232,13 @@
     "uploaded_filename": "submission_gru_v026.zip",
     "outcome": "SCORE:TIMEOUT",
     "note": "TIMED OUT at 69m57s = 116.6% of the 3600s limit, so no score was ever computed. This is a real and useful reading: our local projection said 132.1 min (220%), and the truth was 70.0 min. The 1.62x grader factor HOLDS -- the error was ours. v026's contended local p50 was 124.17 us/row, which implies a quiet local of ~65.8 us/row once the 1.62x is applied to the observed 106.5 us/row grader rate. Contention, not the model, produced the bad number. The 4x-capacity probe v027 was correctly never submitted: at 1,742,717 params it is ~2x v026's compute and would have needed ~140 min. TIMEOUT also settles the last open question on v026's bundled latency reading, which had been marked NOT-READY for projecting 220% -- it would have been a genuine failure, and the gate was directionally right even though the magnitude was wrong."
+  },
+  "v025": {
+    "public_score": 0.658,
+    "grader_seconds": 2767,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-02T13:51Z",
+    "uploaded_filename": "submission_gru_v025.zip",
+    "note": "OUR SECOND BEST, and the most informative submission we have made -- not because of its rank but because of its OFFSET. Local full_valid_wp 0.684438 (a -1.5 sigma regression on v023) but public 0.6580, which BEATS v023's 0.6568 by +0.0012. The offset is -0.026438 against -0.028264 +/- 0.000419 for the five 3-epoch runs: +0.001826, or +4.4 sigma. The control is unusually clean: v024 is the IDENTICAL recipe at 3 epochs and sits normally at -0.028818, so batch 64 is exonerated and epochs is the only structural difference. Against v024 the shift is +0.002380. CONSEQUENCE: the local-to-public offset is NOT a constant, it moves with training length, and full_valid_wp is therefore a BIASED selector across different epoch counts -- biased against the longer run. v025 was ranked a regression locally and was nearly discarded on that basis. It also ran 46m07s = 77% of budget, so the longer schedule costs nothing to serve. This directly motivates v032: v028's recipe (best local, distill_weight 1.0) at 5 epochs, predicting 0.6585 + 0.0024 = 0.6609 if the epoch effect composes."
   }
 }
