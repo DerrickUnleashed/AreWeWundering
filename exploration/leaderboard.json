@@ -164,7 +164,7 @@
   "_organiser_baseline": {
     "public_score": 0.5935,
     "grader_seconds": 1581,
-    "note": "The organiser's own baseline on the public leaderboard, restated by the user. Confirms the number already on file. We are +0.0605 above it with v017 (0.6540); dozken is +0.0653; the leader is +0.0742."
+    "note": "The organiser's own baseline on the public leaderboard, restated by the user. Confirms the number already on file. We are +0.0650 above it with v028 (0.6585); dozken is +0.0653 with distil160 (0.6588); the leader is +0.0742. We are now level with dozken and 0.0092 behind the leader."
   },
   "v019": {
     "public_score": 0.651,
@@ -185,7 +185,7 @@
     "grader_seconds": 3046,
     "memory_mb": 631,
     "submitted_utc": "2026-10-01T14:41Z",
-    "note": "OUR BEST. Distilled student on dozken's architecture (hidden 160, 321,602 params) trained against his reset2k model replayed as exact teacher labels. 50m46s = 85% of the 60-min budget, and it COMPLETED, which is the evidence that our 75% margin is too strict. Public 0.6565 beats v017's 0.6540 by +0.0025 and v021's 0.6505 by +0.0060, both in the direction the local metric predicted. Local 0.685228 with a -0.0287 offset, consistent with the eight-submission mean of -0.0279 (spread 0.0016). This confirms distilling his model transfers ~+0.0025 of real public score on top of our previous best."
+    "note": "SUPERSEDED by v028 (0.6585), our current best. Distilled student on dozken's architecture (hidden 160, 321,602 params) trained against his reset2k model replayed as exact teacher labels. 50m46s = 85% of the 60-min budget, and it COMPLETED, which is the evidence that our 75% margin is too strict. Public 0.6565 beats v017's 0.6540 by +0.0025 and v021's 0.6505 by +0.0060, both in the direction the local metric predicted. Local 0.685228 with a -0.0287 offset, consistent with the eight-submission mean of -0.0279 (spread 0.0016). This confirms distilling his model transfers ~+0.0025 of real public score on top of our previous best."
   },
   "v021": {
     "public_score": 0.6505,
@@ -199,7 +199,7 @@
     "grader_seconds": 2736,
     "memory_mb": 628,
     "submitted_utc": "2026-10-01T22:05Z",
-    "note": "OUR BEST. The SMALLEST distilled student yet: hidden 128, 225,922 params = 51.8% of dozken's 435,943-param teacher, trained on his architecture with his reset2k model as the teacher. It scored ABOVE v022 (0.6565) which has 42% more parameters (321,602), and it runs in 45m36s = 76% of the budget against v022's 50m46s = 85%. Locally v023 was 0.000547 BELOW v022 (inside the 0.000317 noise floor, so the two were a statistical tie) and publicly v023 is 0.0003 above. So: the two are tied in truth, and v023 is the better artifact -- fewer params, 10% less runtime, and it cleared the old 75% latency gate outright at 40.12 us/row. This is the distillation-regularisation effect dozken reports, and it means the compression axis was NOT wasted after all: smaller costs nothing and buys latency headroom."
+    "note": "SUPERSEDED by v028 (0.6585), our current best. The SMALLEST distilled student yet: hidden 128, 225,922 params = 51.8% of dozken's 435,943-param teacher, trained on his architecture with his reset2k model as the teacher. It scored ABOVE v022 (0.6565) which has 42% more parameters (321,602), and it runs in 45m36s = 76% of the budget against v022's 50m46s = 85%. Locally v023 was 0.000547 BELOW v022 (inside the 0.000317 noise floor, so the two were a statistical tie) and publicly v023 is 0.0003 above. So: the two are tied in truth, and v023 is the better artifact -- fewer params, 10% less runtime, and it cleared the old 75% latency gate outright at 40.12 us/row. This is the distillation-regularisation effect dozken reports, and it means the compression axis was NOT wasted after all: smaller costs nothing and buys latency headroom."
   },
   "v024": {
     "public_score": 0.656,
@@ -207,5 +207,21 @@
     "memory_mb": 631,
     "submitted_utc": "2026-10-01T22:06Z",
     "note": "batch 64, v022's exact size. 0.6560 public against v022's 0.6565, i.e. -0.0005, which is inside the noise. Confirms batch 64 is neither better nor worse than batch 16 -- the refutation stands. Its value was speed: 2.39h of training instead of 5.31h for the same score. Runs 50m17s = 84% of budget."
+  },
+  "v028": {
+    "public_score": 0.6585,
+    "grader_seconds": 2812,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-02T13:51Z",
+    "uploaded_filename": "submission_gru_v028.zip",
+    "note": "OUR BEST. v023's exact architecture and recipe with ONE change: distill_weight 0.5 -> 1.0, 225,922 params. Local full_valid_wp 0.686510 vs v023's 0.684681, i.e. +0.001829 = +11.5 sigma, far outside the 0.000317 detection threshold. That gain transferred almost exactly: public 0.6585 vs v023's 0.6568, +0.0017 against a predicted +0.0018. The local->public offset is -0.028010, which lands on the 12-submission mean of -0.0280 almost to the digit, so the calibration now holds over 14 clean submissions. Puts us level with dozken's distil160 (0.6588) and 0.0092 behind the 0.6677 leader. RAN 46m52s = 78% of budget and COMPLETED, against our own projection of 72m06s = 120% -- the 1.62x grader factor over-projected by 35% on a p50 taken while v027 was training. The bundle was marked NOT-READY on that projection and should not have been: see the latency note."
+  },
+  "v029": {
+    "public_score": 0.6568,
+    "grader_seconds": 2667,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-02T13:51Z",
+    "uploaded_filename": "submission_gru_v029.zip",
+    "note": "IDEA 5, tail-weighted distillation, and a clean public confirmation of a local null. The distillation term was reweighted by abs(clip(teacher)) instead of the metric weight abs(clip(y)) (gamma=2.0, with gamma=0 verified bit-identical to the parent). Locally it moved full_valid_wp by +0.000002 -- +0.0 sigma, dead flat. Publicly it scored 0.6568, identical to v023's 0.6568 to four decimals. So the null replicates outside the validation set, which is the strongest form of this evidence available. Retires idea 5: teacher weighting is saturated, and the remaining 0.0092 gap to the leader is NOT a loss-shaping problem. Ran 44m27s = 74% of the fastest of the new runs, so idea 5 is also the cheapest of the three to have run."
   }
 }
