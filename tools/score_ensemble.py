@@ -39,8 +39,12 @@ assumed.
 from __future__ import annotations
 
 import argparse
+import json
+import platform
+import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -82,7 +86,56 @@ def main():
                     help='default: all 1,873 (the official full-validation number)')
     ap.add_argument('--chunk', type=int, default=1000)
     ap.add_argument('--out', default=None, help='optional .npy of the mean prediction')
+    ap.add_argument('--log', default=None,
+                    help='transcript path; default exploration/logs/log_ensemble_<members>.log. '
+                         'A result that decides whether we ship an ensemble must survive in '
+                         'the repo, not in /tmp, so the default is a tracked path rather '
+                         'than stdout.')
     args = ap.parse_args()
+
+    vers_str = ','.join(v.strip() for v in args.members.split(',') if v.strip())
+    log_path = Path(args.log) if args.log else \
+        ROOT / 'exploration' / 'logs' / f'log_ensemble_{vers_str}.log'
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    # tee stdout into the transcript so the header, the per-sequence progress and the
+    # final numbers all land in one committed artifact
+    _real = sys.stdout
+    fh = open(log_path, 'w')
+
+    class _Tee:
+        def write(self, t):
+            _real.write(t)
+            fh.write(t)
+
+        def flush(self):
+            _real.flush()
+            fh.flush()
+
+    sys.stdout = _Tee()
+
+    def _git(*a):
+        try:
+            return subprocess.run(['git', *a], capture_output=True, text=True,
+                                  cwd=str(ROOT)).stdout.strip() or 'n/a'
+        except Exception:
+            return 'n/a'
+
+    print(f'### ensemble scoring, log opened '
+          f'{datetime.now(timezone.utc).isoformat(timespec="seconds")}')
+    print('=' * 78)
+    print(f'command           : tools/score_ensemble.py --members {vers_str}')
+    print(f'timestamp         : {datetime.now(timezone.utc).isoformat(timespec="seconds")}')
+    print(f'host              : {platform.platform()}  python {platform.python_version()}')
+    print(f'git commit        : {_git("rev-parse", "HEAD")}')
+    print(f'numpy / onnxrt    : {__import__("numpy").__version__} / '
+          f'{__import__("onnxruntime").__version__}')
+    print(f'members           : {vers_str}')
+    print(f'sequences         : {args.n_sequences or "all 1873"}')
+    print(f'chunk             : {args.chunk}')
+    print(f'NOTE              : scored with tools/metric_ref.py global_wp on the real')
+    print(f'                    need_prediction AND is_scored mask, so the number is')
+    print(f'                    directly comparable to every full_valid_wp in the table.')
+    print('=' * 78)
 
     vers = [v.strip() for v in args.members.split(',') if v.strip()]
     X = np.load(ROOT / 'cache/valid/X.npy', mmap_mode='r')
