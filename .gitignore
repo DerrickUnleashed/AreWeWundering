@@ -26,3 +26,11 @@ cache/
 # shard cache and the organiser's oversized parquets stay out.
 
 .DS_Store
+
+# Editor / IDE local state (added 2026-10-02).  Per-user settings, launch configs and
+# workspace caches: machine-specific, not part of the experiment record, and different
+# for everyone who opens the repo.  Nothing here is currently tracked, so this is a
+# forward-looking rule with no `git rm --cached` needed.
+.vscode/
+.idea/
+
