@@ -14,7 +14,7 @@ reference metric in `tools/metric_ref.py`.
 | 4 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
 | 5 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
 | 6 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Do not ship | -- | 62m18s (104%) | -- |
-| 7 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | Ready to Submit (latency unverified) | -- | -- | -- |
+| 7 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | TIMED OUT on grader | no score | 69m57s (117%) | 646 MB |
 | 8 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | Yet to package | -- | -- | -- |
 | 9 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
 | 10 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
@@ -48,6 +48,8 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 |---|---|---|---|---|
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
+| **v030** | v028's exact recipe and architecture with... | -- | Training | -- |
+| **v031** | v028's exact recipe and architecture with... | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -597,3 +599,79 @@ same architecture going from 64m04s to killed within about ten hours, with memor
 flat at 627 MB throughout, so it is purely wall time. The practical conclusion is
 that model quality, not inference budget, is what limits this problem -- within the
 2x128 envelope we have been using all along.
+
+## What the other competitor's public notes settled for free (2026-10-02)
+
+dozken publishes a full experiment log and a resume file. Reading them changed the
+plan substantially — mostly by killing two ideas I was about to spend GPU hours on.
+
+**The metric changed on 2026-09-15 and it inverted his ranking.** Per-sequence WP
+was replaced by Global WP, and the ordering flipped hard:
+
+| model | old per-seq | new global |
+|---|---:|---:|
+| reset4k | 0.6598 | **0.6823** |
+| seq_5ep | 0.6671 | 0.6704 |
+| **chunk4k** | **0.6835** (best) | **0.6498** (worst) |
+| proj128_v2 | 0.6836 | 0.6487 |
+
+Two levers I had queued are dead, and both were on his resume file's "next runs"
+list rather than in the experiment log:
+
+- **Longer TBPTT is a liability, not the win.** `chunk 4000` looks like +0.0164 on
+  the resume file, but that number is pre-metric-change. Under Global WP it is
+  −0.0370 against reset4k at P(>0)=1.000. We already train at `chunk_len 1000` and
+  that was right for a reason we had not understood. **Do not raise it.**
+- **`proj 128` did not materialise.** The same notes claim the 64-wide input
+  projection destroys ~0.014 WP of linearly available signal; the measured run says
+  −0.0032. We use `input_proj 64`. Leave it.
+
+**The one lever that survived is loss diversity.** His `reset2k + reset4k` ensemble
+is **+0.0056 global, P(>0)=1.000, 95% CI [+0.0019, +0.0100]** — and the stated reason
+is that the members use *different losses* (`GlobalPearsonLoss` vs the older
+`SequencePearsonLoss`). Same-loss pairs add nothing.
+
+That ensemble is also the failure that makes it actionable. He shipped it as two
+ORT graphs and it was **killed at 69m59s**, so he concluded "2-graph ensembles are
+out" and moved on. That conclusion is about *sessions*, not models: we fuse members
+into a single graph, paying the fixed per-session cost once.
+
+Also worth carrying over, both measured by him and both consistent with what we
+already do: averaging members must be on **raw** outputs (z-scoring them inflated
+output std 1.55× and pushed 14.30% of scored rows past the ±2 clip — that artifact
+is what produced his earlier, wrong "ensembling is dead" reading); never rescale
+predictions at all (×1.5 costs 0.0038, ×2.0 costs 0.0176, because the metric
+clips); and do not recentre per sequence (0.6823 → 0.5756).
+
+### Three things we are doing about it
+
+1. **A loss-diverse ensemble fused into one graph** (`tools/score_ensemble.py`).
+   Members **v028** (`distill_weight 1.0`, 0.686510) and **v029**
+   (`distill_weight 0.5` + tail-weighted `gamma 2.0`, 0.684683): identical
+   architecture and hidden width, so the fusion is cheap, but genuinely different
+   loss functions. This is the pair shape his +0.0056 came from, and it is
+   shippable where his was not.
+2. **The distillation-weight curve, sampled properly** (`v030` = 1.5,
+   `v031` = 2.0). Our steepest lever, and until now only two points existed on it.
+   Two points cannot distinguish a curve still climbing from one that has turned
+   over, and the follow-up action is completely different in each case.
+3. **His 0.6879 two-graph ensemble, downloaded and kept**, as a candidate
+   *teacher*. Distillation is the only route to ensemble accuracy that fits in one
+   graph, and a teacher never runs at inference, so it is free. Held with an honest
+   prior attached: his own `distil_ens` (0.6585) did **not** beat his `distil160`
+   (0.6588), so a better teacher demonstrably failed to transfer through
+   compression for him. Worth one run, not worth assuming.
+
+### The v026 timeout, and what it settles
+
+`v026` was uploaded and **killed at 69m57s — 117% of the 3600s limit**, no score. Our
+local projection had said 132.1 min (220%).
+
+The 1.62× grader factor turns out to **hold**; the error was ours. Applying it to the
+observed 106.5 µs/row grader rate implies a quiet local p50 near 65.8 µs/row, not the
+124.17 we measured while four other jobs were saturating the box. So the gate was
+directionally right about v026 and wrong only about magnitude — while the same gate
+called v028 NOT-READY at a projected 120% and v028 ran at 78% and scored our best.
+
+The actionable rule is narrow and worth stating: **a contended p50 is not a
+measurement.** Re-measure idle or do not gate.
