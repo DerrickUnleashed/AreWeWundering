@@ -1,0 +1,323 @@
+### new run, log opened 2026-10-02T16:21:10+0530
+==============================================================================
+command            : python exploration/models/train_gru_v033.py --config exploration/version/version_gru_v033.yaml
+timestamp          : 2026-10-02T16:21:10+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 9f84b75949585492f42ca27e8ee2c0caad5f8eb7
+seed               : 1337
+log                : exploration/logs/log_gru_v033.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v033
+  parent: gru_v028
+  status: smoke
+description: 'A deliberately DIVERSE ensemble member, not a candidate to ship alone.
+  v028''s exact architecture, recipe, distill_weight 1.0 and teacher, with one change
+  to the objective: loss.pool global -> per_sequence. Under global pooling every row
+  of every lane feeds ONE correlation, which is what the live metric does. Under per-sequence
+  pooling each lane gets its own correlation and they are averaged, so a per-lane
+  level offset is washed out instead of being free.'
+hypothesis: 'This is the CORRECTED retest of an idea already refuted once. dozken
+  measured +0.0056 global WP at P(>0)=1.000 from ensembling two models trained with
+  different LOSSES, and stated that same-loss pairs add nothing. We tried it with
+  v028 + v029 and got -0.000174, inside the noise floor. The diagnosis was that the
+  members were not actually diverse: v029 differs from v028 only by gamma=2.0 tail-weighting,
+  which was itself already a measured null (+0.000002), and a knob that provably does
+  nothing cannot create diversity. So the lesson was applied rather than the result
+  forgotten. v033 is built to diverge: global and per-sequence pooling genuinely disagree,
+  and the disagreement is measured rather than assumed. Injecting per-lane level offsets
+  spread -3..3 into a synthetic batch costs the global loss 0.276 and the per-sequence
+  loss 0.069, a 4x difference, while a single shared offset of +3 costs both 0.195
+  identically -- which is correct, because a shared bias is not re-centreable. That
+  is the diversity dozken''s pair had and ours did not. Prediction: v033 alone scores
+  BELOW v028, because per-sequence pooling is the objective the metric abandoned on
+  2026-09-15. dozken measured exactly this inversion: his reset4k (per-sequence loss)
+  0.6598 -> 0.6823 while seq_5ep went 0.6671 -> 0.6704, and he notes a pure per-sequence
+  offset cost the old loss +0.0000 and the new one +0.0721. A member that is individually
+  worse and differently wrong is precisely what an ensemble wants, and this run is
+  only useful if its score is within a few sigma of v028''s. If it lands far below,
+  the diversity is real but too expensive and this line closes.'
+change_vs_parent: loss.pool global -> per_sequence only. The aux MSE and distillation
+  terms are shared code paths and unchanged, and the reporting metric stays global,
+  so v033 is scored on exactly the same rows and metric as every other run in the
+  table. Verified pool=global reproduces v028's loss bit-identically (diff 0.00e+00),
+  so the option itself introduces no drift.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: 225922
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  pool: per_sequence
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 1.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 59
+  best_val_wp: -0.12766612242428696
+  best_val_t0: 0.014268691669177448
+  best_val_t1: -0.26960093651775136
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.012
+  finished_utc: '2026-10-02T10:50:59Z'
+artifacts:
+  log: exploration/logs/log_gru_v033.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v033
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=64 in_dim=224 params=225,922
+max_steps derived: 13,259 steps/epoch x 3 epoch(s) = 39,777 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 1 member(s), 212,140,000 rows, weight 1.0
+train sequences=10607  valid sequences=200  steps=39777
+step 0/39777 lr 4.00e-06 loss 1.909213 grad_norm 3.823 (1s)
+step 25/39777 lr 1.04e-04 loss 1.802034 grad_norm 2.639 (15s)
+step 50/39777 lr 2.04e-04 loss 1.349850 grad_norm 2.252 (30s)
+step 75/39777 lr 3.04e-04 loss 1.048453 grad_norm 1.890 (45s)
+step 100/39777 lr 4.04e-04 loss 1.173819 grad_norm 2.864 (60s)
+step 125/39777 lr 5.04e-04 loss 0.997718 grad_norm 2.211 (75s)
+step 150/39777 lr 6.04e-04 loss 0.826410 grad_norm 1.571 (91s)
+step 175/39777 lr 7.04e-04 loss 1.025939 grad_norm 1.510 (107s)
+step 200/39777 lr 8.04e-04 loss 1.026357 grad_norm 1.813 (121s)
+step 225/39777 lr 9.04e-04 loss 0.832306 grad_norm 1.506 (134s)
+step 250/39777 lr 1.00e-03 loss 0.825115 grad_norm 1.351 (149s)
+step 275/39777 lr 1.10e-03 loss 0.955314 grad_norm 1.480 (163s)
+step 300/39777 lr 1.20e-03 loss 0.897866 grad_norm 1.805 (178s)
+step 325/39777 lr 1.30e-03 loss 1.091556 grad_norm 1.574 (192s)
+step 350/39777 lr 1.40e-03 loss 0.809971 grad_norm 1.442 (206s)
+step 375/39777 lr 1.50e-03 loss 0.848864 grad_norm 0.949 (220s)
+step 400/39777 lr 1.60e-03 loss 0.967805 grad_norm 1.331 (234s)
+step 425/39777 lr 1.70e-03 loss 0.789660 grad_norm 0.880 (248s)
+step 450/39777 lr 1.80e-03 loss 0.835206 grad_norm 0.827 (262s)
+step 475/39777 lr 1.90e-03 loss 0.910502 grad_norm 1.965 (277s)
+step 500/39777 lr 2.00e-03 loss 0.976063 grad_norm 1.211 (291s)
+step 525/39777 lr 2.00e-03 loss 0.926875 grad_norm 0.942 (305s)
+step 550/39777 lr 2.00e-03 loss 0.715734 grad_norm 0.698 (319s)
+step 575/39777 lr 2.00e-03 loss 0.865688 grad_norm 0.918 (332s)
+step 600/39777 lr 2.00e-03 loss 0.806601 grad_norm 0.663 (346s)
+step 625/39777 lr 2.00e-03 loss 0.799116 grad_norm 1.067 (361s)
+step 650/39777 lr 2.00e-03 loss 0.801930 grad_norm 0.995 (375s)
+step 675/39777 lr 2.00e-03 loss 0.787158 grad_norm 1.174 (389s)
+step 700/39777 lr 2.00e-03 loss 0.792724 grad_norm 1.131 (403s)
+step 725/39777 lr 2.00e-03 loss 0.846394 grad_norm 0.803 (417s)
+step 750/39777 lr 2.00e-03 loss 0.814526 grad_norm 0.676 (431s)
+step 775/39777 lr 2.00e-03 loss 0.789889 grad_norm 0.831 (445s)
+step 800/39777 lr 2.00e-03 loss 0.831283 grad_norm 1.008 (459s)
+step 825/39777 lr 2.00e-03 loss 0.820534 grad_norm 0.868 (473s)
+step 850/39777 lr 2.00e-03 loss 0.756027 grad_norm 0.669 (487s)
+step 875/39777 lr 2.00e-03 loss 0.937792 grad_norm 0.838 (501s)
+step 900/39777 lr 2.00e-03 loss 0.839610 grad_norm 0.779 (515s)
+step 925/39777 lr 2.00e-03 loss 0.759404 grad_norm 0.776 (528s)
+step 950/39777 lr 2.00e-03 loss 0.620055 grad_norm 0.796 (542s)
+step 975/39777 lr 2.00e-03 loss 0.916319 grad_norm 1.084 (556s)
+step 1000/39777 lr 2.00e-03 loss 0.931212 grad_norm 1.043 (570s)
+step 1025/39777 lr 2.00e-03 loss 0.723652 grad_norm 0.876 (584s)
+step 1050/39777 lr 2.00e-03 loss 0.818432 grad_norm 0.845 (598s)
+step 1075/39777 lr 2.00e-03 loss 0.730453 grad_norm 0.617 (613s)
+step 1100/39777 lr 2.00e-03 loss 0.713342 grad_norm 0.686 (627s)
+step 1125/39777 lr 2.00e-03 loss 0.650361 grad_norm 1.028 (641s)
+step 1150/39777 lr 2.00e-03 loss 0.741725 grad_norm 0.916 (656s)
+step 1175/39777 lr 2.00e-03 loss 0.761747 grad_norm 0.758 (671s)
+step 1200/39777 lr 2.00e-03 loss 0.841874 grad_norm 0.838 (686s)
+step 1225/39777 lr 2.00e-03 loss 0.737853 grad_norm 0.903 (701s)
+step 1250/39777 lr 2.00e-03 loss 0.752044 grad_norm 0.651 (715s)
+step 1275/39777 lr 2.00e-03 loss 0.765317 grad_norm 1.073 (730s)
+step 1300/39777 lr 2.00e-03 loss 0.702217 grad_norm 0.828 (746s)
+step 1325/39777 lr 2.00e-03 loss 0.770140 grad_norm 1.945 (761s)
+step 1350/39777 lr 2.00e-03 loss 0.752538 grad_norm 0.815 (776s)
+step 1375/39777 lr 2.00e-03 loss 0.713071 grad_norm 1.189 (791s)
+step 1400/39777 lr 2.00e-03 loss 0.740796 grad_norm 0.588 (807s)
+step 1425/39777 lr 2.00e-03 loss 0.821742 grad_norm 0.778 (822s)
+step 1450/39777 lr 2.00e-03 loss 0.793821 grad_norm 1.185 (837s)
+step 1475/39777 lr 2.00e-03 loss 0.707810 grad_norm 0.677 (853s)
+step 1500/39777 lr 2.00e-03 loss 0.732745 grad_norm 0.827 (867s)
+step 1525/39777 lr 2.00e-03 loss 0.737522 grad_norm 0.483 (882s)
+step 1550/39777 lr 2.00e-03 loss 0.784769 grad_norm 0.819 (897s)
+step 1575/39777 lr 2.00e-03 loss 0.722847 grad_norm 0.996 (912s)
+step 1600/39777 lr 2.00e-03 loss 0.746328 grad_norm 1.254 (927s)
+step 1625/39777 lr 2.00e-03 loss 0.888564 grad_norm 0.894 (940s)
+step 1650/39777 lr 2.00e-03 loss 0.609077 grad_norm 0.452 (954s)
+step 1675/39777 lr 2.00e-03 loss 0.779646 grad_norm 0.619 (967s)
+step 1700/39777 lr 2.00e-03 loss 0.768199 grad_norm 1.192 (980s)
+step 1725/39777 lr 2.00e-03 loss 0.616395 grad_norm 0.716 (994s)
+step 1750/39777 lr 2.00e-03 loss 0.632568 grad_norm 0.632 (1009s)
+step 1775/39777 lr 1.99e-03 loss 0.734265 grad_norm 1.047 (1022s)
+step 1800/39777 lr 1.99e-03 loss 0.716321 grad_norm 0.640 (1037s)
+step 1825/39777 lr 1.99e-03 loss 0.808086 grad_norm 0.665 (1051s)
+step 1850/39777 lr 1.99e-03 loss 0.689382 grad_norm 0.803 (1064s)
+step 1875/39777 lr 1.99e-03 loss 0.755533 grad_norm 1.000 (1078s)
