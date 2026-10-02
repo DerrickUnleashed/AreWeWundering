@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v025
   parent: gru_v023
-  status: running
+  status: finished
 description: 'v023''s exact recipe (hidden 128, 225,922 params, his architecture,
   his model as teacher) with his FULL training schedule: batch 64 and 5 epochs instead
   of 3. Two variables changed from v023, both from his notes, and both now affordable
@@ -197,16 +197,16 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.12241172038849811
-  best_val_t0: 0.021453693895816826
-  best_val_t1: -0.26627713467281305
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.0115
-  finished_utc: '2026-10-01T17:40:11Z'
+  best_step: 14999
+  best_val_wp: 0.6943664447749605
+  best_val_t0: 0.6930310509951906
+  best_val_t1: 0.6957018385547304
+  full_valid_wp: 0.6844376572109676
+  latency_us_p50: 58.54
+  latency_us_p99: 118.33
+  train_hours: 4.7849
+  finished_utc: '2026-10-01T22:27:25Z'
 artifacts:
   log: exploration/logs/log_gru_v025.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v025
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v025

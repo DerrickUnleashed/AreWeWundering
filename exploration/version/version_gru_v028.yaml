@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v028
   parent: gru_v023
-  status: running
+  status: finished
 description: 'v023''s exact recipe and architecture with ONE change: distill_weight
   0.5 -> 1.0. Same hidden 128 (225,922 params), same teacher (dozken''s reset2k replayed
   as exact labels), same loss otherwise, same optimiser, same batch 16, 3 epochs,
@@ -200,16 +200,16 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.12683075317994563
-  best_val_t0: 0.015945747355048986
-  best_val_t1: -0.26960725371494026
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.0106
-  finished_utc: '2026-10-01T19:19:59Z'
+  best_step: 39776
+  best_val_wp: 0.696010684949746
+  best_val_t0: 0.6937522660882126
+  best_val_t1: 0.6982691038112794
+  full_valid_wp: 0.6865104544260149
+  latency_us_p50: 67.75
+  latency_us_p99: 128.58
+  train_hours: 5.9069
+  finished_utc: '2026-10-02T01:14:58Z'
 artifacts:
   log: exploration/logs/log_gru_v028.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v028
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v028

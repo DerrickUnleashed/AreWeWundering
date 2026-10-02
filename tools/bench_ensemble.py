@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -128,14 +129,22 @@ def main():
     probe = ROOT / args.probe
     probe.mkdir(parents=True, exist_ok=True)
 
+    # cache/latency_probe/ is regenerable and gitignored, and build_ensemble_graph.py
+    # deletes its own solo files on success, so the fused ensemble may simply be absent.
+    # Build it here rather than assuming a previous run left it behind.
+    ens = probe / ('ensemble_' + '_'.join(vers) + '.onnx')
+    if not ens.exists():
+        print(f'  {ens.name} absent -> building it')
+        subprocess.run([sys.executable, str(ROOT / 'tools/build_ensemble_graph.py'),
+                        '--members', ','.join(vers), '--out', str(ens)],
+                       check=True, cwd=str(ROOT))
+
     print(f'  members: {members}')
 
     # single fused model
     v0, h0 = members[0]
     solo0 = probe / f'solo_{v0}.onnx'
     B.build_solo(B.load_sd(v0)[0], solo0, feat_dim, 17, v0)
-    ens = probe / ('ensemble_' + '_'.join(vers) + '.onnx')
-
     tr = load_transform(v0)
     X = np.load(ROOT / 'cache/valid/X.npy', mmap_mode='r')
     xb = np.asarray(tr.batch(np.asarray(X[400:400 + args.rows], dtype=np.float32)),
