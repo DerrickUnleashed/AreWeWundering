@@ -144,9 +144,9 @@ def main() -> int:
                     help="foreign or local graph; NAME is how it is labelled")
     ap.add_argument("--student", action="append", default=[],
                     help="our student version, e.g. v039 (uses its FeatureTransform)")
-    ap.add_argument("--mean-of", default="",
-                    help="comma-separated NAMES to also score as a mean, "
-                         "e.g. dozken_pair:reset2k,reset4k")
+    ap.add_argument("--mean-of", action="append", default=[],
+                    help="REPEATABLE. NAME:member1,member2 to also score the mean, "
+                         "e.g. --mean-of dozken_pair:reset2k,reset4k")
     ap.add_argument("--n-sequences", type=int, default=500)
     ap.add_argument("--log", default=None)
     a = ap.parse_args()
@@ -204,11 +204,30 @@ def main() -> int:
               f"states={g.state_names}")
 
     means: dict[str, list[str]] = {}
-    for spec in a.mean_of.split(","):
+    # NOTE: --mean-of is REPEATED, not comma-joined. It was originally parsed as one
+    # comma-separated string, which silently destroys the member lists: splitting
+    # "dozken_pair:reset2k,reset4k" on "," FIRST yields ['dozken_pair:reset2k',
+    # 'reset4k'], so the pair is averaged over ONE member and 'reset4k' becomes a
+    # degenerate mean over nothing. The run that exposed this produced dozken_pair
+    # absent and student_plus_pair exactly equal to v039. The three single-model scores
+    # in that run were unaffected, so its conclusion stands.
+    for spec in (a.mean_of or []):
+        spec = str(spec)
         if not spec.strip():
             continue
         nm, _, members = spec.partition(":")
-        means[nm.strip()] = [m.strip() for m in members.split(",") if m.strip()]
+        mem = [m.strip() for m in members.split(",") if m.strip()]
+        if not mem:
+            raise SystemExit(f"[score] --mean-of {spec!r} names no members")
+        # Members may be raw models OR means defined EARLIER in the list, so
+        # student_plus_pair can be built on top of dozken_pair. Order matters.
+        known = set(graphs) | set(means)
+        unknown = [m for m in mem if m not in known]
+        if unknown:
+            raise SystemExit(
+                f"[score] --mean-of {spec!r} names unknown model(s) {unknown}. "
+                f"Known so far: {sorted(known)}")
+        means[nm.strip()] = mem
 
     rows = n_seq * SEQ
     P = {n: np.empty((rows, 2), np.float32) for n in graphs}
