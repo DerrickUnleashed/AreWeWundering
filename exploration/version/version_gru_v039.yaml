@@ -3,19 +3,31 @@ identity:
   model: gru
   version: v039
   parent: gru_v031
-  status: planned
-description: >-
-  v031's exact recipe with a BETTER TEACHER. Student unchanged: hidden 128, input_proj 64, distill_weight 2.0, 3 epochs, same architecture and seed. Only the distillation targets change.
-hypothesis: >-
-  The teacher's quality is the one input to distillation we have never varied, and a strictly better one is on disk. Our current teacher is dozken's reset2k at 0.6864 local. His two-graph loss-diverse ensemble of reset2k + reset4k is 0.6879, which is 0.0015 better, and it is free at inference because a teacher never runs at serving time.
-
-    TeacherStore already averages multiple label files on read, so pointing loss.teacher_labels at both members reproduces his raw-mean ensemble exactly with no change to the training script. His solution.py confirms the average is raw (scale = 1/len(graphs), no z-scoring), which matters because the metric clips at +/-2.
-
-    The honest prior is POOR and stated as such. dozken's distil_ens scored 0.6585 against his distil160's 0.6588, so on his pair a better teacher did not beat a worse one through compression. The visible reason is that his student already sat at the compression sweet spot, leaving no gap for the teacher's extra 0.0015 to close.
-
-    Our student is somewhere different: 225,922 params at 0.687376 against a 0.6864 teacher, so it has ALREADY OVERTAKEN the single-model teacher. That is new -- none of dozken's students beat their own teacher locally. Whether that means there is headroom for a better teacher, or that the student has extracted everything extractable, is exactly the question. Worth one run, not worth assuming.
-change_vs_parent: >-
-  loss.teacher_labels gains a second member so TeacherStore averages dozken's reset2k and reset4k into his 0.6879 ensemble. Student architecture, distill_weight, schedule and seed all unchanged.
+  status: finished
+description: 'v031''s exact recipe with a BETTER TEACHER. Student unchanged: hidden
+  128, input_proj 64, distill_weight 2.0, 3 epochs, same architecture and seed. Only
+  the distillation targets change.'
+hypothesis: "The teacher's quality is the one input to distillation we have never\
+  \ varied, and a strictly better one is on disk. Our current teacher is dozken's\
+  \ reset2k at 0.6864 local. His two-graph loss-diverse ensemble of reset2k + reset4k\
+  \ is 0.6879, which is 0.0015 better, and it is free at inference because a teacher\
+  \ never runs at serving time.\n\n  TeacherStore already averages multiple label\
+  \ files on read, so pointing loss.teacher_labels at both members reproduces his\
+  \ raw-mean ensemble exactly with no change to the training script. His solution.py\
+  \ confirms the average is raw (scale = 1/len(graphs), no z-scoring), which matters\
+  \ because the metric clips at +/-2.\n\n  The honest prior is POOR and stated as\
+  \ such. dozken's distil_ens scored 0.6585 against his distil160's 0.6588, so on\
+  \ his pair a better teacher did not beat a worse one through compression. The visible\
+  \ reason is that his student already sat at the compression sweet spot, leaving\
+  \ no gap for the teacher's extra 0.0015 to close.\n\n  Our student is somewhere\
+  \ different: 225,922 params at 0.687376 against a 0.6864 teacher, so it has ALREADY\
+  \ OVERTAKEN the single-model teacher. That is new -- none of dozken's students beat\
+  \ their own teacher locally. Whether that means there is headroom for a better teacher,\
+  \ or that the student has extracted everything extractable, is exactly the question.\
+  \ Worth one run, not worth assuming."
+change_vs_parent: loss.teacher_labels gains a second member so TeacherStore averages
+  dozken's reset2k and reset4k into his 0.6879 ensemble. Student architecture, distill_weight,
+  schedule and seed all unchanged.
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -150,7 +162,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -194,15 +206,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.6968970749765502
+  best_val_t0: 0.6944442496164015
+  best_val_t1: 0.6993499003366987
+  full_valid_wp: 0.6882122473285281
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.2357
+  finished_utc: '2026-10-03T02:02:51Z'
 artifacts:
   log: exploration/logs/log_gru_v039.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v039
