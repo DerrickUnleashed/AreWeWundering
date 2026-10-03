@@ -1135,28 +1135,28 @@ result lives here instead.
 **full_valid_wp 0.687219**, which is **+0.000708 over v028 at +4.5σ** — the same
 architecture, the same `distill_weight` 1.0, one scalar changed.
 
+**RESOLVED — v032 was submitted and scored 0.6587.** It was packaged as
+`submissions/submission_gru_v032/submission_gru_v032.zip` and ran 45m32s = 76% of budget.
+
 | ver | recipe | local | public | offset |
 |---|---|---:|---:|---:|
 | v028 | 3 epochs, distill 1.0 | 0.686510 | 0.6585 | −0.028010 |
 | v031 | 3 epochs, distill 2.0 | 0.687376 | 0.6587 | −0.028676 |
-| **v032** | **5 epochs, distill 1.0** | **0.687219** | **unsubmitted** | **?** |
+| **v032** | **5 epochs, distill 1.0** | **0.687219** | **0.6587** | **−0.028519** |
 | v025 | 5 epochs, distill 0.5 | 0.684438 | 0.6580 | **−0.026438** |
 
-**Half the answer is in.** Longer training is worth **+0.000708 on local validation** —
-a real effect, +4.5σ, and the first time epochs has moved local score in our favour.
+**Both halves are now in, and the answer is negative.** The pre-registered prediction was
+~0.6616 if v025's +0.0024 offset bonus transferred and ~0.6592 if it did not. **It did
+not** — v032's offset is −0.028519, dead normal at −0.4σ against the 8-run band, landing
+squarely on the second branch. Longer training does **not** move the local→public mapping.
 
-**The other half is the interesting one and only submitting can answer it.** v025 was
-*also* 5 epochs, and it carried an offset of −0.026438 — **+0.0024 better than the
-3-epoch band**, at +4.4σ, invisible to local validation. That is the largest
-public-score effect we have found, larger than any architecture or loss result.
+Full analysis, including what is left of the v025 anomaly and why batch size does not
+explain it either, is in [v032 refuted the epoch hypothesis](#v032-refuted-the-epoch-hypothesis--the-most-promising-thread-we-had-is-dead).
 
-- If v032 inherits it: **~0.6616** (0.6585 + 0.0007 local + 0.0024 offset)
-- If it does not: **~0.6592**
-
-This is the cleanest remaining experiment in the project: one upload, one scalar already
-known locally, and a binary answer about whether the epoch effect is a property of
-*training length* or was specific to v025's lower distillation weight. The two levers
-either compose or they interact, and we have never found out which.
+The submission settled it, and the answer is no: the epoch effect was not a property of
+training length. `v032`'s offset came back dead normal, so the two levers do not compose
+in the way the offset anomaly suggested, and v025's +0.0024 remains a single unreproduced
+observation we cannot attribute.
 
 ### Bundle: `submissions/submission_gru_v032/submission_gru_v032.zip` — all gates PASS
 
@@ -1312,3 +1312,62 @@ v032 ran 45m32s = 76% of budget. Its bundle had predicted 42.5 min from an
 in the session, taken under 4-way contention, were off by up to 25 minutes and marked
 shippable models NOT-READY. The only reliable latency number we have ever produced was
 the one taken on a quiet box.
+
+## All five new experiments reported — two wins, and two of my priors were wrong
+
+| ver | lever | change | params | full_valid_wp | vs v031 | σ |
+|---|---|---|---:|---:|---:|---:|
+| v035 | size **down** | hidden 128→96 | 148,674 | 0.687177 | −0.000199 | −1.3 |
+| v036 | bottleneck **up** | `input_proj` 64→96 | 251,682 | 0.687535 | +0.000159 | +1.0 |
+| **v037** | **schedule** | **epochs 3→8** | 225,922 | **0.688370** | **+0.000994** | **+6.3** |
+| v038 | regularisation | weight_decay 3× | 225,922 | 0.687577 | +0.000201 | +1.3 |
+| **v039** | **teacher** | **+ dozken 0.6879 ensemble** | 225,922 | **0.688212** | **+0.000836** | **+5.3** |
+
+**v037 is the best local score this project has produced**, v039 the second. Both clear
+±0.000318 by a wide margin. Nothing got worse.
+
+### v039 refuted the prior I recorded against it
+
+I wrote a **poor** prior into v039's yaml: dozken's `distil_ens` (0.6585) lost to his
+`distil160` (0.6588), so on his pair a better teacher did not beat a worse one through
+compression. **That did not hold here — the better teacher gained +0.000836 (+5.3σ).**
+
+The reasoning I offered for why our student might differ was the whole argument, and it
+was right: his student already sat at the compression sweet spot, so there was no gap left
+for the teacher's extra 0.0015 to close. **Ours had overtaken its own teacher** (0.687376 vs
+0.6864), which none of his did — so there *was* a gap, and a better teacher filled it.
+The transferable lesson: a prior carried over from another team's configuration is worth
+less than the structural difference between the two cases, and the structural difference
+is usually knowable before the run.
+
+### v038 refuted my diagnosis of the capacity failures
+
+Across three separate commit messages I argued that bigger models lose **because they
+overfit**, and that heavier regularisation should therefore help at the current size.
+**Tripling `weight_decay` gained +0.000201 — +1.3σ, inside the noise.**
+
+So the capacity losses were **not** an overfitting signature and that explanation was
+wrong. The three regressions (head −3.2σ, hidden 285 −13.7σ, hidden 415 −21.7σ) are real
+and reproducible, but "too many parameters" is a description, not a mechanism. I wrote a
+causal story into those commits from a correlation, and the honest position is that we do
+not know why capacity hurts here.
+
+### The three nulls are informative too
+
+- **v035 (smaller, −34%): −1.3σ.** 128 is a genuine **interior** optimum — neither too
+  big nor too small. That closes the capacity axis in *both* directions at once, which is a
+  cleaner result than the one-sided closure I had.
+- **v036 (widen the bottleneck, +11%): +1.0σ.** `input_proj` 64 was already past the knee.
+  dozken's "~0.014 WP destroyed by the projection" does not reproduce on our recipe; the
+  useful information is that the bottleneck is not the binding constraint.
+- **v038: +1.3σ.** See above.
+
+### The caveat that governs all five
+
+v032 just established that local gains in this regime **decay into the public split**:
+v031's +0.000865 local delivered +0.0002 public, a 4.3× attenuation. At the same factor,
+v037's +0.000994 projects to roughly **+0.0002 public** and v039's +0.000836 to about
++0.0002.
+
+So these are **real local gains of uncertain public value**, not a predicted scoreboard.
+Two are worth submission slots; the three nulls are not.
