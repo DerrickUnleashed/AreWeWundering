@@ -8,7 +8,7 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Yet to package | -- | -- | -- |
+| 1 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Ready to Submit | -- | 42m48s (71%) | -- |
 | 2 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Yet to package | -- | -- | -- |
 | 3 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Yet to package | -- | -- | -- |
 | 4 | **v036** | v031's exact recipe with ONE change:... | 0.687535 | Yet to package | -- | -- | -- |
@@ -17,7 +17,7 @@ reference metric in `tools/metric_ref.py`.
 | 7 | **v035** | v031's exact recipe with ONE change: hidden... | 0.687177 | Yet to package | -- | -- | -- |
 | 8 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
 | 9 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
-| 10 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Ready to Submit | -- | 49m30s (82%) | -- |
+| 10 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Submitted | 0.6579 | 47m17s (79%) | 629 MB |
 | 11 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
 | 12 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
 | 13 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
@@ -80,32 +80,33 @@ table above, and the disagreements are the interesting part:
 | 3 | **v030** | 0.686919 | **0.6585** | -0.0002 | 47m11s (79%) | scored |
 | 4 | **v028** | 0.686510 | **0.6585** | -0.0002 | 46m52s (78%) | scored |
 | 5 | **v025** | 0.684438 | **0.6580** | -0.0007 | 46m07s (77%) | scored |
-| 6 | **v029** | 0.684683 | **0.6568** | -0.0019 | 44m27s (74%) | scored |
-| 7 | **v023** | 0.684681 | **0.6568** | -0.0019 | 45m36s (76%) | scored |
-| 8 | **v022** | 0.685228 | **0.6565** | -0.0022 | 50m46s (85%) | scored |
-| 9 | **v024** | 0.684818 | **0.6560** | -0.0027 | 50m17s (84%) | scored |
-| 10 | **v016** | 0.681753 | **0.6541** | -0.0046 | 30m56s (52%) | scored |
-| 11 | **v017** | 0.681866 | **0.6540** | -0.0047 | 25m37s (43%) | scored |
-| 12 | **v018** | 0.680603 | **0.6518** | -0.0069 | 29m21s (49%) | scored |
-| 13 | **v014** | 0.679676 | **0.6517** | -0.0070 | 40m12s (67%) | scored |
-| 14 | **v015** | -- | **0.6515** | -0.0072 | 30m31s (51%) | scored |
-| 15 | **v011** | 0.679986 | **0.6515** | -0.0072 | 30m12s (50%) | scored |
-| 16 | **v020** | 0.681773 | **0.6513** | -0.0074 | 29m52s (50%) | scored |
-| 17 | **v012** | 0.678784 | **0.6512** | -0.0075 | 29m47s (50%) | scored |
-| 18 | **v019** | 0.678374 | **0.6510** | -0.0077 | 30m32s (51%) | scored |
-| 19 | **v021** | 0.678575 | **0.6505** | -0.0082 | 55m32s (93%) | scored |
-| 20 | **v013** | 0.676198 | **0.6490** | -0.0097 | 28m36s (48%) | scored |
-| 21 | **v009** | 0.674456 | **0.6483** | -0.0104 | 39m52s (66%) | scored |
-| 22 | **v007** | 0.674258 | **0.6481** | -0.0106 | 42m16s (70%) | scored |
-| 23 | **v005** | 0.674037 | **0.6481** | -0.0106 | 36m56s (62%) | scored |
-| 24 | **v006** | 0.674149 | **0.6475** | -0.0112 | 35m32s (59%) | scored |
-| 25 | **v008** | 0.674445 | **0.6473** | -0.0114 | 41m17s (69%) | scored |
-| 26 | **v003** | 0.673711 | **0.6457** | -0.0130 | 30m57s (52%) | scored |
-| 27 | **v004** | 0.672206 | **0.6446** | -0.0141 | 43m16s (72%) | scored |
-| 28 | **v002** | 0.674350 | **0.6435** | -0.0152 | 35m02s (58%) | scored |
-| 29 | **v010** | 0.670696 | **0.6427** | -0.0160 | 34m37s (58%) | scored |
-| 30 | **v001** | 0.674315 | **0.6416** | -0.0171 | 34m02s (57%) | scored |
-| 31 | **v033** | 0.660415 | **0.6274** | -0.0313 | 47m22s (79%) | scored |
+| 6 | **v034** | 0.686000 | **0.6579** | -0.0008 | 47m17s (79%) | scored |
+| 7 | **v029** | 0.684683 | **0.6568** | -0.0019 | 44m27s (74%) | scored |
+| 8 | **v023** | 0.684681 | **0.6568** | -0.0019 | 45m36s (76%) | scored |
+| 9 | **v022** | 0.685228 | **0.6565** | -0.0022 | 50m46s (85%) | scored |
+| 10 | **v024** | 0.684818 | **0.6560** | -0.0027 | 50m17s (84%) | scored |
+| 11 | **v016** | 0.681753 | **0.6541** | -0.0046 | 30m56s (52%) | scored |
+| 12 | **v017** | 0.681866 | **0.6540** | -0.0047 | 25m37s (43%) | scored |
+| 13 | **v018** | 0.680603 | **0.6518** | -0.0069 | 29m21s (49%) | scored |
+| 14 | **v014** | 0.679676 | **0.6517** | -0.0070 | 40m12s (67%) | scored |
+| 15 | **v015** | -- | **0.6515** | -0.0072 | 30m31s (51%) | scored |
+| 16 | **v011** | 0.679986 | **0.6515** | -0.0072 | 30m12s (50%) | scored |
+| 17 | **v020** | 0.681773 | **0.6513** | -0.0074 | 29m52s (50%) | scored |
+| 18 | **v012** | 0.678784 | **0.6512** | -0.0075 | 29m47s (50%) | scored |
+| 19 | **v019** | 0.678374 | **0.6510** | -0.0077 | 30m32s (51%) | scored |
+| 20 | **v021** | 0.678575 | **0.6505** | -0.0082 | 55m32s (93%) | scored |
+| 21 | **v013** | 0.676198 | **0.6490** | -0.0097 | 28m36s (48%) | scored |
+| 22 | **v009** | 0.674456 | **0.6483** | -0.0104 | 39m52s (66%) | scored |
+| 23 | **v007** | 0.674258 | **0.6481** | -0.0106 | 42m16s (70%) | scored |
+| 24 | **v005** | 0.674037 | **0.6481** | -0.0106 | 36m56s (62%) | scored |
+| 25 | **v006** | 0.674149 | **0.6475** | -0.0112 | 35m32s (59%) | scored |
+| 26 | **v008** | 0.674445 | **0.6473** | -0.0114 | 41m17s (69%) | scored |
+| 27 | **v003** | 0.673711 | **0.6457** | -0.0130 | 30m57s (52%) | scored |
+| 28 | **v004** | 0.672206 | **0.6446** | -0.0141 | 43m16s (72%) | scored |
+| 29 | **v002** | 0.674350 | **0.6435** | -0.0152 | 35m02s (58%) | scored |
+| 30 | **v010** | 0.670696 | **0.6427** | -0.0160 | 34m37s (58%) | scored |
+| 31 | **v001** | 0.674315 | **0.6416** | -0.0171 | 34m02s (57%) | scored |
+| 32 | **v033** | 0.660415 | **0.6274** | -0.0313 | 47m22s (79%) | scored |
 
 | Ver | full_valid_wp | Public score | Grader | Outcome |
 |---|---:|---|---:|---|
@@ -1371,3 +1372,39 @@ v037's +0.000994 projects to roughly **+0.0002 public** and v039's +0.000836 to 
 
 So these are **real local gains of uncertain public value**, not a predicted scoreboard.
 Two are worth submission slots; the three nulls are not.
+
+## v034 scored 0.6579 — and it sharpens what the attenuation problem actually is
+
+`v034` (doubled MLP head, 263,362 params) is now on the board: **0.6579**, our 5th best.
+
+| | local | public | Δ local | Δ public | ratio |
+|---|---:|---:|---:|---:|---:|
+| v031 vs v028 | +0.000865 | +0.0002 | gain | gain | **0.23×** |
+| **v034 vs v028** | **−0.000510** | **−0.0006** | loss | loss | **1.18×** |
+
+**This is the useful part.** v031's local *gain* delivered only 23% of itself publicly,
+while v034's local *loss* delivered 118%. So the attenuation is **not** the mapping being
+noisy in both directions — **it is specifically that local gains are not converting.**
+
+That is a sharper problem than "local and public disagree", and it changes what to do about
+it. A noisy mapping would mean our local metric is uninformative and we should stop
+trusting it. A one-sided gain attenuation means the local metric is measuring something
+real that simply stops mattering near the ceiling — which is consistent with v031 at
+0.687376 having already overtaken its 0.6864 teacher, and with the top of our table
+(v028/v030/v031/v032 all within 0.0002 public) being a genuine plateau rather than four
+coincidences.
+
+Its offset is **−0.028100, +0.7σ — completely normal.** So widening the head perturbed the
+local-to-public mapping no more than it perturbed anything else.
+
+### v033 and v034, both now on the board
+
+| ver | what it tested | local | public | outcome |
+|---|---|---:|---:|---|
+| v034 | double the MLP head | 0.686000 | **0.6579** | clean negative, 5th best |
+| v033 | per-sequence pooling | 0.660415 | **0.6274** | offset broke, −11.3σ |
+
+Both were worth submitting and both were worth the slots: v034 gives a clean 1:1
+confirmation of the head regression, and v033's −0.0047 excess offset is the single
+clearest measurement in the project of what per-sequence pooling costs against a global
+metric. Neither could have been known locally.
