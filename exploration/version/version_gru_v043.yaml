@@ -3,14 +3,16 @@ identity:
   model: gru
   version: v043
   parent: gru_v039
-  status: planned
-identity:
-  model: gru
-  version: v043
-  parent: gru_v039
-  status: planned
-description: v039 with ONLY dozken reset4k as teacher, dropping the reset2k member. Diagnostic, not an attempt to improve the score.
-hypothesis: v039 gained from having two teachers but we do not know WHICH member did the work. reset4k alone is the weaker model on dozken public (0.6538 against 0.6569) yet it is the one trained against a different loss, which is the stated source of the ensemble diversity. If reset4k alone matches the pair, the gain is loss-diversity and one member suffices; if the pair beats it, it is genuine ensembling and adding members is worth the replay cost v042 is paying. Either answer tells us where to spend the next hour, which is the point of spending one now.
+  status: running
+description: v039 with ONLY dozken reset4k as teacher, dropping the reset2k member.
+  Diagnostic, not an attempt to improve the score.
+hypothesis: v039 gained from having two teachers but we do not know WHICH member did
+  the work. reset4k alone is the weaker model on dozken public (0.6538 against 0.6569)
+  yet it is the one trained against a different loss, which is the stated source of
+  the ensemble diversity. If reset4k alone matches the pair, the gain is loss-diversity
+  and one member suffices; if the pair beats it, it is genuine ensembling and adding
+  members is worth the replay cost v042 is paying. Either answer tells us where to
+  spend the next hour, which is the point of spending one now.
 change_vs_parent: loss.teacher_labels reduced to the reset4k member only.
 data:
   train_shards: cache/train
@@ -146,7 +148,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -198,7 +200,9 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: Teacher identity is the only lever that won (v039, 0.6594); everything else plateaued at ~0.659. So v04x push upstream. Base = v039. loss.teacher_labels reduced to the reset4k member only.
+  note: Teacher identity is the only lever that won (v039, 0.6594); everything else
+    plateaued at ~0.659. So v04x push upstream. Base = v039. loss.teacher_labels reduced
+    to the reset4k member only.
 artifacts:
   log: exploration/logs/log_gru_v043.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v043
