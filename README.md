@@ -10,11 +10,11 @@ reference metric in `tools/metric_ref.py`.
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Ready to Submit | -- | 42m48s (71%) | -- |
 | 2 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Ready to Submit | -- | 42m42s (71%) | -- |
-| 3 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Yet to package | -- | -- | -- |
-| 4 | **v036** | v031's exact recipe with ONE change:... | 0.687535 | Yet to package | -- | -- | -- |
+| 3 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Ready to Submit | -- | 42m24s (71%) | -- |
+| 4 | **v036** | v031's exact recipe with ONE change:... | 0.687535 | Ready to Submit | -- | 44m30s (74%) | -- |
 | 5 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
 | 6 | **v032** | v028's exact recipe -- same architecture,... | 0.687219 | Submitted | 0.6587 | 45m32s (76%) | 628 MB |
-| 7 | **v035** | v031's exact recipe with ONE change: hidden... | 0.687177 | Yet to package | -- | -- | -- |
+| 7 | **v035** | v031's exact recipe with ONE change: hidden... | 0.687177 | Ready to Submit | -- | 36m48s (61%) | -- |
 | 8 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
 | 9 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
 | 10 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Submitted | 0.6579 | 47m17s (79%) | 629 MB |
@@ -1408,3 +1408,46 @@ Both were worth submitting and both were worth the slots: v034 gives a clean 1:1
 confirmation of the head regression, and v033's −0.0047 excess offset is the single
 clearest measurement in the project of what per-sequence pooling costs against a global
 metric. Neither could have been known locally.
+
+## All seven bundles are packaged, every gate PASS on an idle machine
+
+| ver | params | full_valid_wp | grader | % budget | zip | public |
+|---|---:|---:|---:|---:|---:|---|
+| v035 | 148,674 | 0.687177 | 36.8 min | 61% | 1.60 MB | — |
+| v038 | 225,922 | 0.687577 | 42.4 min | 71% | 2.42 MB | — |
+| v032 | 225,922 | 0.687219 | 42.5 min | 71% | 2.42 MB | **0.6587** |
+| v039 | 225,922 | 0.688212 | 42.7 min | 71% | 2.42 MB | — |
+| v037 | 225,922 | **0.688370** | 42.8 min | 71% | 2.42 MB | — |
+| v036 | 251,682 | 0.687535 | 44.5 min | 74% | 2.69 MB | — |
+| v031 | 225,922 | 0.687376 | *(45m41s actual)* | 76% | 2.42 MB | **0.6587** |
+
+All seven: contract, determinism, parity and size **PASS**, and latency **PASS**. Parity
+ranged 2.146e-06 to 4.888e-06 against a 1e-03 tolerance.
+
+**Every one of these latency numbers was taken on an idle box**, which is the first time
+that has been true for a full packaging session. It is why they cluster so tightly — the
+four 225,922-param models all land at 71%, within 0.4 minutes of each other, which is what
+identical graphs should do and is exactly what never happened under contention.
+
+### v035 is the cheap fallback, and that is its real value
+
+At **148,674 params it runs in 61% of budget and ships in a 1.60 MB zip** — 34% smaller
+than any other bundle and 10 points cheaper to serve. Its score is 0.687177, which is
+−1.3σ against v031: a null.
+
+So the smallest model in the project is also, by a wide margin, the most efficient
+artifact, and the capacity axis being closed costs us almost nothing. If latency ever
+becomes the binding constraint rather than score, v035 is the obvious fallback and it is
+already packaged and verified. That is a useful thing to have on disk for a null result.
+
+### One stale number, deliberately left
+
+`v031`'s `metadata.json` still records **NOT-READY at 63.9 min (106%)**, because it was
+packaged under 4-way contention. It has since been submitted and **ran 45m41s = 76% of
+budget**, so the recorded verdict is wrong by 40%.
+
+It is not corrected, for the same reason v034's null parity was not: the bundle is an
+immutable record of what the gate said at packaging time, and hand-editing a NOT-READY to
+READY would destroy the evidence that this failure mode exists and keeps recurring. The
+README resolves it through the measured-anchor rule and through the real grader reading,
+which is where a reader should look.
