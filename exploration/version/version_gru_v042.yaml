@@ -3,14 +3,16 @@ identity:
   model: gru
   version: v042
   parent: gru_v039
-  status: planned
-identity:
-  model: gru
-  version: v042
-  parent: gru_v039
-  status: planned
-description: 'v039 with a THREE-member teacher: dozken reset2k + reset4k plus our own v037 replayed over the full training set.'
-hypothesis: Teacher identity is the ONLY lever out of five that produced a top result, so it is the one worth pushing hardest. v039 gained +0.000836 local / +0.0007 public going from one teacher to two, so the direction is confirmed rather than speculative. The third member is v037, a DIFFERENT model on a DIFFERENT schedule (8 epochs) scoring 0.6592 publicly, so it is genuinely decorrelated from dozken rather than a near-duplicate -- exactly the lesson from v023, where an ensemble of two models trained the same way contributed nothing (-0.000174) because the members were not actually diverse.
+  status: running
+description: 'v039 with a THREE-member teacher: dozken reset2k + reset4k plus our
+  own v037 replayed over the full training set.'
+hypothesis: Teacher identity is the ONLY lever out of five that produced a top result,
+  so it is the one worth pushing hardest. v039 gained +0.000836 local / +0.0007 public
+  going from one teacher to two, so the direction is confirmed rather than speculative.
+  The third member is v037, a DIFFERENT model on a DIFFERENT schedule (8 epochs) scoring
+  0.6592 publicly, so it is genuinely decorrelated from dozken rather than a near-duplicate
+  -- exactly the lesson from v023, where an ensemble of two models trained the same
+  way contributed nothing (-0.000174) because the members were not actually diverse.
 change_vs_parent: loss.teacher_labels gains a third path. Same averaging path as v039.
 data:
   train_shards: cache/train
@@ -146,7 +148,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -200,7 +202,9 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: Teacher identity is the only lever that won (v039, 0.6594); everything else plateaued at ~0.659. So v04x push upstream. Base = v039. loss.teacher_labels gains a third path. Same averaging path as v039.
+  note: Teacher identity is the only lever that won (v039, 0.6594); everything else
+    plateaued at ~0.659. So v04x push upstream. Base = v039. loss.teacher_labels gains
+    a third path. Same averaging path as v039.
 artifacts:
   log: exploration/logs/log_gru_v042.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v042
