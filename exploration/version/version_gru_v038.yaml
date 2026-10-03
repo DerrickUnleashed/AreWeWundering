@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v038
   parent: gru_v031
-  status: running
+  status: finished
 description: 'v031''s exact recipe with ONE change: AdamW weight_decay 0.01 -> 0.03.
   Model, teacher, distill_weight, schedule, LR and seed all unchanged.'
 hypothesis: "A direct test of the DIAGNOSIS behind three failed capacity runs. Bigger\
@@ -198,15 +198,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.6968145093321346
+  best_val_t0: 0.6945106229205418
+  best_val_t1: 0.6991183957437275
+  full_valid_wp: 0.6875770297390393
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 5.7952
+  finished_utc: '2026-10-03T01:07:30Z'
 artifacts:
   log: exploration/logs/log_gru_v038.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v038
