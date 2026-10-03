@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v036
   parent: gru_v031
-  status: running
+  status: finished
 description: 'v031''s exact recipe with ONE change: input_proj 64 -> 96, so the 224-wide
   transformed row is compressed 2.3x instead of 3.5x. Recurrent trunk untouched at
   hidden 128.'
@@ -202,15 +202,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: 0.026730855551968566
-  best_val_t0: 0.20574014950803168
-  best_val_t1: -0.15227843840409455
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.696657255065984
+  best_val_t0: 0.6944181143131212
+  best_val_t1: 0.6988963958188468
+  full_valid_wp: 0.6875349967000814
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0067
-  finished_utc: '2026-10-02T19:18:38Z'
+  train_hours: 5.8894
+  finished_utc: '2026-10-03T01:13:09Z'
 artifacts:
   log: exploration/logs/log_gru_v036.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v036
