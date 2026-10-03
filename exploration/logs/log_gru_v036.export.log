@@ -1,0 +1,237 @@
+### new run, log opened 2026-10-03T15:18:15+0530
+==============================================================================
+command            : python exploration/models/train_gru_v036.py --config /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/version/version_gru_v036.yaml --export-only --checkpoint /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v036/best_001_step39776_val0.696657.pt
+timestamp          : 2026-10-03T15:18:15+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 3d9a72efbb3e6cabefc42a3da959ed056b743136
+seed               : 1337
+log                : exploration/logs/log_gru_v036.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v036
+  parent: gru_v031
+  status: finished
+description: 'v031''s exact recipe with ONE change: input_proj 64 -> 96, so the 224-wide
+  transformed row is compressed 2.3x instead of 3.5x. Recurrent trunk untouched at
+  hidden 128.'
+hypothesis: "THIS IS NOT A CAPACITY EXPERIMENT, and that is the whole point. Every\
+  \ recurrence-widening result says extra parameters get absorbed as overfitting.\
+  \ But the input projection is a different animal: at 64 units it is a 3.5x BOTTLENECK\
+  \ on the 224-wide level-plus-difference row, and a bottleneck destroys information\
+  \ rather than merely adding variance.\n\n  dozken's audit put a number on it --\
+  \ \"the 224->64 projection destroying ~0.014 WP of linearly available signal\" --\
+  \ and then measured it at -0.0032 on his chunk4k recipe. That does not settle it\
+  \ for us, because chunk4k is a recipe his own data shows is HARMFUL under Global\
+  \ WP (-0.0370 vs reset4k), making it the wrong substrate to measure a projection\
+  \ change on. We have never varied input_proj on OUR recipe.\n\n  It is also nearly\
+  \ free where the trunk was not: the projection is 6.4% of per-row compute, so widening\
+  \ it 1.5x costs about 3% latency, against the 2x-4x that blew the budget for v026\
+  \ and v027.\n\n  Prediction: if the bottleneck hypothesis is right this GAINS where\
+  \ added recurrence lost, because it feeds the recurrence more signal without giving\
+  \ it more parameters to overfit with. Flat or negative joins head_hidden and hidden\
+  \ on the closed-capacity list."
+change_vs_parent: model.input_proj 64 -> 96 only. Recurrent trunk, distill_weight,
+  schedule and seed all unchanged.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 96
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: 251682
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 39776
+  best_val_wp: 0.696657255065984
+  best_val_t0: 0.6944181143131212
+  best_val_t1: 0.6988963958188468
+  full_valid_wp: 0.6875349967000814
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 5.8894
+  finished_utc: '2026-10-03T01:13:09Z'
+artifacts:
+  log: exploration/logs/log_gru_v036.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v036
+  submission_dir: null
+
+==============================================================================
+device: cpu
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/models/train_gru_v036.py:593: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter has become the default. Learn more about the new export logic: https://docs.pytorch.org/docs/stable/onnx_export.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html
+  torch.onnx.export(graph, dummy, str(path), opset_version=opset,
+/Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/venv/lib/python3.11/site-packages/torch/onnx/_internal/torchscript_exporter/symbolic_opset9.py:4604: UserWarning: Exporting a model to ONNX with a batch_size other than 1, with a variable length with GRU can cause an error when running the ONNX model with a different batch size. Make sure to save the model with a batch size of 1, or define the initial states (h0/c0) as inputs of the model. 
+  return _generic_rnn(
+export verified: ONNX == PyTorch, max |diff| = 1.401e-06
+exported inference artifacts from best_001_step39776_val0.696657.pt into /Users/derricksamuel/Desktop/Projects/wnn_connectome_starterpack/exploration/checkpoints/checkpoint_gru_v036
