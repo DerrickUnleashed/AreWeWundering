@@ -34,21 +34,28 @@ This file is the project memory for any coding agent or human working in this re
 3. **Latency first.** Before training any new architecture, benchmark its inference step (`tools/bench_latency.py`). Never spend GPU hours on a model that cannot meet the budget.
 4. **Metric fidelity.** Every reported score comes from the reference metric code with the correct mask. Never report a Pearson computed some other way as "WP".
 5. **Immutability.** Never overwrite an existing version's script, yaml, log, checkpoint folder or submission folder. A change of any kind = a new version. Never delete anything unless the user explicitly asks.
-6. **No silent uploads; every change lands by PR.** Two separate rules:
+6. **No silent uploads. Agents do NOT have permission to push.** Three separate rules:
    (a) **agents never upload anything to the competition site** — the user does that. Unchanged and absolute.
-   (b) **Direct commits to `main`.** Changed 2026-10-02 by explicit user decision: agents **commit and push straight to `main`** and **no longer open pull requests**. The branch-and-PR workflow that applied from 2026-09-30 to 2026-10-02 is retired. Still standing: never `git push --force*` (except one explicitly authorised rewrite, see below), never `git lfs push`, never upload to the competition site, and never rewrite published history without asking first.
+   (b) **NO PUSHING. Changed 2026-10-03 by explicit user decision: agents must NOT run `git push` in any form.** Not `git push origin main`, not a branch, not `--force`, not via a helper script. **Commits stay local.** The user pushes.
 
-   **Why this changed.** The PR workflow existed to keep agents off `main` without an absolute no-push rule, and it did that job — but it cost real friction: two PRs conflicted and had to be redone because the branch was cut from a stale local `main`, and a `gh pr merge` fast-forward silently landed branch commits on `main` as a side effect. The user owns the repository and has decided the review gate is not worth that.
+   This supersedes the 2026-10-02 rule that had agents committing *and pushing* straight to `main`, and it also supersedes the 2026-09-30 → 2026-10-02 branch-and-PR workflow, under which pushing a feature branch was allowed. **Both of those are retired.** Pushing to a feature branch was previously treated as harmless because it "carries no more authority than a local commit"; that reasoning is withdrawn. Nothing is pushed.
+
+   **Why.** The user owns the repository and the remote. Pushing is the one irreversible action in the normal workflow — it cannot be undone without a force-push or a revert, and it publishes to a shared remote without a review step. Everything else an agent does (edit, stage, commit, run tools, launch training) is reversible locally.
+
+   **What this means in practice.**
+   - Do **not** run `git push`. If a task seems to need it, stop and say so.
+   - Local `main` is expected to **diverge** from `origin/main`, and that is normal, not a problem to fix. Do **not** try to reconcile it.
+   - `git pull --ff-only` / `git fetch` are **reads** and remain fine — they are how you check what the user has pushed.
+   - If `git push` fails or is rejected, that is the rule working. Report the unpushed commits; do not retry.
+   - Never `git push --force*` (see the history-rewrite precedent below), never `git lfs push`.
 
    **Workflow per change:**
    ```bash
-   git pull --ff-only                          # keep local main in step FIRST
+   git pull --ff-only                          # read-only: sync with what the user pushed
    # ... edit, then stage only the intended paths (never `git add -A`, see below) ...
    git commit -m "..." -F -                    # one commit per logical change
-   git push origin main
+   # STOP HERE. Do not push. Report the commit SHAs and let the user push.
    ```
-
-   **Never `git add -A`.** `exploration/logs/` is untracked and NOT gitignored, so `git add -A` will stage a live training job's log. See the open-file hazard below. Stage explicit paths, or use `git add <dir>` with the log directory excluded.
 
    **(c) One commit per changed file.** Added 2026-10-02 by explicit user decision. When a change touches several files, each one gets its **own commit** — never a single commit bundling them. Stage exactly one path, commit, then stage the next:
 
@@ -60,6 +67,10 @@ This file is the project memory for any coding agent or human working in this re
    **Why.** Bundled commits make `git log` and `git blame` useless for reconstructing why a file says what it says, and they make a mistake in one file impossible to revert without reverting the others. This bites hardest on generated files: `tools/update_readme.py` rewrites `README.md` and a bundle's `metadata.json` in the same run, and those two changes are unrelated — the table is a report, the metadata is the record for one specific artifact. They must be revertible independently.
 
    Practical consequence: a commit message should describe **one file's** change, and must not claim to cover files it does not contain.
+
+   **Exception: a submission bundle is one commit.** `solution.py` without `model.onnx` is not a partial state, it is a broken one. The four-to-six interdependent files of `submissions/submission_gru_vNNN/` go in a single commit, and that is not a violation of (c).
+
+   **Never `git add -A`.** `exploration/logs/` is untracked and NOT gitignored, so `git add -A` will stage a live training job's log. See the open-file hazard below. Stage explicit paths, or use `git add <dir>` with the log directory excluded.
 
    **History rewrite, once, with authorisation.** On 2026-10-02 the user asked for every Claude co-author trailer to be removed from all of `main`. That required rewriting 4 of 818 commits and force-pushing `main` with `--force-with-lease`, which (b) otherwise forbids. It was done in a throwaway clone at `/tmp` so the dirty live worktree and five running training jobs were never touched, after taking a backup bundle and a `backup/pre-coauthor-removal` tag. Precedent, not standing permission: **ask again before any further rewrite.**
 
@@ -300,7 +311,7 @@ venv/bin/pip install torch pyyaml onnx matplotlib tqdm
 
 **Packages.** Pre-existing and *guaranteed in the scorer*: `numpy 2.2.6`, `onnxruntime 1.23.2`, `pyarrow 19.0.1`, `protobuf 7.36.2`, `sympy 1.14.0`, `flatbuffers`, `packaging`, `mpmath`, plus `humanfriendly`/`coloredlogs` (coloredlogs is an onnxruntime dep). Installed by us into `venv/` for **training/EDA only, NOT guaranteed at scoring time**: `torch 2.14.0` (MPS available, 8 torch threads), `PyYAML 6.0.3`, `onnx 1.23.0`, `matplotlib 3.11.2`, `tqdm 4.70.1`, `pillow 12.3.0`.
 
-**Git.** The folder **is** a git repository, remote `origin` = `https://github.com/DerrickUnleashed/AreWeWundering.git` (branch `main`, **private**). **Datasets are deliberately NOT in git** (see below). `git log` mixes our framework commits with the owner's own (`Adding gitattributes`, `Add Valid_mask.parquet`), so check `git log --format='%h %an %s'` before assuming who changed what. `.gitignore` covers `cache/`, `exploration/checkpoints/`, `exploration/logs/`, `submissions/*/*.zip`, `venv/`, `__pycache__/`, `.DS_Store`, and the two oversized parquets. Do not `git init`; do not commit without being asked. **Workflow: branch from `main`, commit there, push the branch, open a PR, and merge it with a merge commit (§2.6b). Agents never commit straight to `main` and never squash-merge.** The 33 commits made before this rule existed are already local on `main`; they are left alone and are **not** rebased, moved or force-pushed, per the user's explicit decision on 2026-09-30.
+**Git.** The folder **is** a git repository, remote `origin` = `https://github.com/DerrickUnleashed/AreWeWundering.git` (branch `main`, **private**). **Datasets are deliberately NOT in git** (see below). `git log` mixes our framework commits with the owner's own (`Adding gitattributes`, `Add Valid_mask.parquet`), so check `git log --format='%h %an %s'` before assuming who changed what. `.gitignore` covers `cache/`, `exploration/checkpoints/`, `exploration/logs/`, `submissions/*/*.zip`, `venv/`, `__pycache__/`, `.DS_Store`, and the two oversized parquets. Do not `git init`; do not commit without being asked. **Workflow: `git pull --ff-only`, edit, commit locally — one commit per changed file (§2.6c) — and STOP. Agents do not have permission to push (§2.6b). The user pushes.** Local `main` diverging from `origin/main` is expected and is not to be reconciled. The 33 commits made before this rule existed are already local on `main`; they are left alone and are **not** rebased, moved or force-pushed, per the user's explicit decision on 2026-09-30.
 
 **Why the parquets are not in git — the GitHub LFS limits, measured 2026-09-29:**
 - **A single LFS object may not exceed 2 GiB.** `train.parquet` (29.2 GB) and `valid.parquet` (5.6 GB) are rejected by the LFS API with `422 Size must be less than or equal to 2147483648`. This is *not* the familiar 100 MB per-blob limit (LFS bypasses that entirely); it is a separate per-object ceiling that **splitting the repository does not avoid**.
