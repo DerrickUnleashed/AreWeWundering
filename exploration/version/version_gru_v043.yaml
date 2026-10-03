@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v043
   parent: gru_v039
-  status: running
+  status: finished
 description: v039 with ONLY dozken reset4k as teacher, dropping the reset2k member.
   Diagnostic, not an attempt to improve the score.
 hypothesis: v039 gained from having two teachers but we do not know WHICH member did
@@ -191,15 +191,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 38999
+  best_val_wp: 0.6960030574884253
+  best_val_t0: 0.6937393024708404
+  best_val_t1: 0.6982668125060101
+  full_valid_wp: 0.6879443736754344
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 8.4213
+  finished_utc: '2026-10-03T19:37:35Z'
   note: Teacher identity is the only lever that won (v039, 0.6594); everything else
     plateaued at ~0.659. So v04x push upstream. Base = v039. loss.teacher_labels reduced
     to the reset4k member only.
