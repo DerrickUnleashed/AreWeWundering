@@ -8,39 +8,44 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
-| 2 | **v032** | v028's exact recipe -- same architecture,... | 0.687219 | Ready to Submit | -- | 42m30s (71%) | -- |
-| 3 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
-| 4 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
-| 5 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Ready to Submit | -- | 49m30s (82%) | -- |
-| 6 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
-| 7 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
-| 8 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
-| 9 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
-| 10 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Submitted | 0.6580 | 46m07s (77%) | 628 MB |
-| 11 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | TIMED OUT on grader | no score | 69m57s (117%) | 646 MB |
-| 12 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | TIMED OUT on grader | no score | 69m57s (117%) | 643 MB |
-| 13 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
-| 14 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
-| 15 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
-| 16 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
-| 17 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
-| 18 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
-| 19 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
-| 20 | **v021** | dozken arch, no teacher | 0.678575 | Submitted | 0.6505 | 55m32s (93%) | 634 MB |
-| 21 | **v019** | FIX loss: globally pooled | 0.678374 | Submitted | 0.6510 | 30m32s (51%) | 627 MB |
-| 22 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
-| 23 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
-| 24 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
-| 25 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
-| 26 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
-| 27 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
-| 28 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
-| 29 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
-| 30 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
-| 31 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
-| 32 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
-| 33 | **v033** | A deliberately DIVERSE ensemble member, not... | 0.660415 | Submitted | 0.6274 | 47m22s (79%) | 628 MB |
+| 1 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Yet to package | -- | -- | -- |
+| 2 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Yet to package | -- | -- | -- |
+| 3 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Yet to package | -- | -- | -- |
+| 4 | **v036** | v031's exact recipe with ONE change:... | 0.687535 | Yet to package | -- | -- | -- |
+| 5 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
+| 6 | **v032** | v028's exact recipe -- same architecture,... | 0.687219 | Submitted | 0.6587 | 45m32s (76%) | 628 MB |
+| 7 | **v035** | v031's exact recipe with ONE change: hidden... | 0.687177 | Yet to package | -- | -- | -- |
+| 8 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
+| 9 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
+| 10 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Ready to Submit | -- | 49m30s (82%) | -- |
+| 11 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
+| 12 | **v024** | distil, batch 64 (his recipe) | 0.684818 | Submitted | 0.6560 | 50m17s (84%) | 631 MB |
+| 13 | **v029** | Distilled student on dozken's architecture... | 0.684683 | Submitted | 0.6568 | 44m27s (74%) | 628 MB |
+| 14 | **v023** | distil, smaller (52% of teacher) | 0.684681 | Submitted | 0.6568 | 45m36s (76%) | 628 MB |
+| 15 | **v025** | v023's exact recipe (hidden 128, 225,922... | 0.684438 | Submitted | 0.6580 | 46m07s (77%) | 628 MB |
+| 16 | **v026** | v023's exact recipe and architecture at 2x... | 0.684335 | TIMED OUT on grader | no score | 69m57s (117%) | 646 MB |
+| 17 | **v027** | v026 at 2x again: hidden 415, 1,742,717... | 0.683058 | TIMED OUT on grader | no score | 69m57s (117%) | 643 MB |
+| 18 | **v017** | distilled student, 117k (0.61x teacher) | 0.681866 | Submitted | 0.6540 | 25m37s (43%) | 625 MB |
+| 19 | **v016** | distilled student, 192k | 0.681753 | Submitted | 0.6541 | 30m56s (52%) | 627 MB |
+| 20 | **v018** | soft mask + state reset 10k | 0.680603 | Submitted | 0.6518 | 29m21s (49%) | 627 MB |
+| 21 | **v015** | v011 re-exported, reset served [shares v011's weights] | 0.679986 | Submitted | 0.6515 | 30m31s (51%) | 627 MB |
+| 22 | **v011** | soft mask + state reset 4k | 0.679986 | Submitted | 0.6515 | 30m12s (50%) | 627 MB |
+| 23 | **v014** | soft mask + reset 4k, 2x192 proj64 | 0.679676 | Submitted | 0.6517 | 40m12s (67%) | 632 MB |
+| 24 | **v012** | soft mask + state reset 2k | 0.678784 | Submitted | 0.6512 | 29m47s (50%) | 627 MB |
+| 25 | **v021** | dozken arch, no teacher | 0.678575 | Submitted | 0.6505 | 55m32s (93%) | 634 MB |
+| 26 | **v019** | FIX loss: globally pooled | 0.678374 | Submitted | 0.6510 | 30m32s (51%) | 627 MB |
+| 27 | **v013** | reset 4k, no soft mask (control) | 0.676198 | Submitted | 0.6490 | 28m36s (48%) | 627 MB |
+| 28 | **v009** | input: signed-log tail compression | 0.674456 | Submitted | 0.6483 | 39m52s (66%) | 627 MB |
+| 29 | **v008** | input: cross-instrument i0/i1 | 0.674445 | Submitted | 0.6473 | 41m17s (69%) | 626 MB |
+| 30 | **v002** | input: robust z-score, 8-sigma clip | 0.674350 | Submitted | 0.6435 | 35m02s (58%) | 628 MB |
+| 31 | **v001** | wider: 1 layer x 256 | 0.674315 | Submitted | 0.6416 | 34m02s (57%) | 626 MB |
+| 32 | **v007** | input: first differences | 0.674258 | Submitted | 0.6481 | 42m16s (70%) | 626 MB |
+| 33 | **v006** | seed replicate of v002 (1339) | 0.674149 | Submitted | 0.6475 | 35m32s (59%) | 631 MB |
+| 34 | **v005** | seed replicate of v002 (1338) | 0.674037 | Submitted | 0.6481 | 36m56s (62%) | 626 MB |
+| 35 | **v003** | aux \|t\|-weighted MSE + EMA | 0.673711 | Submitted | 0.6457 | 30m57s (52%) | 627 MB |
+| 36 | **v004** | bigger: 2x192 with 128 proj | 0.672206 | Submitted | 0.6446 | 43m16s (72%) | 630 MB |
+| 37 | **v010** | schedule: 6 epochs not 3 | 0.670696 | Submitted | 0.6427 | 34m37s (58%) | 626 MB |
+| 38 | **v033** | A deliberately DIVERSE ensemble member, not... | 0.660415 | Submitted | 0.6274 | 47m22s (79%) | 628 MB |
 
 Ranked by `full_valid_wp`, the global weighted Pearson over all 1,873
 validation sequences (3,528,273 scored rows).
@@ -53,11 +58,6 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 |---|---|---|---|---|
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
-| **v035** | v031's exact recipe with ONE change: hidden... | 0.067588 | Training | -- |
-| **v036** | v031's exact recipe with ONE change:... | 0.026731 | Training | -- |
-| **v037** | v031's exact recipe at 8 epochs instead of 3 | -- | Training | -- |
-| **v038** | v031's exact recipe with ONE change: AdamW... | -- | Training | -- |
-| **v039** | v031's exact recipe with a BETTER TEACHER | -- | Yet to Train | -- |
 
 <!-- END GENERATED: leaderboard -->
 
@@ -75,36 +75,37 @@ table above, and the disagreements are the interesting part:
 
 | Rank | Ver | full_valid_wp | Public score | vs best | Grader | Outcome |
 |---:|---|---:|---:|---:|---:|---|
-| 1 | **v031** | 0.687376 | **0.6587** | +0.0000 | 45m41s (76%) | scored |
-| 2 | **v030** | 0.686919 | **0.6585** | -0.0002 | 47m11s (79%) | scored |
-| 3 | **v028** | 0.686510 | **0.6585** | -0.0002 | 46m52s (78%) | scored |
-| 4 | **v025** | 0.684438 | **0.6580** | -0.0007 | 46m07s (77%) | scored |
-| 5 | **v029** | 0.684683 | **0.6568** | -0.0019 | 44m27s (74%) | scored |
-| 6 | **v023** | 0.684681 | **0.6568** | -0.0019 | 45m36s (76%) | scored |
-| 7 | **v022** | 0.685228 | **0.6565** | -0.0022 | 50m46s (85%) | scored |
-| 8 | **v024** | 0.684818 | **0.6560** | -0.0027 | 50m17s (84%) | scored |
-| 9 | **v016** | 0.681753 | **0.6541** | -0.0046 | 30m56s (52%) | scored |
-| 10 | **v017** | 0.681866 | **0.6540** | -0.0047 | 25m37s (43%) | scored |
-| 11 | **v018** | 0.680603 | **0.6518** | -0.0069 | 29m21s (49%) | scored |
-| 12 | **v014** | 0.679676 | **0.6517** | -0.0070 | 40m12s (67%) | scored |
-| 13 | **v015** | -- | **0.6515** | -0.0072 | 30m31s (51%) | scored |
-| 14 | **v011** | 0.679986 | **0.6515** | -0.0072 | 30m12s (50%) | scored |
-| 15 | **v020** | 0.681773 | **0.6513** | -0.0074 | 29m52s (50%) | scored |
-| 16 | **v012** | 0.678784 | **0.6512** | -0.0075 | 29m47s (50%) | scored |
-| 17 | **v019** | 0.678374 | **0.6510** | -0.0077 | 30m32s (51%) | scored |
-| 18 | **v021** | 0.678575 | **0.6505** | -0.0082 | 55m32s (93%) | scored |
-| 19 | **v013** | 0.676198 | **0.6490** | -0.0097 | 28m36s (48%) | scored |
-| 20 | **v009** | 0.674456 | **0.6483** | -0.0104 | 39m52s (66%) | scored |
-| 21 | **v007** | 0.674258 | **0.6481** | -0.0106 | 42m16s (70%) | scored |
-| 22 | **v005** | 0.674037 | **0.6481** | -0.0106 | 36m56s (62%) | scored |
-| 23 | **v006** | 0.674149 | **0.6475** | -0.0112 | 35m32s (59%) | scored |
-| 24 | **v008** | 0.674445 | **0.6473** | -0.0114 | 41m17s (69%) | scored |
-| 25 | **v003** | 0.673711 | **0.6457** | -0.0130 | 30m57s (52%) | scored |
-| 26 | **v004** | 0.672206 | **0.6446** | -0.0141 | 43m16s (72%) | scored |
-| 27 | **v002** | 0.674350 | **0.6435** | -0.0152 | 35m02s (58%) | scored |
-| 28 | **v010** | 0.670696 | **0.6427** | -0.0160 | 34m37s (58%) | scored |
-| 29 | **v001** | 0.674315 | **0.6416** | -0.0171 | 34m02s (57%) | scored |
-| 30 | **v033** | 0.660415 | **0.6274** | -0.0313 | 47m22s (79%) | scored |
+| 1 | **v032** | 0.687219 | **0.6587** | +0.0000 | 45m32s (76%) | scored |
+| 2 | **v031** | 0.687376 | **0.6587** | +0.0000 | 45m41s (76%) | scored |
+| 3 | **v030** | 0.686919 | **0.6585** | -0.0002 | 47m11s (79%) | scored |
+| 4 | **v028** | 0.686510 | **0.6585** | -0.0002 | 46m52s (78%) | scored |
+| 5 | **v025** | 0.684438 | **0.6580** | -0.0007 | 46m07s (77%) | scored |
+| 6 | **v029** | 0.684683 | **0.6568** | -0.0019 | 44m27s (74%) | scored |
+| 7 | **v023** | 0.684681 | **0.6568** | -0.0019 | 45m36s (76%) | scored |
+| 8 | **v022** | 0.685228 | **0.6565** | -0.0022 | 50m46s (85%) | scored |
+| 9 | **v024** | 0.684818 | **0.6560** | -0.0027 | 50m17s (84%) | scored |
+| 10 | **v016** | 0.681753 | **0.6541** | -0.0046 | 30m56s (52%) | scored |
+| 11 | **v017** | 0.681866 | **0.6540** | -0.0047 | 25m37s (43%) | scored |
+| 12 | **v018** | 0.680603 | **0.6518** | -0.0069 | 29m21s (49%) | scored |
+| 13 | **v014** | 0.679676 | **0.6517** | -0.0070 | 40m12s (67%) | scored |
+| 14 | **v015** | -- | **0.6515** | -0.0072 | 30m31s (51%) | scored |
+| 15 | **v011** | 0.679986 | **0.6515** | -0.0072 | 30m12s (50%) | scored |
+| 16 | **v020** | 0.681773 | **0.6513** | -0.0074 | 29m52s (50%) | scored |
+| 17 | **v012** | 0.678784 | **0.6512** | -0.0075 | 29m47s (50%) | scored |
+| 18 | **v019** | 0.678374 | **0.6510** | -0.0077 | 30m32s (51%) | scored |
+| 19 | **v021** | 0.678575 | **0.6505** | -0.0082 | 55m32s (93%) | scored |
+| 20 | **v013** | 0.676198 | **0.6490** | -0.0097 | 28m36s (48%) | scored |
+| 21 | **v009** | 0.674456 | **0.6483** | -0.0104 | 39m52s (66%) | scored |
+| 22 | **v007** | 0.674258 | **0.6481** | -0.0106 | 42m16s (70%) | scored |
+| 23 | **v005** | 0.674037 | **0.6481** | -0.0106 | 36m56s (62%) | scored |
+| 24 | **v006** | 0.674149 | **0.6475** | -0.0112 | 35m32s (59%) | scored |
+| 25 | **v008** | 0.674445 | **0.6473** | -0.0114 | 41m17s (69%) | scored |
+| 26 | **v003** | 0.673711 | **0.6457** | -0.0130 | 30m57s (52%) | scored |
+| 27 | **v004** | 0.672206 | **0.6446** | -0.0141 | 43m16s (72%) | scored |
+| 28 | **v002** | 0.674350 | **0.6435** | -0.0152 | 35m02s (58%) | scored |
+| 29 | **v010** | 0.670696 | **0.6427** | -0.0160 | 34m37s (58%) | scored |
+| 30 | **v001** | 0.674315 | **0.6416** | -0.0171 | 34m02s (57%) | scored |
+| 31 | **v033** | 0.660415 | **0.6274** | -0.0313 | 47m22s (79%) | scored |
 
 | Ver | full_valid_wp | Public score | Grader | Outcome |
 |---|---:|---|---:|---|
@@ -1241,3 +1242,73 @@ offset +0.0024 better than the 3-epoch band — invisible to local validation by
 construction. v037 (8 epochs) will move the *local* number and we still will not know
 whether the public mapping moved with it. **v032 is packaged and unanswered**; submitting
 it remains the single highest-information action available.
+
+## v032 refuted the epoch hypothesis — the most promising thread we had is dead
+
+`v032` was built to answer one binary question and it answered it, cleanly and negatively.
+
+**Result: public 0.6587, offset −0.028519 — dead normal, at −0.4σ.**
+
+The prediction written into its yaml *before* the run:
+
+| | predicted | actual |
+|---|---:|---:|
+| if v025's +0.0024 offset bonus transferred | ~0.6616 | |
+| if it did not | ~0.6592 | **0.6587** |
+
+It landed squarely on the second branch. **Longer training does not move the
+local→public mapping.** That was the thread three of our last five ideas were resting on —
+v025's +4.4σ offset looked like the single largest public-score effect we had ever found,
+bigger than any architecture or loss result, and it turns out not to be a property of
+training length.
+
+### What is left of v025, honestly
+
+| ver | batch | epochs | offset | vs band |
+|---|---:|---:|---:|---:|
+| v024 | 64 | 3 | −0.028818 | −1.2σ |
+| **v025** | **64** | **5** | **−0.026438** | **+5.3σ** |
+| v032 | 16 | 5 | −0.028519 | −0.4σ |
+
+The obvious next suspect was **batch size** — v025 is batch 64 and v032 is batch 16. But
+v024 is *also* batch 64 and its offset is perfectly ordinary, so batch size does not explain
+it either. **v025 is a real +5.3σ anomaly that we cannot attribute.** That is a loose end,
+not a lever, and it should not be used to justify more long-schedule runs.
+
+The disciplined reading is that one run at one setting produced one outlier we have not
+reproduced, and the correct response to an unreproduced outlier is to stop building on it
+rather than to construct an explanation after the fact.
+
+### Where that leaves us
+
+```
+ours v032  0.6587   ties on public, 2nd locally
+ours v031  0.6587   ties on public, BEST locally (0.687376)
+dozken     0.6588
+#1         0.6677   → 0.0090 back
+```
+
+**v031 and v032 are tied at 0.6587** and are within 0.0002 of dozken. Two independent
+levers — distillation weight and training length — both moved *local* score (+5.5σ and
++4.5σ) and neither moved the *board* beyond v028's 0.6585.
+
+That is now three separate confirmations of the same uncomfortable fact:
+
+| lever | local | public |
+|---|---|---|
+| distill_weight 0.5→1.0→1.5→2.0 | +0.0027 | +0.0002 |
+| epochs 3→5 | +0.0007 | +0.0002 |
+| both | — | 0.6587, tied |
+
+**Local gains in this regime are decaying into the public split.** We are close enough to
+the teacher's ceiling (0.690168) and the teacher itself (0.6879) that further local
+improvement is no longer buying board position. The remaining 0.0090 is probably not
+reachable by tuning this student at all.
+
+### Latency note
+
+v032 ran 45m32s = 76% of budget. Its bundle had predicted 42.5 min from an
+**idle-machine** measurement — accurate to within 8%. The packager's projections earlier
+in the session, taken under 4-way contention, were off by up to 25 minutes and marked
+shippable models NOT-READY. The only reliable latency number we have ever produced was
+the one taken on a quiet box.
