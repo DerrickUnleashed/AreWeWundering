@@ -3,15 +3,16 @@ identity:
   model: gru
   version: v044
   parent: gru_v039
-  status: planned
-identity:
-  model: gru
-  version: v044
-  parent: gru_v039
-  status: planned
-description: v039 with epochs 3 -> 8 AND distill_weight 2.0 -> 3.0, stacking the two changes that individually produced our two best public runs.
-hypothesis: Deliberately the aggressive corner of the 2x2 that v040 and v041 probe one axis at a time, so that if the stack wins we ship it and if it loses we still know which axis broke it. Both axes moved the score in the same direction at dw 2.0, and v043 in this same batch is the control that tells us whether the teacher pair needs a third member.
-change_vs_parent: training.epochs 3 -> 8 and loss.distill_weight 2.0 -> 3.0 versus v039.
+  status: running
+description: v039 with epochs 3 -> 8 AND distill_weight 2.0 -> 3.0, stacking the two
+  changes that individually produced our two best public runs.
+hypothesis: Deliberately the aggressive corner of the 2x2 that v040 and v041 probe
+  one axis at a time, so that if the stack wins we ship it and if it loses we still
+  know which axis broke it. Both axes moved the score in the same direction at dw
+  2.0, and v043 in this same batch is the control that tells us whether the teacher
+  pair needs a third member.
+change_vs_parent: training.epochs 3 -> 8 and loss.distill_weight 2.0 -> 3.0 versus
+  v039.
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -146,7 +147,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -199,7 +200,9 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: Teacher identity is the only lever that won (v039, 0.6594); everything else plateaued at ~0.659. So v04x push upstream. Base = v039. training.epochs 3 -> 8 and loss.distill_weight 2.0 -> 3.0 versus v039.
+  note: Teacher identity is the only lever that won (v039, 0.6594); everything else
+    plateaued at ~0.659. So v04x push upstream. Base = v039. training.epochs 3 ->
+    8 and loss.distill_weight 2.0 -> 3.0 versus v039.
 artifacts:
   log: exploration/logs/log_gru_v044.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v044
