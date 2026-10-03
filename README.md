@@ -9,7 +9,7 @@ reference metric in `tools/metric_ref.py`.
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Ready to Submit | -- | 42m48s (71%) | -- |
-| 2 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Yet to package | -- | -- | -- |
+| 2 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Ready to Submit | -- | 42m42s (71%) | -- |
 | 3 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Yet to package | -- | -- | -- |
 | 4 | **v036** | v031's exact recipe with ONE change:... | 0.687535 | Yet to package | -- | -- | -- |
 | 5 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
