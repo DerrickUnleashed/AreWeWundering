@@ -3,14 +3,15 @@ identity:
   model: gru
   version: v040
   parent: gru_v039
-  status: planned
-identity:
-  model: gru
-  version: v040
-  parent: gru_v039
-  status: planned
-description: v039 (our best at 0.6594) trained for 8 epochs instead of 3, keeping the two-member dozken teacher and distill_weight 2.0.
-hypothesis: 'The two best public runs are v039 (better teacher, 0.6594) and v037 (8 epochs, 0.6592), and they are ORTHOGONAL: one changes who teaches, the other how long we train. Both ran at distill_weight 2.0, so the combination is untested. If schedule length and teacher quality attack the same ceiling they will not add; if they attack different error components they will, and the student sits 0.0008 above the local 0.6879 teacher so there is real gap to close.'
+  status: running
+description: v039 (our best at 0.6594) trained for 8 epochs instead of 3, keeping
+  the two-member dozken teacher and distill_weight 2.0.
+hypothesis: 'The two best public runs are v039 (better teacher, 0.6594) and v037 (8
+  epochs, 0.6592), and they are ORTHOGONAL: one changes who teaches, the other how
+  long we train. Both ran at distill_weight 2.0, so the combination is untested. If
+  schedule length and teacher quality attack the same ceiling they will not add; if
+  they attack different error components they will, and the student sits 0.0008 above
+  the local 0.6879 teacher so there is real gap to close.'
 change_vs_parent: training.epochs 3 -> 8. Nothing else differs from v039.
 data:
   train_shards: cache/train
@@ -146,7 +147,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -199,7 +200,9 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: Teacher identity is the only lever that won (v039, 0.6594); everything else plateaued at ~0.659. So v04x push upstream. Base = v039. training.epochs 3 -> 8. Nothing else differs from v039.
+  note: Teacher identity is the only lever that won (v039, 0.6594); everything else
+    plateaued at ~0.659. So v04x push upstream. Base = v039. training.epochs 3 ->
+    8. Nothing else differs from v039.
 artifacts:
   log: exploration/logs/log_gru_v040.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v040
