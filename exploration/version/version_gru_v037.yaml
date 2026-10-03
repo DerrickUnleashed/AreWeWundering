@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v037
   parent: gru_v031
-  status: running
+  status: finished
 description: 'v031''s exact recipe at 8 epochs instead of 3. 225,922 params, hidden
   128, input_proj 64, distill_weight 2.0. The composition test: both levers that have
   ever worked.'
@@ -200,15 +200,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 89999
+  best_val_wp: 0.6976989292948805
+  best_val_t0: 0.6950161690986651
+  best_val_t1: 0.7003816894910959
+  full_valid_wp: 0.6883703702106307
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 11.7821
+  finished_utc: '2026-10-03T07:06:43Z'
 artifacts:
   log: exploration/logs/log_gru_v037.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v037
