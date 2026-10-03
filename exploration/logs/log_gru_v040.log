@@ -1,0 +1,258 @@
+### new run, log opened 2026-10-03T16:42:11+0530
+==============================================================================
+command            : python exploration/models/train_gru_v040.py --config exploration/version/version_gru_v040.yaml
+timestamp          : 2026-10-03T16:42:11+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 007cd5cc5cf86eb1f20b7bd2623138330827bfbf
+seed               : 1337
+log                : exploration/logs/log_gru_v040.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v040
+  parent: gru_v039
+  status: planned
+description: v039 (our best at 0.6594) trained for 8 epochs instead of 3, keeping
+  the two-member dozken teacher and distill_weight 2.0.
+hypothesis: 'The two best public runs are v039 (better teacher, 0.6594) and v037 (8
+  epochs, 0.6592), and they are ORTHOGONAL: one changes who teaches, the other how
+  long we train. Both ran at distill_weight 2.0, so the combination is untested. If
+  schedule length and teacher quality attack the same ceiling they will not add; if
+  they attack different error components they will, and the student sits 0.0008 above
+  the local 0.6879 teacher so there is real gap to close.'
+change_vs_parent: training.epochs 3 -> 8. Nothing else differs from v039.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+  - cache/teacher/teacher_dozken_reset4k.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 8
+  seed: 1337
+  eval_every_steps: 2500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+  note: Teacher identity is the only lever that won (v039, 0.6594); everything else
+    plateaued at ~0.659. So v04x push upstream. Base = v039. training.epochs 3 ->
+    8. Nothing else differs from v039.
+artifacts:
+  log: exploration/logs/log_gru_v040.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v040
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=64 in_dim=224 params=225,922
+max_steps derived: 13,259 steps/epoch x 8 epoch(s) = 106,072 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 2 member(s), 212,140,000 rows, weight 2.0
+train sequences=10607  valid sequences=200  steps=106072
+step 0/106072 lr 4.00e-06 loss 2.632020 grad_norm 7.288 (1s)
+step 25/106072 lr 1.04e-04 loss 2.340854 grad_norm 6.281 (12s)
+step 50/106072 lr 2.04e-04 loss 1.552868 grad_norm 4.312 (29s)
+step 75/106072 lr 3.04e-04 loss 1.286128 grad_norm 3.611 (46s)
+step 100/106072 lr 4.04e-04 loss 1.262535 grad_norm 5.235 (63s)
+step 125/106072 lr 5.04e-04 loss 1.138618 grad_norm 2.916 (82s)
+step 150/106072 lr 6.04e-04 loss 0.845581 grad_norm 2.324 (101s)
+step 175/106072 lr 7.04e-04 loss 1.029948 grad_norm 2.879 (121s)
+step 200/106072 lr 8.04e-04 loss 0.985292 grad_norm 2.840 (141s)
+step 225/106072 lr 9.04e-04 loss 0.741106 grad_norm 2.243 (161s)
+step 250/106072 lr 1.00e-03 loss 0.815127 grad_norm 2.508 (182s)
+step 275/106072 lr 1.10e-03 loss 0.797434 grad_norm 1.851 (206s)
+step 300/106072 lr 1.20e-03 loss 0.884018 grad_norm 2.277 (228s)
+step 325/106072 lr 1.30e-03 loss 1.142714 grad_norm 4.375 (246s)
+step 350/106072 lr 1.40e-03 loss 0.870366 grad_norm 2.011 (265s)
+step 375/106072 lr 1.50e-03 loss 0.768693 grad_norm 1.635 (285s)
+step 400/106072 lr 1.60e-03 loss 0.995305 grad_norm 2.881 (303s)
+step 425/106072 lr 1.70e-03 loss 0.737871 grad_norm 1.250 (321s)
+step 450/106072 lr 1.80e-03 loss 0.847997 grad_norm 1.721 (338s)
+step 475/106072 lr 1.90e-03 loss 0.561693 grad_norm 1.496 (355s)
+step 500/106072 lr 2.00e-03 loss 0.812295 grad_norm 2.033 (375s)
+step 525/106072 lr 2.00e-03 loss 0.707826 grad_norm 1.457 (394s)
+step 550/106072 lr 2.00e-03 loss 0.735675 grad_norm 1.509 (410s)
+step 575/106072 lr 2.00e-03 loss 0.600270 grad_norm 1.751 (426s)
+step 600/106072 lr 2.00e-03 loss 0.719747 grad_norm 1.728 (441s)
+step 625/106072 lr 2.00e-03 loss 0.867462 grad_norm 2.378 (456s)
+step 650/106072 lr 2.00e-03 loss 0.921630 grad_norm 2.713 (472s)
+step 675/106072 lr 2.00e-03 loss 0.574247 grad_norm 1.704 (487s)
+step 700/106072 lr 2.00e-03 loss 0.615241 grad_norm 1.499 (505s)
+step 725/106072 lr 2.00e-03 loss 0.554008 grad_norm 1.332 (523s)
