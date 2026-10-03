@@ -289,5 +289,45 @@
     "submitted_utc": "2026-10-02T00:23Z",
     "uploaded_filename": "submission_gru_v034.zip",
     "note": "THE DOUBLED-HEAD REGRESSION, CONFIRMED ON THE BOARD. full_valid_wp 0.686000 (-0.000510 vs v028, -3.2 sigma locally) -> public 0.6579, which is -0.0006 against v028's 0.6585. The regression is real but SMALL, and unusually it transferred at roughly 1:1 (ratio 1.18), where v031's +0.000865 local delivered only +0.0002 public. Losses attenuate LESS than gains on this split, which sharpens the attenuation problem: it is specifically that local GAINS are not converting, not that the mapping is noisy in both directions. Offset -0.028100, +0.7 sigma against the 8-run band -- completely normal, so widening the head did nothing to the local-to-public mapping either. Our 5th best entry, and a clean negative: doubling the MLP head cost score without a meaningful latency change (47m17s = 79%)."
+  },
+  "v039": {
+    "public_score": 0.6594,
+    "grader_seconds": 2862,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-03T15:28Z",
+    "uploaded_filename": "submission_gru_v039.zip",
+    "note": "OUR BEST, AND WE ARE NOW AHEAD OF dozken. Better teacher: loss.teacher_labels gained a second member so TeacherStore averages his reset2k + reset4k into his 0.6879 loss-diverse ensemble. Student unchanged (hidden 128, 225,922 params, distill_weight 2.0, 3 epochs). Local 0.688212, +0.000836 over v031 at +5.3 sigma, second best locally and FIRST publicly. This is the run that refuted the poor prior I wrote into its own yaml, reasoning from dozken's distil_ens losing to his distil160. The reasoning was right and it is the interesting part: his student already sat at the compression sweet spot with no gap for the teacher's extra 0.0015 to close, while OURS had overtaken its own teacher, so a gap existed and a better teacher filled it. At 0.6594 we lead dozken's distil160 (0.6588) by +0.0006, the first time we have been ahead of him."
+  },
+  "v037": {
+    "public_score": 0.6592,
+    "grader_seconds": 2886,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-03T15:27Z",
+    "uploaded_filename": "submission_gru_v037.zip",
+    "note": "epochs 3 -> 8, nothing else changed. Local 0.688370, +0.000994 over v031 at +6.3 sigma -- THE BEST LOCAL SCORE IN THE PROJECT -- and second best publicly. The local gain transferred at a factor of 0.50, which corrects the 4.3x attenuation figure derived earlier from v031 alone: that number was one sample, and across five independent levers the true factor is nearer 0.5."
+  },
+  "v038": {
+    "public_score": 0.6588,
+    "grader_seconds": 2886,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-03T15:27Z",
+    "uploaded_filename": "submission_gru_v038.zip",
+    "note": "weight_decay 0.01 -> 0.03. Local 0.687577, +0.000201 at +1.3 sigma -- inside the noise, a null. It is the run that REFUTED my own diagnosis: I had argued across three commit messages that bigger models lose because they OVERFIT and that heavier regularisation should therefore help. It did not help. The capacity regressions are real and reproducible but 'too many parameters' is a description, not a mechanism. Publicly it landed at 0.6588, a shade above v031's 0.6587, which is what a null should do."
+  },
+  "v036": {
+    "public_score": 0.6586,
+    "grader_seconds": 2886,
+    "memory_mb": 629,
+    "submitted_utc": "2026-10-03T15:27Z",
+    "uploaded_filename": "submission_gru_v036.zip",
+    "note": "input_proj 64 -> 96, 251,682 params. Local 0.687535, +0.000159 at +1.0 sigma -- a null. The finding it records is that input_proj 64 was ALREADY past the knee: dozken's audit put ~0.014 WP lost to the 224->64 bottleneck and widening it recovered essentially nothing on our recipe. The bottleneck is not the binding constraint. Also the most expensive bundle of the five at 44m30s projected."
+  },
+  "v035": {
+    "public_score": 0.6586,
+    "grader_seconds": 2692,
+    "memory_mb": 626,
+    "submitted_utc": "2026-10-03T15:26Z",
+    "uploaded_filename": "submission_gru_v035.zip",
+    "note": "hidden 128 -> 96, 148,674 params (-34%). Local 0.687177, -0.000199 at -1.3 sigma -- a null. Its value is efficiency, not score: 44m52s actual = 75% of budget in a 1.60 MB zip, 34% smaller than any other bundle. It also makes 128 a genuine INTERIOR optimum -- closing the capacity axis in both directions at once, which is cleaner than the one-sided closure the three upward experiments gave. If latency ever becomes binding rather than score, this is the fallback and it is verified."
   }
 }
