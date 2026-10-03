@@ -3,14 +3,16 @@ identity:
   model: gru
   version: v041
   parent: gru_v039
-  status: planned
-identity:
-  model: gru
-  version: v041
-  parent: gru_v039
-  status: planned
-description: v039 with distill_weight 2.0 -> 3.0, i.e. the two-member dozken teacher supervised at three times the label-loss weight.
-hypothesis: The distill_weight sweep was MONOTONE across 0.5, 1.0, 1.5 and 2.0 and never turned over, but it was stopped at 2.0 on an argument that a higher floor should not help -- an argument we never tested, in the same class of untested claim that v038 and v041 are designed to correct. A monotone response with the optimum beyond the tested range is the textbook case for extending the range. v039 also showed the student has OVERTAKEN its own teacher, which raises the case for trusting the teacher more.
+  status: running
+description: v039 with distill_weight 2.0 -> 3.0, i.e. the two-member dozken teacher
+  supervised at three times the label-loss weight.
+hypothesis: The distill_weight sweep was MONOTONE across 0.5, 1.0, 1.5 and 2.0 and
+  never turned over, but it was stopped at 2.0 on an argument that a higher floor
+  should not help -- an argument we never tested, in the same class of untested claim
+  that v038 and v041 are designed to correct. A monotone response with the optimum
+  beyond the tested range is the textbook case for extending the range. v039 also
+  showed the student has OVERTAKEN its own teacher, which raises the case for trusting
+  the teacher more.
 change_vs_parent: loss.distill_weight 2.0 -> 3.0. Everything else identical to v039.
 data:
   train_shards: cache/train
@@ -146,7 +148,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -199,7 +201,9 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: Teacher identity is the only lever that won (v039, 0.6594); everything else plateaued at ~0.659. So v04x push upstream. Base = v039. loss.distill_weight 2.0 -> 3.0. Everything else identical to v039.
+  note: Teacher identity is the only lever that won (v039, 0.6594); everything else
+    plateaued at ~0.659. So v04x push upstream. Base = v039. loss.distill_weight 2.0
+    -> 3.0. Everything else identical to v039.
 artifacts:
   log: exploration/logs/log_gru_v041.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v041
