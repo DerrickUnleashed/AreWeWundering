@@ -1,0 +1,15 @@
+### external-model scoring, log opened 2026-10-03T17:23:52+00:00
+==============================================================================
+command     : tools/score_external_onnx.py --graph reset2k=submissions/submission_dozken_ens_6879/reset2k.onnx --graph reset4k=submissions/submission_dozken_ens_6879/reset4k.onnx --student v039 --mean-of dozken_pair:reset2k,reset4k --mean-of student_plus_pair:v039,dozken_pair --n-sequences 500 --log exploration/logs/log_external_teacher_probe.log
+host        : macOS-27.0-arm64-arm-64bit  python 3.11.9
+git commit  : 3cedadeb736aa2233300375851b711ee4f68a8c1
+numpy / ort : 2.2.6 / 1.23.2
+sequences   : 500 of 1873   (SUBSET -- not the official scale)
+NOTE        : every model below sees IDENTICAL rows and mask, so the
+              DIFFERENCES between them are exact regardless of subset size.
+              Absolute values are NOT comparable to full_valid_wp.
+
+  reset2k          raw_mode=True  feat_rank=2 dim=112 H=192 state_reset=2000 states=['state_0', 'state_1']
+  reset4k          raw_mode=True  feat_rank=2 dim=112 H=192 state_reset=4000 states=['state_0', 'state_1']
+  v039             raw_mode=False feat_rank=3 dim=224 H=128 state_reset=0 states=['hidden_0', 'hidden_1']
+    seq 50/500    165.1s  eta  1486.3s
