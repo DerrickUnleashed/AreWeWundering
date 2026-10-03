@@ -3,14 +3,27 @@ identity:
   model: gru
   version: v045
   parent: gru_v041
-  status: planned
-identity:
-  model: gru
-  version: v045
-  parent: gru_v041
-  status: planned
-description: v041 with hidden 128 -> 192, i.e. our student at the SAME hidden width as the teacher it distils from. v041 is the best full-validation score in the project at 0.689036; everything else it holds fixed (pair teacher, distill_weight 3.0, 3 epochs) is the winning recipe.
-hypothesis: 'The external probe settled what v039''s config got wrong. Measured on 500 identical validation sequences, dozken''s reset4k scores 0.709584 against our v039''s 0.703872 -- the TEACHER is +0.005712 BETTER than the student on our own rows and our own metric. v039''s config had argued the opposite, and the error is legible: it compared our subset number against dozken''s number from a DIFFERENT 192-sequence held-out set, so the two were never on the same scale and the comparison could not have held. The teacher is also 2x WIDER -- hidden 192 / 435,943 params against our hidden 128 / 225,922. That gives a concrete, testable reason the gap stays open: the student is capacity-limited relative to the thing it is distilling from, so it cannot represent the teacher''s function however much supervision we give it. v041 already pushed distill_weight to 3.0 and gained, consistent with ''more signal helps'', but supervision cannot exceed capacity. This is the one axis where ''make the student bigger'' has a positive prior rather than the negative one that closed the capacity question in v034-v036 -- and the reason is that v034''s hidden 192 regressed 12.4 sigma with NO teacher to absorb the extra capacity, which is a different experiment from this one.'
+  status: running
+description: v041 with hidden 128 -> 192, i.e. our student at the SAME hidden width
+  as the teacher it distils from. v041 is the best full-validation score in the project
+  at 0.689036; everything else it holds fixed (pair teacher, distill_weight 3.0, 3
+  epochs) is the winning recipe.
+hypothesis: 'The external probe settled what v039''s config got wrong. Measured on
+  500 identical validation sequences, dozken''s reset4k scores 0.709584 against our
+  v039''s 0.703872 -- the TEACHER is +0.005712 BETTER than the student on our own
+  rows and our own metric. v039''s config had argued the opposite, and the error is
+  legible: it compared our subset number against dozken''s number from a DIFFERENT
+  192-sequence held-out set, so the two were never on the same scale and the comparison
+  could not have held. The teacher is also 2x WIDER -- hidden 192 / 435,943 params
+  against our hidden 128 / 225,922. That gives a concrete, testable reason the gap
+  stays open: the student is capacity-limited relative to the thing it is distilling
+  from, so it cannot represent the teacher''s function however much supervision we
+  give it. v041 already pushed distill_weight to 3.0 and gained, consistent with ''more
+  signal helps'', but supervision cannot exceed capacity. This is the one axis where
+  ''make the student bigger'' has a positive prior rather than the negative one that
+  closed the capacity question in v034-v036 -- and the reason is that v034''s hidden
+  192 regressed 12.4 sigma with NO teacher to absorb the extra capacity, which is
+  a different experiment from this one.'
 change_vs_parent: model.hidden 128 -> 192. Single change versus v041.
 data:
   train_shards: cache/train
@@ -146,7 +159,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 435714
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -199,7 +212,9 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: 'Probe-driven: teacher scores +0.005712 ABOVE student on identical rows, and the teacher is 2x wider (192 vs 128). v045 gives the student the teacher''s width to test whether the open gap is capacity. Base = v041 (0.689036, best in project).'
+  note: 'Probe-driven: teacher scores +0.005712 ABOVE student on identical rows, and
+    the teacher is 2x wider (192 vs 128). v045 gives the student the teacher''s width
+    to test whether the open gap is capacity. Base = v041 (0.689036, best in project).'
 artifacts:
   log: exploration/logs/log_gru_v045.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v045
