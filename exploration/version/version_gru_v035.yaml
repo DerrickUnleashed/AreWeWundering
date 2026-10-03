@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v035
   parent: gru_v031
-  status: running
+  status: finished
 description: 'v031''s exact recipe with ONE change: hidden 128 -> 96, so 225,922 ->
   148,674 params, a 34% reduction. Every other scalar identical: distill_weight 2.0,
   input_proj 64, 3 epochs, same teacher, schedule, LR and seed.'
@@ -200,15 +200,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: 0.06758808811371189
-  best_val_t0: 0.12193645815724537
-  best_val_t1: 0.01323971807017841
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.6962102181093646
+  best_val_t0: 0.6939723089712747
+  best_val_t1: 0.6984481272474544
+  full_valid_wp: 0.687176575980303
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0049
-  finished_utc: '2026-10-02T19:18:12Z'
+  train_hours: 3.6377
+  finished_utc: '2026-10-02T22:58:03Z'
 artifacts:
   log: exploration/logs/log_gru_v035.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v035
