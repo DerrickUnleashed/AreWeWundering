@@ -21,8 +21,7 @@ stale. Scored rows sort by score; unscored rows sort after, by `full_valid_wp`,
 which is **not** comparable to the public column.
 
 | Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |
-
-| Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |
+|---:|---|---:|---|---:|---|
 | 1 | **v039** | 0.688212 | **0.6594** | +0.0000 | 47m42s (80%) |
 | 2 | **v041** | 0.689036 | **0.6593** | -0.0001 | 46m51s (78%) |
 | 3 | **v037** | 0.688370 | **0.6592** | -0.0002 | 48m06s (80%) |
