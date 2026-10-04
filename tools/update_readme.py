@@ -449,29 +449,51 @@ def build_tables() -> str:
 
 
 def render_public():
-    """Rank every submission by its PUBLIC score, with the timeouts shown as failures.
+    """ONE table for README.md: every model, ranked by public score, with STATUS in the
+    score column for anything that has no score yet.
 
-    Kept separate from the main table because the two rankings disagree, and only one
-    of them is the board that decides the prize. A timeout appears here rather than
-    being dropped: v026 and v027 are the two largest models we ever built, they were
-    uploaded, and the grader killed both at 69m57s. Listing them by what they would
-    have scored locally would misrepresent them; listing what actually happened does
-    not.
+    Why one table with mixed content rather than two tables. The user asked for a single
+    table on the front page (2026-10-04) AND for models that are ready to submit or ready
+    to package to appear in it. Those two asks only reconcile in one table, because a
+    second table would recreate exactly the drift that motivated the split: a page whose
+    ranking half is current and whose status half is not.
+
+    The score column therefore carries EITHER a public score OR a status:
+      0.6594                        scored, ranked by score
+      awaiting score                uploaded, grader has not answered
+      Ready to Submit               bundled, gate clear
+      Ready to Package              trained to full_valid_wp, no bundle yet
+      Marginal (93% of budget)      bundled but too close to the runtime limit
+      Do not ship                   bundled and rejected for a real reason
+      Training                      run in progress
+    Rows with a score sort first, ranked by it, because that ranking is the one that
+    decides the prize. Everything else sorts after by local score, which is the best
+    available proxy and is explicitly NOT comparable to the public column.
     """
     out = [BEGIN_PUB, '',
-           '### Ranked by public (leaderboard) score', '',
-           'This is the ranking that counts for the prize. It does **not** agree with the',
-           'table above, and the disagreements are the interesting part:', '',
-           '- **v022** has the 2nd-best `full_valid_wp` (0.685228) and only the 5th-best',
-           '  public score. Our local metric overrates it.',
-           '- **v025** is a local *regression* against v023 (-1.5 sigma) and our 2nd-best',
-           '  public result. The local metric underrates it.',
-           '',
-           '| Rank | Ver | full_valid_wp | Public score | vs best | Grader | Outcome |',
-           '|---:|---|---:|---:|---:|---:|---|']
-    scored, failed = [], []
-    lb = load_leaderboard()          # LEADERBOARD is a PATH; this is the parsed dict
-    for v in sorted(k for k in lb if k.startswith('v')):
+           '### Every model, ranked by public score', '',
+           'One table. The **Public score / Status** column carries a public score where',
+           'one exists, and a status where it does not, so models that are ready to submit',
+           'or ready to package appear here rather than in a second table that could go',
+           'stale. Scored rows sort by score; unscored rows sort after, by `full_valid_wp`,',
+           'which is **not** comparable to the public column.', '',
+           '| Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |',
+           '|---:|---|---:|---|---:|---|']
+    _to = [k for k, e in load_leaderboard().items()
+           if isinstance(e, dict) and e.get('outcome') == 'SCORE:TIMEOUT']
+    if _to:
+        # The timeouts are ROWS above, but the argument they make is not obvious from a
+        # row, and it is the single clearest piece of evidence for the capacity result.
+        # Generated from the data so a future timeout cannot be added without the note.
+        out[-1] = '| Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |'
+        out.insert(len(out) - 1, '')
+
+    lb = load_leaderboard()
+    scored, pending, unbuilt = [], [], []
+
+    for v in sorted(k for k in lb if re.fullmatch(r'v\d{3}', k)):
+        if v == 'v000':
+            continue   # framework smoke test, never a modelling result
         e = lb[v]
         y = ROOT / 'exploration' / 'version' / f'version_gru_{v}.yaml'
         loc = None
@@ -481,46 +503,63 @@ def render_public():
             except Exception:
                 loc = None
         secs = e.get('grader_seconds')
-        dur = fmt_mmss(secs) + (f' ({secs / 3600 * 100:.0f}%)' if secs else '')
+        dur = fmt_mmss(secs) + (f' ({secs / 3600 * 100:.0f}%)' if secs else '—')
+        outcome = e.get('outcome')
         pub = e.get('public_score')
-        if e.get('outcome') == 'SCORE:TIMEOUT' or pub is None:
-            failed.append((v, loc, dur, e.get('outcome') or 'not submitted',
-                           e.get('grader_seconds')))
-        elif v == 'v000':
-            continue   # framework smoke test, never a modelling result
+        if outcome == 'SCORE:TIMEOUT':
+            pending.append((v, loc, f'**killed at {dur}**', '--', dur))
+        elif pub is not None:
+            scored.append((pub, v, loc, f'**{pub:.4f}**', dur))
+        elif outcome == 'SUBMITTED:PENDING':
+            pending.append((v, loc, 'awaiting score', '--', '—'))
         else:
-            scored.append((pub, v, loc, dur))
-    scored.sort(reverse=True)
-    if scored:
-        best = scored[0][0]
-        for i, (pub, v, loc, dur) in enumerate(scored, 1):
-            l = f'{loc:.6f}' if loc else '--'
-            out.append(f'| {i} | **{v}** | {l} | **{pub:.4f}** | {pub - best:+.4f} | {dur} | scored |')
-        out.append('')
-    if failed:
-        # NO SECOND TABLE. README.md carries exactly one table (2026-10-04, explicit user
-        # decision), and the non-scoring entries are an EXTREME CASE rather than ranking
-        # data, so they belong in the prose below it. They stay here, still derived from
-        # leaderboard.json, so a future timeout cannot go unnoticed by being unmentioned.
-        to = [f for f in failed if f[3] == 'SCORE:TIMEOUT']
-        ns = [f for f in failed if f[3] != 'SCORE:TIMEOUT']
-        def _describe(items):
-            bits = []
-            for v, loc, dur, outcome, secs in items:
-                l = f'{loc:.6f}' if loc else '--'
-                bits.append(f'**{v}** ({l} local, {dur})')
-            return ', '.join(bits)
-        if to:
-            out += ['**Killed by the grader, no score at all:** ' + _describe(to) + '.',
-                    '',
-                    'These are the two largest models this project ever built, and they',
-                    'are the clearest evidence for the capacity result: locally they were',
-                    '2.2 and 10.2 sigma BELOW v028, and on the grader neither could finish',
-                    'at all. Two independent lines agreeing is why the student stays near',
-                    '225k parameters -- and why a local score alone never justified shipping',
-                    'a big one.', '']
-        if ns:
-            out += ['**Submitted but not scored:** ' + _describe(ns) + '.', '']
+            pending.append((v, loc, 'not submitted', '--', '—'))
+
+    # Models with no leaderboard entry at all: trained, or bundled, but never uploaded.
+    for y in sorted((ROOT / 'exploration' / 'version').glob('version_gru_v*.yaml')):
+        v = y.stem.replace('version_gru_', '')
+        if v in lb or v == 'v000':
+            continue
+        d = yaml.safe_load(y.read_text()) or {}
+        loc = (d.get('results') or {}).get('full_valid_wp')
+        st = (d.get('identity') or {}).get('status')
+        bundled = (ROOT / 'submissions' / f'submission_gru_{v}').exists()
+        if st == 'running':
+            label = 'Training'
+        elif bundled:
+            # bundle_status derives Ready to Submit / Marginal / Do not ship from the
+            # bundle's own gate and EVIDENCE, so this label can never contradict
+            # the bundle's metadata.json. It is the same function the local table uses.
+            label = bundle_status(v, d, lb)[0]
+        elif st == 'finished' and loc is not None:
+            label = 'Ready to Package'
+        else:
+            continue
+        unbuilt.append((v, loc, label, '--', '—'))
+
+    scored.sort(key=lambda r: -r[0])
+    best = scored[0][0] if scored else 0.0
+    for i, (pub, v, loc, s_txt, dur) in enumerate(scored, 1):
+        l = f'{loc:.6f}' if loc else '--'
+        out.append(f'| {i} | **{v}** | {l} | {s_txt} | {pub - best:+.4f} | {dur} |')
+
+    rest = pending + unbuilt
+    # Unscored rows sort by local score, best first. This is a PROXY ordering, not a
+    # claim: see edge case 1 in README.md, where local and public disagree outright.
+    rest.sort(key=lambda r: -(r[1] if r[1] is not None else -1))
+    for v, loc, label, vs, dur in rest:
+        l = f'{loc:.6f}' if loc else '--'
+        out.append(f'| — | **{v}** | {l} | {label} | {vs} | {dur} |')
+
+    if _to:
+        out += ['',
+                '**The rows marked `killed at ...` are the clearest evidence for the',
+                'capacity result.** ' + ', '.join(f'**{v}**' for v in sorted(_to)) +
+                ' are the two largest models this project ever built. Locally they were',
+                '2.2 and 10.2 sigma BELOW v028, and on the grader neither could finish at',
+                'all -- two independent lines pointing the same way, which is why the',
+                'student stays near 225k parameters and why a good local score alone never',
+                'justified shipping a large one.']
     out.append('')
     out.append(END_PUB)
     return '\n'.join(out)
