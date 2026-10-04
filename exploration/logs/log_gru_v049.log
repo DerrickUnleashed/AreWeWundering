@@ -1,0 +1,273 @@
+### new run, log opened 2026-10-04T16:16:39+0530
+==============================================================================
+command            : python exploration/models/train_gru_v049.py --config exploration/version/version_gru_v049.yaml
+timestamp          : 2026-10-04T16:16:39+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 4310cae5be80265b6ca44543e507edbd3f04f47e
+seed               : 1337
+log                : exploration/logs/log_gru_v049.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v049
+  parent: gru_v042
+  status: planned
+description: v042's three-member teacher with distill_weight 2.0 -> 3.0, crossing
+  our two best public recipes.
+hypothesis: 'v042 (triple teacher, dw 2.0) is the public winner at 0.6600 and v044
+  (pair teacher, dw 3.0) is second at 0.6599 with the best local score in the project.
+  They differ on both axes, so neither tells us which mattered. This crosses them:
+  v042''s teacher with v044''s distillation weight. Note the honest prior is weak
+  -- dw 3.0 bought +0.000823 (+5.2 sigma) LOCALLY over v039 and that delivered -0.0001
+  publicly -- but the two axes have never actually been combined, and v042 has never
+  run above dw 2.0.'
+change_vs_parent: loss.distill_weight 2.0 -> 3.0. Single change versus v042.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 3.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+  - cache/teacher/teacher_dozken_reset4k.npy
+  - cache/teacher/teacher_member_v037.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 1500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 2000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
+    from the evidence, not by resampling a dead axis: preprocessing is closed on both
+    the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
+    at two members, distill_weight turns over at 3.0, and output calibration is a
+    null. loss.distill_weight 2.0 -> 3.0. Single change versus v042.'
+artifacts:
+  log: exploration/logs/log_gru_v049.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v049
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=64 in_dim=224 params=225,922
+max_steps derived: 13,259 steps/epoch x 3 epoch(s) = 39,777 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 3 member(s), 212,140,000 rows, weight 3.0
+train sequences=10607  valid sequences=200  steps=39777
+step 0/39777 lr 4.00e-06 loss 3.379411 grad_norm 9.783 (0s)
+step 25/39777 lr 1.04e-04 loss 3.003761 grad_norm 7.826 (11s)
+step 50/39777 lr 2.04e-04 loss 1.969899 grad_norm 5.440 (22s)
+step 75/39777 lr 3.04e-04 loss 1.547322 grad_norm 4.505 (32s)
+step 100/39777 lr 4.04e-04 loss 1.470244 grad_norm 6.906 (43s)
+step 125/39777 lr 5.04e-04 loss 1.262823 grad_norm 3.486 (54s)
+step 150/39777 lr 6.04e-04 loss 0.952368 grad_norm 2.984 (64s)
+step 175/39777 lr 7.04e-04 loss 1.167908 grad_norm 3.806 (75s)
+step 200/39777 lr 8.04e-04 loss 1.111982 grad_norm 3.624 (86s)
+step 225/39777 lr 9.04e-04 loss 0.815706 grad_norm 2.223 (97s)
+step 250/39777 lr 1.00e-03 loss 0.914287 grad_norm 3.149 (108s)
+step 275/39777 lr 1.10e-03 loss 0.842415 grad_norm 2.381 (118s)
+step 300/39777 lr 1.20e-03 loss 0.985638 grad_norm 3.065 (129s)
+step 325/39777 lr 1.30e-03 loss 1.225775 grad_norm 5.272 (141s)
+step 350/39777 lr 1.40e-03 loss 0.928748 grad_norm 2.373 (153s)
+step 375/39777 lr 1.50e-03 loss 0.806773 grad_norm 2.015 (164s)
+step 400/39777 lr 1.60e-03 loss 1.064019 grad_norm 3.473 (176s)
+step 425/39777 lr 1.70e-03 loss 0.793034 grad_norm 1.592 (188s)
+step 450/39777 lr 1.80e-03 loss 0.891129 grad_norm 1.969 (201s)
+step 475/39777 lr 1.90e-03 loss 0.618604 grad_norm 2.215 (214s)
+step 500/39777 lr 2.00e-03 loss 0.870613 grad_norm 2.438 (227s)
+step 525/39777 lr 2.00e-03 loss 0.760340 grad_norm 1.908 (240s)
+step 550/39777 lr 2.00e-03 loss 0.726045 grad_norm 1.478 (254s)
+step 575/39777 lr 2.00e-03 loss 0.660508 grad_norm 2.539 (268s)
+step 600/39777 lr 2.00e-03 loss 0.730783 grad_norm 2.008 (282s)
+step 625/39777 lr 2.00e-03 loss 0.893416 grad_norm 3.358 (296s)
+step 650/39777 lr 2.00e-03 loss 0.922519 grad_norm 3.406 (311s)
+step 675/39777 lr 2.00e-03 loss 0.672317 grad_norm 2.465 (326s)
+step 700/39777 lr 2.00e-03 loss 0.679459 grad_norm 2.607 (341s)
+step 725/39777 lr 2.00e-03 loss 0.580852 grad_norm 1.459 (356s)
+step 750/39777 lr 2.00e-03 loss 0.762541 grad_norm 2.281 (373s)
+step 775/39777 lr 2.00e-03 loss 0.613808 grad_norm 1.471 (390s)
+step 800/39777 lr 2.00e-03 loss 1.112095 grad_norm 6.266 (408s)
+step 825/39777 lr 2.00e-03 loss 0.870841 grad_norm 2.086 (427s)
+step 850/39777 lr 2.00e-03 loss 0.698796 grad_norm 1.111 (444s)
+step 875/39777 lr 2.00e-03 loss 0.982146 grad_norm 1.720 (462s)
+step 900/39777 lr 2.00e-03 loss 0.882846 grad_norm 1.372 (480s)
+step 925/39777 lr 2.00e-03 loss 0.629160 grad_norm 0.893 (498s)
+step 950/39777 lr 2.00e-03 loss 0.515482 grad_norm 1.991 (515s)
+step 975/39777 lr 2.00e-03 loss 0.881906 grad_norm 1.909 (533s)
+step 1000/39777 lr 2.00e-03 loss 0.988962 grad_norm 4.231 (552s)

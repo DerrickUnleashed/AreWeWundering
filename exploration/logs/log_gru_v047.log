@@ -1,0 +1,279 @@
+### new run, log opened 2026-10-04T16:16:30+0530
+==============================================================================
+command            : python exploration/models/train_gru_v047.py --config exploration/version/version_gru_v047.yaml
+timestamp          : 2026-10-04T16:16:30+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : 4310cae5be80265b6ca44543e507edbd3f04f47e
+seed               : 1337
+log                : exploration/logs/log_gru_v047.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v047
+  parent: gru_v042
+  status: planned
+description: v042 with training.state_reset 2000 -> 4000, so training and serving
+  finally AGREE.
+hypothesis: 'Every version from v021 has trained with state_reset=2000 and served
+  with 4000, an accidental skew nobody intended. Measuring it showed serving at 4000
+  beats serving at 2000 by +0.001221, which is 7.7 sigma and the largest single effect
+  we have measured in months. That raises a sharp question: is the gain from the LONGER
+  horizon at serving, or from the train/serve MISMATCH? v042 is the mismatch arm and
+  v047 is the matched arm at the same 4000 interval. If matched wins, the mismatch
+  was luck and should be closed. If matched loses, the mismatch is a real effect worth
+  keeping and pushing further (v048).'
+change_vs_parent: training.state_reset 2000 -> 4000. inference.state_reset stays 4000,
+  so this version trains and serves on the SAME interval for the first time in the
+  project.
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.0
+  layernorm: true
+  head: mlp
+  param_count: null
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+  - cache/teacher/teacher_dozken_reset4k.npy
+  - cache/teacher/teacher_member_v037.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 1500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: null
+  best_val_wp: null
+  best_val_t0: null
+  best_val_t1: null
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: null
+  finished_utc: null
+  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
+    from the evidence, not by resampling a dead axis: preprocessing is closed on both
+    the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
+    at two members, distill_weight turns over at 3.0, and output calibration is a
+    null. training.state_reset 2000 -> 4000. inference.state_reset stays 4000, so
+    this version trains and serves on the SAME interval for the first time in the
+    project.'
+artifacts:
+  log: exploration/logs/log_gru_v047.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v047
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=64 in_dim=224 params=225,922
+max_steps derived: 13,259 steps/epoch x 3 epoch(s) = 39,777 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 3 member(s), 212,140,000 rows, weight 2.0
+train sequences=10607  valid sequences=200  steps=39777
+step 0/39777 lr 4.00e-06 loss 2.621393 grad_norm 7.265 (0s)
+step 25/39777 lr 1.04e-04 loss 2.332115 grad_norm 6.281 (9s)
+step 50/39777 lr 2.04e-04 loss 1.540377 grad_norm 4.240 (20s)
+step 75/39777 lr 3.04e-04 loss 1.286020 grad_norm 3.617 (30s)
+step 100/39777 lr 4.04e-04 loss 1.240525 grad_norm 5.053 (41s)
+step 125/39777 lr 5.04e-04 loss 1.129717 grad_norm 2.898 (52s)
+step 150/39777 lr 6.04e-04 loss 0.832917 grad_norm 2.264 (62s)
+step 175/39777 lr 7.04e-04 loss 1.025222 grad_norm 2.892 (73s)
+step 200/39777 lr 8.04e-04 loss 0.971349 grad_norm 2.720 (84s)
+step 225/39777 lr 9.04e-04 loss 0.741241 grad_norm 2.119 (95s)
+step 250/39777 lr 1.00e-03 loss 0.807907 grad_norm 2.526 (106s)
+step 275/39777 lr 1.10e-03 loss 0.752477 grad_norm 1.778 (116s)
+step 300/39777 lr 1.20e-03 loss 0.877104 grad_norm 2.293 (127s)
+step 325/39777 lr 1.30e-03 loss 1.120232 grad_norm 4.159 (138s)
+step 350/39777 lr 1.40e-03 loss 0.862185 grad_norm 2.013 (150s)
+step 375/39777 lr 1.50e-03 loss 0.755053 grad_norm 1.611 (161s)
+step 400/39777 lr 1.60e-03 loss 0.981140 grad_norm 2.755 (173s)
+step 425/39777 lr 1.70e-03 loss 0.730616 grad_norm 1.270 (185s)
+step 450/39777 lr 1.80e-03 loss 0.842544 grad_norm 1.607 (197s)
+step 475/39777 lr 1.90e-03 loss 0.566461 grad_norm 1.600 (210s)
+step 500/39777 lr 2.00e-03 loss 0.810377 grad_norm 2.102 (223s)
+step 525/39777 lr 2.00e-03 loss 0.688706 grad_norm 1.314 (235s)
+step 550/39777 lr 2.00e-03 loss 0.725037 grad_norm 1.518 (249s)
+step 575/39777 lr 2.00e-03 loss 0.593917 grad_norm 1.733 (262s)
+step 600/39777 lr 2.00e-03 loss 0.696120 grad_norm 1.528 (276s)
+step 625/39777 lr 2.00e-03 loss 0.853217 grad_norm 2.299 (290s)
+step 650/39777 lr 2.00e-03 loss 0.913210 grad_norm 2.797 (304s)
+step 675/39777 lr 2.00e-03 loss 0.578816 grad_norm 1.800 (319s)
+step 700/39777 lr 2.00e-03 loss 0.616101 grad_norm 1.449 (334s)
+step 725/39777 lr 2.00e-03 loss 0.534463 grad_norm 1.341 (349s)
+step 750/39777 lr 2.00e-03 loss 0.725444 grad_norm 1.542 (365s)
+step 775/39777 lr 2.00e-03 loss 0.585560 grad_norm 0.935 (382s)
+step 800/39777 lr 2.00e-03 loss 0.969560 grad_norm 3.831 (399s)
+step 825/39777 lr 2.00e-03 loss 0.841971 grad_norm 1.923 (417s)
+step 850/39777 lr 2.00e-03 loss 0.677636 grad_norm 0.868 (436s)
+step 875/39777 lr 2.00e-03 loss 0.935303 grad_norm 1.296 (453s)
+step 900/39777 lr 2.00e-03 loss 0.849885 grad_norm 1.211 (471s)
+step 925/39777 lr 2.00e-03 loss 0.577439 grad_norm 0.650 (490s)
+step 950/39777 lr 2.00e-03 loss 0.502603 grad_norm 1.591 (507s)
+step 975/39777 lr 2.00e-03 loss 0.915255 grad_norm 2.418 (524s)
+step 1000/39777 lr 2.00e-03 loss 0.913176 grad_norm 3.165 (542s)
+step 1025/39777 lr 2.00e-03 loss 0.693029 grad_norm 1.333 (561s)
