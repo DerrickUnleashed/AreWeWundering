@@ -3,15 +3,18 @@ identity:
   model: gru
   version: v050
   parent: gru_v042
-  status: planned
-identity:
-  model: gru
-  version: v050
-  parent: gru_v042
-  status: planned
-description: v042's EXACT recipe at seed 1338 instead of 1337. A control, not an attempt to improve the score.
-hypothesis: 'We currently cannot tell a real +0.0003 from noise. Six submissions of the same recipe family spanned 0.6593 to 0.6600 publicly, and excluding one outlier the local-to-public correlation is -0.13, so the two metrics disagree about ordering inside the noise band. Before we can interpret v046 to v049 we need to know how big the seed-to-seed spread is on the PUBLIC board. This measures it directly: same config, same teacher, one variable changed, submitted. Without this control, none of the other four runs can be called a win.'
-change_vs_parent: training.seed 1337 -> 1338. Everything else identical to v042, including the teacher files and distill_weight.
+  status: running
+description: v042's EXACT recipe at seed 1338 instead of 1337. A control, not an attempt
+  to improve the score.
+hypothesis: 'We currently cannot tell a real +0.0003 from noise. Six submissions of
+  the same recipe family spanned 0.6593 to 0.6600 publicly, and excluding one outlier
+  the local-to-public correlation is -0.13, so the two metrics disagree about ordering
+  inside the noise band. Before we can interpret v046 to v049 we need to know how
+  big the seed-to-seed spread is on the PUBLIC board. This measures it directly: same
+  config, same teacher, one variable changed, submitted. Without this control, none
+  of the other four runs can be called a win.'
+change_vs_parent: training.seed 1337 -> 1338. Everything else identical to v042, including
+  the teacher files and distill_weight.
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -146,7 +149,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -200,7 +203,12 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen from the evidence, not by resampling a dead axis: preprocessing is closed on both the linear and the nonlinear side, capacity is plateaued, teacher identity saturates at two members, distill_weight turns over at 3.0, and output calibration is a null. training.seed 1337 -> 1338. Everything else identical to v042, including the teacher files and distill_weight.'
+  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
+    from the evidence, not by resampling a dead axis: preprocessing is closed on both
+    the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
+    at two members, distill_weight turns over at 3.0, and output calibration is a
+    null. training.seed 1337 -> 1338. Everything else identical to v042, including
+    the teacher files and distill_weight.'
 artifacts:
   log: exploration/logs/log_gru_v050.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v050
