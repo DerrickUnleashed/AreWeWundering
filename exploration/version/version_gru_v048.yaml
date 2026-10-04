@@ -3,15 +3,18 @@ identity:
   model: gru
   version: v048
   parent: gru_v042
-  status: failed
-identity:
-  model: gru
-  version: v048
-  parent: gru_v042
-  status: failed
-description: v042 with training.state_reset 2000 -> 10000, so the train/serve gap reverses direction and widens fivefold.
-hypothesis: 'If v042''s advantage is the mismatch itself rather than the serving horizon, then a BIGGER gap pointing the other way should help more: train at 10000, serve at 4000, so the model learns long-range dynamics and is served a shorter slice of them. If instead the gain is purely from serving at 4000, this will lose to v042. Together with v042 (2000/4000) and v047 (4000/4000) this is a three-point sweep on the train/serve horizon gap, and it is the first time anyone has probed that axis at all.'
-change_vs_parent: training.state_reset 2000 -> 10000. inference.state_reset unchanged at 4000. chunk_len stays 1000 so resets still land on chunk boundaries.
+  status: running
+description: v042 with training.state_reset 2000 -> 10000, so the train/serve gap
+  reverses direction and widens fivefold.
+hypothesis: 'If v042''s advantage is the mismatch itself rather than the serving horizon,
+  then a BIGGER gap pointing the other way should help more: train at 10000, serve
+  at 4000, so the model learns long-range dynamics and is served a shorter slice of
+  them. If instead the gain is purely from serving at 4000, this will lose to v042.
+  Together with v042 (2000/4000) and v047 (4000/4000) this is a three-point sweep
+  on the train/serve horizon gap, and it is the first time anyone has probed that
+  axis at all.'
+change_vs_parent: training.state_reset 2000 -> 10000. inference.state_reset unchanged
+  at 4000. chunk_len stays 1000 so resets still land on chunk boundaries.
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -200,7 +203,12 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen from the evidence, not by resampling a dead axis: preprocessing is closed on both the linear and the nonlinear side, capacity is plateaued, teacher identity saturates at two members, distill_weight turns over at 3.0, and output calibration is a null. training.state_reset 2000 -> 10000. inference.state_reset unchanged at 4000. chunk_len stays 1000 so resets still land on chunk boundaries.'
+  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
+    from the evidence, not by resampling a dead axis: preprocessing is closed on both
+    the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
+    at two members, distill_weight turns over at 3.0, and output calibration is a
+    null. training.state_reset 2000 -> 10000. inference.state_reset unchanged at 4000.
+    chunk_len stays 1000 so resets still land on chunk boundaries.'
 artifacts:
   log: exploration/logs/log_gru_v048.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v048
