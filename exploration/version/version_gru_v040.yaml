@@ -196,8 +196,8 @@ results:
   best_val_t0: 0.6969846753861533
   best_val_t1: 0.7015249622333504
   full_valid_wp: 0.6891457951741398
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 39.71
+  latency_us_p99: 71.66
   train_hours: 16.1392
   finished_utc: '2026-10-04T03:20:33Z'
   note: Teacher identity is the only lever that won (v039, 0.6594); everything else
@@ -206,4 +206,4 @@ results:
 artifacts:
   log: exploration/logs/log_gru_v040.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v040
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v040
