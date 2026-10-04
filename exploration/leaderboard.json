@@ -329,5 +329,21 @@
     "submitted_utc": "2026-10-03T15:26Z",
     "uploaded_filename": "submission_gru_v035.zip",
     "note": "hidden 128 -> 96, 148,674 params (-34%). Local 0.687177, -0.000199 at -1.3 sigma -- a null. Its value is efficiency, not score: 44m52s actual = 75% of budget in a 1.60 MB zip, 34% smaller than any other bundle. It also makes 128 a genuine INTERIOR optimum -- closing the capacity axis in both directions at once, which is cleaner than the one-sided closure the three upward experiments gave. If latency ever becomes binding rather than score, this is the fallback and it is verified."
+  },
+  "v041": {
+    "public_score": 0.6593,
+    "grader_seconds": 2811,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-04T01:41Z",
+    "uploaded_filename": "submission_gru_v041.zip",
+    "note": "The PAIR teacher arm, and the run the whole v04x batch was built to justify. Locally +0.000824 (+5.2 sigma) over v039 -- the largest single-lever gain of the batch -- and it came out 0.0001 BELOW v039 publicly. That is a clean measurement of how badly our local metric mis-ranks small differences: a +5.2 sigma local result is worth -0.0001 on the board that decides the prize. Both durations are fine (78%), confirming the identical-graph anchor to v037's measured 48m06s was the right call -- the bundle's own contended gate had said NOT-READY at 101.9%."
+  },
+  "v043": {
+    "public_score": 0.6569,
+    "grader_seconds": 2752,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-04T01:42Z",
+    "uploaded_filename": "submission_gru_v043.zip",
+    "note": "The SINGLE reset4k teacher arm, packaged as the control that makes 'the pair is better' interpretable. Locally a null (-0.000268, -1.7 sigma) and publicly -0.0025 against v039 -- the worst score of any model we have submitted since v033. This is the useful half of the pair: it confirms that reset4k alone really is the weaker teacher on our data, in BOTH metrics and in the same ORDER as the local ladder, which is what stops 'the pair won' from being indistinguishable from 'the pair happened to pick the better member'. Note the asymmetry this exposes: a +0.000824 local gain did not transfer at all (-0.0001), while a -0.000268 local loss transferred at full size (-0.0025)."
   }
 }
