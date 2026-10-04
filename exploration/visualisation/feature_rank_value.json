@@ -1,0 +1,63 @@
+{
+  "n_sequences": 300,
+  "rows": 6000000,
+  "top_k_ranked": [
+    "i0_p3",
+    "i0_v4",
+    "i0_p8",
+    "i0_dp0",
+    "i0_p0",
+    "i1_p3",
+    "i0_v15",
+    "i0_v5",
+    "i1_dp0",
+    "i0_p6",
+    "i0_p10",
+    "i0_v3",
+    "i0_p9",
+    "i0_p2",
+    "i0_p1",
+    "i0_p18"
+  ],
+  "ridge": [
+    {
+      "alpha": 1e-06,
+      "r2_raw": 0.08972670554395523,
+      "r2_raw_plus_ranks": 0.09574528110322433
+    },
+    {
+      "alpha": 1e-05,
+      "r2_raw": 0.08972670537968397,
+      "r2_raw_plus_ranks": 0.09574528101678137
+    },
+    {
+      "alpha": 0.0001,
+      "r2_raw": 0.08972668906810044,
+      "r2_raw_plus_ranks": 0.09574527241957553
+    },
+    {
+      "alpha": 0.001,
+      "r2_raw": 0.08972516607056702,
+      "r2_raw_plus_ranks": 0.09574445717490188
+    },
+    {
+      "alpha": 0.01,
+      "r2_raw": 0.08963662675540307,
+      "r2_raw_plus_ranks": 0.09569109222081784
+    },
+    {
+      "alpha": 0.1,
+      "r2_raw": 0.08847096420789835,
+      "r2_raw_plus_ranks": 0.09470883225336812
+    }
+  ],
+  "best_alpha": 0.1,
+  "r2_raw": 0.08847096420789835,
+  "r2_raw_plus_ranks": 0.09470883225336812,
+  "increment": 0.006237868045469774,
+  "increment_pct_of_raw": 7.050751736819978,
+  "verdict": "REJECT -- squares recover it, so the network already can",
+  "naive_verdict": "BUILD IT -- increment is real",
+  "r2_raw_plus_squares": 0.09774915354794178,
+  "variance_attributable_to_rank_specifically": -0.0030403212945736557
+}
