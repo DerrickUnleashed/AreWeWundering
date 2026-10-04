@@ -208,8 +208,8 @@ results:
   best_val_t0: 0.6962679383894403
   best_val_t1: 0.7000436556112821
   full_valid_wp: 0.6891161064531113
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 54.62
+  latency_us_p99: 97.92
   train_hours: 7.1387
   finished_utc: '2026-10-04T03:12:20Z'
   note: 'Probe-driven: teacher scores +0.005712 ABOVE student on identical rows, and
@@ -218,4 +218,4 @@ results:
 artifacts:
   log: exploration/logs/log_gru_v045.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v045
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v045
