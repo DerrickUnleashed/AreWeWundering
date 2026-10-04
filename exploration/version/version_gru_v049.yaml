@@ -3,14 +3,16 @@ identity:
   model: gru
   version: v049
   parent: gru_v042
-  status: planned
-identity:
-  model: gru
-  version: v049
-  parent: gru_v042
-  status: planned
-description: v042's three-member teacher with distill_weight 2.0 -> 3.0, crossing our two best public recipes.
-hypothesis: 'v042 (triple teacher, dw 2.0) is the public winner at 0.6600 and v044 (pair teacher, dw 3.0) is second at 0.6599 with the best local score in the project. They differ on both axes, so neither tells us which mattered. This crosses them: v042''s teacher with v044''s distillation weight. Note the honest prior is weak -- dw 3.0 bought +0.000823 (+5.2 sigma) LOCALLY over v039 and that delivered -0.0001 publicly -- but the two axes have never actually been combined, and v042 has never run above dw 2.0.'
+  status: running
+description: v042's three-member teacher with distill_weight 2.0 -> 3.0, crossing
+  our two best public recipes.
+hypothesis: 'v042 (triple teacher, dw 2.0) is the public winner at 0.6600 and v044
+  (pair teacher, dw 3.0) is second at 0.6599 with the best local score in the project.
+  They differ on both axes, so neither tells us which mattered. This crosses them:
+  v042''s teacher with v044''s distillation weight. Note the honest prior is weak
+  -- dw 3.0 bought +0.000823 (+5.2 sigma) LOCALLY over v039 and that delivered -0.0001
+  publicly -- but the two axes have never actually been combined, and v042 has never
+  run above dw 2.0.'
 change_vs_parent: loss.distill_weight 2.0 -> 3.0. Single change versus v042.
 data:
   train_shards: cache/train
@@ -146,7 +148,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -200,7 +202,11 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen from the evidence, not by resampling a dead axis: preprocessing is closed on both the linear and the nonlinear side, capacity is plateaued, teacher identity saturates at two members, distill_weight turns over at 3.0, and output calibration is a null. loss.distill_weight 2.0 -> 3.0. Single change versus v042.'
+  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
+    from the evidence, not by resampling a dead axis: preprocessing is closed on both
+    the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
+    at two members, distill_weight turns over at 3.0, and output calibration is a
+    null. loss.distill_weight 2.0 -> 3.0. Single change versus v042.'
 artifacts:
   log: exploration/logs/log_gru_v049.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v049
