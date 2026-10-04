@@ -3,14 +3,15 @@ identity:
   model: gru
   version: v046
   parent: gru_v042
-  status: planned
-identity:
-  model: gru
-  version: v046
-  parent: gru_v042
-  status: planned
-description: v042 (our best PUBLIC score, 0.6600) trained for 8 epochs instead of 3.
-hypothesis: 'v042 won the public board on the strength of a three-member teacher, and it is the SHORTEST recipe in the batch at 3 epochs. Schedule length is the only lever in this project that has ever produced a public gain (v037 8 epochs -> 0.6592, v044 8 epochs + dw 3.0 -> 0.6599). v042 has never been given it. This is the single most justified combination we can build: our best public recipe crossed with our only lever that demonstrably moves the public score.'
+  status: running
+description: v042 (our best PUBLIC score, 0.6600) trained for 8 epochs instead of
+  3.
+hypothesis: 'v042 won the public board on the strength of a three-member teacher,
+  and it is the SHORTEST recipe in the batch at 3 epochs. Schedule length is the only
+  lever in this project that has ever produced a public gain (v037 8 epochs -> 0.6592,
+  v044 8 epochs + dw 3.0 -> 0.6599). v042 has never been given it. This is the single
+  most justified combination we can build: our best public recipe crossed with our
+  only lever that demonstrably moves the public score.'
 change_vs_parent: training.epochs 3 -> 8. Single change versus v042.
 data:
   train_shards: cache/train
@@ -146,7 +147,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -200,7 +201,11 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen from the evidence, not by resampling a dead axis: preprocessing is closed on both the linear and the nonlinear side, capacity is plateaued, teacher identity saturates at two members, distill_weight turns over at 3.0, and output calibration is a null. training.epochs 3 -> 8. Single change versus v042.'
+  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
+    from the evidence, not by resampling a dead axis: preprocessing is closed on both
+    the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
+    at two members, distill_weight turns over at 3.0, and output calibration is a
+    null. training.epochs 3 -> 8. Single change versus v042.'
 artifacts:
   log: exploration/logs/log_gru_v046.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v046
