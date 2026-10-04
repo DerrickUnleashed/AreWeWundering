@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v045
   parent: gru_v041
-  status: running
+  status: finished
 description: v041 with hidden 128 -> 192, i.e. our student at the SAME hidden width
   as the teacher it distils from. v041 is the best full-validation score in the project
   at 0.689036; everything else it holds fixed (pair teacher, distill_weight 3.0, 3
@@ -203,15 +203,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.6981557970003612
+  best_val_t0: 0.6962679383894403
+  best_val_t1: 0.7000436556112821
+  full_valid_wp: 0.6891161064531113
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 7.1387
+  finished_utc: '2026-10-04T03:12:20Z'
   note: 'Probe-driven: teacher scores +0.005712 ABOVE student on identical rows, and
     the teacher is 2x wider (192 vs 128). v045 gives the student the teacher''s width
     to test whether the open gap is capacity. Base = v041 (0.689036, best in project).'
