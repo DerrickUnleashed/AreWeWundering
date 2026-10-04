@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v044
   parent: gru_v039
-  status: running
+  status: finished
 description: v039 with epochs 3 -> 8 AND distill_weight 2.0 -> 3.0, stacking the two
   changes that individually produced our two best public runs.
 hypothesis: Deliberately the aggressive corner of the 2x2 that v040 and v041 probe
@@ -191,15 +191,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 103499
+  best_val_wp: 0.6991884696512154
+  best_val_t0: 0.6963299691568298
+  best_val_t1: 0.7020469701456009
+  full_valid_wp: 0.6898463888605111
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 19.9917
+  finished_utc: '2026-10-04T07:11:52Z'
   note: Teacher identity is the only lever that won (v039, 0.6594); everything else
     plateaued at ~0.659. So v04x push upstream. Base = v039. training.epochs 3 ->
     8 and loss.distill_weight 2.0 -> 3.0 versus v039.
