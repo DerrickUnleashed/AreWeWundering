@@ -1192,7 +1192,9 @@ Parity also ran at all — which it could not do for v034 before the `head_hidde
 ## Five new experiments (2026-10-03)
 
 All single-variable against **v031** (`distill_weight` 2.0, 0.687376 local / 0.6587
-public, our best). Four are running, one is waiting on data.
+public, our best at the time). **All five finished and were submitted** — see
+[Five new experiments (2026-10-03)](#five-new-experiments-2026-10-03) for the results and
+[Six experiments upstream](#six-experiments-upstream-2026-10-03) for what they set up.
 
 | ver | lever | change | params | tests |
 |---|---|---|---:|---|
@@ -1462,3 +1464,129 @@ immutable record of what the gate said at packaging time, and hand-editing a NOT
 READY would destroy the evidence that this failure mode exists and keeps recurring. The
 README resolves it through the measured-anchor rule and through the real grader reading,
 which is where a reader should look.
+
+## Six experiments upstream (2026-10-03)
+
+All six **finished**. All were launched against the finding below rather than against the
+plateau, and the finding turned out to matter more than the plateau did.
+
+### The plateau, and what it was pointing at
+
+The five experiments above landed at **0.6586–0.6594 public** — a spread of 0.0008 across
+five levers sharing nothing but the architecture: student size, bottleneck width, schedule
+length, weight decay, and teacher identity. A spread that tight is a **ceiling, not noise**.
+
+But the attenuation factor was also wrong. I had generalised **4.3×** from v031 alone —
+one sample. Across the five the factors are 0.50, 0.84, 0.50, −0.63, 0.50, so local gains
+convert at roughly **half**, not a fifth. Local validation is a materially better selection
+signal than I had been claiming, and the ±0.0003 official floor is worth spending against.
+
+Only one of the five levers won: **teacher identity**. So the six upstream runs (v040–v045)
+all attack the teacher and the supervision signal, not the student.
+
+### The probe: the teacher is BETTER than our student
+
+Nothing had ever scored dozken's models on **our** metric. His 0.6879 comes from his own
+192-sequence held-out set, a different scale from our `full_valid_wp`, so the entire
+"teacher identity is the lever" conclusion rested on a number we could not compare to ours.
+
+`tools/score_external_onnx.py` scores foreign graphs alongside ours — it detects the input
+contract instead of assuming it, because dozken's take **raw** features plus an explicit
+`prev` and difference inside the graph, while ours take a precomputed rank-3 matrix. One
+pass, 500 sequences, every model on **identical rows** under the same mask:
+
+| model | params | t0 | t1 | MEAN |
+|---|---:|---:|---:|---:|
+| dozken `reset4k` | 435,943 | 0.708644 | 0.710524 | **0.709584** |
+| dozken `reset2k` | 435,943 | 0.703904 | 0.705128 | 0.704516 |
+| **our v039** | 225,922 | 0.702736 | 0.705008 | 0.703872 |
+
+```
+reset4k - v039 = +0.005712
+```
+
+**The teacher is 0.0057 better than the student on our own rows and our own metric.** This
+inverted the premise, and the error in v039's own config is legible once written down: it
+argued the student "has already overtaken its own teacher", which it had established by
+comparing our subset number against dozken's number from a *different* held-out set.
+Different scales, so the comparison could not have held.
+
+### The six runs, and two hypotheses that both died
+
+| ver | lever | full_valid_wp | Δ vs parent | σ | verdict |
+|---|---|---:|---:|---:|---|
+| **v044** | epochs 8 **+** dw 3.0 | **0.689846** | +0.001634 | **+10.3** | **best in project** |
+| v040 | epochs 3 → 8 | 0.689146 | +0.000934 | +5.9 | win |
+| v045 | hidden 128 → 192 | 0.689116 | +0.000080 | +0.5 | **NULL** |
+| v041 | dw 2.0 → 3.0 | 0.689036 | +0.000823 | +5.2 | win |
+| v042 | third teacher member | 0.688268 | +0.000056 | +0.4 | **NULL** |
+| v043 | single `reset4k` teacher | 0.687944 | −0.000268 | −1.7 | NULL |
+
+2σ threshold is ±0.000318.
+
+**v045 — capacity. Predicted right, measured null.** The teacher is 2× wider (192 vs 128),
+so a student of the teacher's width should have been able to represent its function. It
+exported at **435,714 params against the teacher's 435,943** — capacity parity confirmed by
+construction — and gained **+0.000080, +0.5σ**. The teacher–student gap is **not** a
+capacity problem. It also cost ~2× latency for nothing, and its latency gate failed; the
+saving grace is that it was never packaged as a ship candidate.
+
+**v042 — more members. Predicted right, measured null.** The pair beat a single teacher by
++0.001091 (**+6.9σ**), so a third *decorrelated* member should have kept paying. It gained
+**+0.000056, +0.4σ**. **Teacher identity saturates at two members.** The third member was
+deliberately diverse — our own v037, trained on a different schedule — so this is not the
+v023 same-recipe mistake; genuinely different teachers simply stop helping.
+
+### What actually worked
+
+Not the teacher, and not the student. **Supervision weight and schedule length**:
+
+```
+distill_weight 2.0 -> 3.0   +0.000823  (+5.2σ)
+epochs 3 -> 8               +0.000934  (+5.9σ)
+both together (v044)        +0.001634 (+10.3σ)
+```
+
+The two stack almost additively, which is the opposite of the plateau: `dw` was monotone and
+unturned at 2.0, and 2.0 was never retested against a *shorter* schedule until v044 put them
+together.
+
+### Bundles (all built, none uploaded)
+
+| ver | full_valid_wp | status | duration |
+|---|---:|---|---|
+| **v044** | **0.689846** | **PASS** | 42m30s (71%) |
+| v040 | 0.689146 | **PASS** | 42m12s (70%) |
+| v045 | 0.689116 | NOT-READY | 55m32s (93%) — null **and** marginal |
+| v041 | 0.689036 | NOT-READY\* | 48m06s (80%) |
+| v042 | 0.688268 | **PASS** | 42m12s (70%) |
+| v043 | 0.687944 | NOT-READY\* | 48m06s (80%) |
+
+This was the **first idle-machine packaging session**, which is why the numbers cluster so
+tightly: the four 225,922-param models land at 70–71%, within 0.4 minutes of each other —
+what identical graphs should do, and exactly what never happened under contention. The same
+tool read v041 at 57.46 µs/row with four runs training and v045 at 72.67; their true idle
+figures are ~40 and 54.62.
+
+\* v041/v043 say NOT-READY **only** because of contended measurements. Both are
+byte-identical in graph to v037 — 16 initializers, `features (1,1,224)`,
+`hidden_0/1 (1,1,128)` — which **actually ran 48m06s at 80%** on the grader. Substantively
+they are submittable; the recorded verdict is a load artifact, left uncorrected for the same
+reason v031's is (bundles are immutable records of what the gate said when it ran).
+
+### Two bugs worth keeping
+
+**A latency label that ignored its own number.** v045 rendered as `Ready to Submit (latency
+anchored on v021)` at **93% of budget** while its own `metadata.json` said NOT-READY at
+96.8%. The anchor branch returns *before* consulting the gate result, so it overrode a
+failure and attached a green label to a number contradicting it — wrong in exactly the
+direction that gets a model uploaded. Anchored branches now check the figure and return
+`Marginal (93% of budget…) - review before upload` above 85%. 85% is where our evidence
+stops: everything submitted landed between 56.7% and 80%, and v026 died at 117%.
+
+**A parser that destroyed its own member lists.** `--mean-of` split on `,` before `:`,
+so `dozken_pair:reset2k,reset4k` became two specs and the "pair" was averaged over **one**
+member. Symptom: `dozken_pair` absent and `student_plus_pair` *exactly* equal to v039. The
+three single-model scores were never affected, so the probe's conclusion stood. It is
+repeatable now, validates its members, and rejects unknown names instead of silently
+averaging the wrong set.
