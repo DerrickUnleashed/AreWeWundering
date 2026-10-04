@@ -256,9 +256,14 @@ def main() -> int:
                       for g, v in G.items() if len(v)},
         "top_features_t0": [{"name": nm[i], "r_t0": float(corr[i, 0]),
                              "r_t1": float(corr[i, 1])} for i in order[:20]],
-        "nonlinear_candidates": [{"name": a, "pearson": b, "spearman": c,
-                                  "kurtosis": d, "pct_beyond_3sd": e}
-                                 for a, b, c, d, e in nl_candidates],
+        # SIX fields are pushed (name, raw r, rank r, weighted raw r, weighted rank r,
+        # weighted gain) -- the weighted pair is what the decision uses. Unpacking five
+        # crashed the 300-sequence run at the JSON dump, AFTER the analysis completed,
+        # which is why the 30-sequence smoke passed and only the long run failed.
+        "nonlinear_candidates": [
+            {"name": a, "r_raw": b, "r_rank": c,
+             "r_weighted_raw": d, "r_weighted_rank": e, "gain_weighted": f}
+            for a, b, c, d, e, f in nl_candidates],
     }, indent=2) + "\n")
     print(f"  numbers -> exploration/visualisation/feature_signal.json")
     return 0
