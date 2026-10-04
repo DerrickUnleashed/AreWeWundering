@@ -278,11 +278,27 @@ def bundle_status(v: str, y: dict, lb: dict) -> tuple[str, str, str, str]:
             anchor = measured_runtime_anchor(v)
             if (not lat.get('grader_safe')) and anchor:
                 secs, src = anchor
-                dur = fmt_mmss(secs) + f' ({secs / 3600 * 100:.0f}%)'
+                pct = secs / 3600 * 100
+                dur = fmt_mmss(secs) + f' ({pct:.0f}%)'
                 mem = f"{meta.get('memory_mb')} MB" if meta.get('memory_mb') else '--'
-                return (f'Ready to Submit (latency anchored on {src})',
-                        (meta.get('scores') or {}).get('weighted_pearson') and '--' or '--',
-                        dur, mem)
+                # A measured anchor is a better duration than a local projection, but it
+                # is NOT a licence to say "Ready to Submit" at any speed. v045 was being
+                # labelled "Ready to Submit" here on the strength of a v021 anchor while
+                # its own bundle said NOT-READY at 96.8% of budget -- the anchor branch
+                # returned before the failure was ever consulted. A label is a decision,
+                # and a decision has to look at the number it is attached to.
+                #
+                # 85% is the threshold because that is where our own history actually
+                # sits: everything we have submitted landed between 56.7% (v001) and
+                # 80% (v037, v039), and the one model that was killed, v026, died at 117%.
+                # So >85% is not a formatting detail, it is outside everything we have
+                # evidence for and inside the range where a timeout is plausible.
+                if pct <= 85:
+                    return (f'Ready to Submit (latency anchored on {src})',
+                            (meta.get('scores') or {}).get('weighted_pearson') and '--' or '--',
+                            dur, mem)
+                return (f'Marginal ({pct:.0f}% of budget, anchored on {src}) - review before upload',
+                        '--', dur, mem)
             if meta.get('status') == 'PASS-BUT-DO-NOT-SUBMIT':
                 why = ('score contaminated' if meta.get('full_valid_score_contaminated')
                        else 'clean but below our own base')
