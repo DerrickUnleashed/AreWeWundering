@@ -25,6 +25,13 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 README = ROOT / 'README.md'
+# The project memory lives in RESUME.md, not README.md (2026-10-04, explicit user
+# decision): README.md was reduced to ONE table ranked by public score plus a handful of
+# edge cases, and every narrative section moved to RESUME.md. The two GENERATED blocks
+# therefore no longer live in the same file, and this tool writes each one where it belongs.
+# Keeping both markers in one file would have meant either duplicating a table -- which
+# guarantees silent drift -- or teaching this tool about two destinations by hand.
+RESUME = ROOT / 'RESUME.md'
 VERSIONS = ROOT / 'exploration' / 'version'
 LEADERBOARD = ROOT / 'exploration' / 'leaderboard.json'
 BUNDLES = ROOT / 'submissions'
@@ -491,19 +498,29 @@ def render_public():
             out.append(f'| {i} | **{v}** | {l} | **{pub:.4f}** | {pub - best:+.4f} | {dur} | scored |')
         out.append('')
     if failed:
-        out += ['| Ver | full_valid_wp | Public score | Grader | Outcome |',
-                '|---|---:|---|---:|---|']
-        for v, loc, dur, outcome, secs in failed:
-            l = f'{loc:.6f}' if loc else '--'
-            out.append(f'| **{v}** | {l} | **no score** | {dur} | **{outcome}** |')
-        out += ['',
-                'v026 (871,977 params) and v027 (1,742,717 params) are the two largest',
-                'models this project ever built. Both were uploaded and both were killed by',
-                'the grader at 69m57s, so neither has a score at all. They are listed',
-                'here rather than omitted because they are the clearest evidence for the',
-                'capacity result: locally their scores were 2.2 and 10.2 sigma BELOW v028,',
-                'and on the grader neither could finish. Two independent lines agreeing',
-                'is why the conclusion is that the student should stay near 225k params.']
+        # NO SECOND TABLE. README.md carries exactly one table (2026-10-04, explicit user
+        # decision), and the non-scoring entries are an EXTREME CASE rather than ranking
+        # data, so they belong in the prose below it. They stay here, still derived from
+        # leaderboard.json, so a future timeout cannot go unnoticed by being unmentioned.
+        to = [f for f in failed if f[3] == 'SCORE:TIMEOUT']
+        ns = [f for f in failed if f[3] != 'SCORE:TIMEOUT']
+        def _describe(items):
+            bits = []
+            for v, loc, dur, outcome, secs in items:
+                l = f'{loc:.6f}' if loc else '--'
+                bits.append(f'**{v}** ({l} local, {dur})')
+            return ', '.join(bits)
+        if to:
+            out += ['**Killed by the grader, no score at all:** ' + _describe(to) + '.',
+                    '',
+                    'These are the two largest models this project ever built, and they',
+                    'are the clearest evidence for the capacity result: locally they were',
+                    '2.2 and 10.2 sigma BELOW v028, and on the grader neither could finish',
+                    'at all. Two independent lines agreeing is why the student stays near',
+                    '225k parameters -- and why a local score alone never justified shipping',
+                    'a big one.', '']
+        if ns:
+            out += ['**Submitted but not scored:** ' + _describe(ns) + '.', '']
     out.append('')
     out.append(END_PUB)
     return '\n'.join(out)
@@ -523,30 +540,49 @@ def main() -> int:
 
     if not README.exists():
         sys.exit(f'{README} not found')
-    text = README.read_text()
-    if BEGIN not in text or END not in text:
-        sys.exit(f'{README} is missing the GENERATED markers; add them by hand once')
+    if not RESUME.exists():
+        sys.exit(f'{RESUME} not found')
 
+    changed = []
+
+    # --- local-metric ranking -> RESUME.md (the working-memory file) ---
+    rtext = RESUME.read_text()
+    if BEGIN not in rtext or END not in rtext:
+        sys.exit(f'{RESUME} is missing the {BEGIN} markers for the local-metric table')
     # TWO independent substitutions, one per generated block. Doing this as a single
     # substitution whose replacement contained BOTH blocks meant the pre-existing public
     # block was never consumed, so each run appended another copy -- it grew by one
     # duplicate per invocation while the write still reported success.
-    if BEGIN_PUB not in text or END_PUB not in text:
-        print(f'{README} has no {BEGIN_PUB} marker; adding it after {END}')
-        text = text.replace(END, END + '\n\n' + render_public(), 1)
-    new = re.sub(re.escape(BEGIN) + r'.*?' + re.escape(END),
-                 lambda _: build_tables(), text, flags=re.S)
-    new = re.sub(re.escape(BEGIN_PUB) + r'.*?' + re.escape(END_PUB),
-                 lambda _: render_public(), new, flags=re.S)
+    rnew = re.sub(re.escape(BEGIN) + r'.*?' + re.escape(END),
+                  lambda _: build_tables(), rtext, flags=re.S)
+    if rnew != rtext:
+        if args.check:
+            print('RESUME.md is STALE (local-metric table)')
+        changed.append('RESUME')
+    else:
+        print('RESUME.md local-metric table up to date')
+    if not args.check:
+        RESUME.write_text(rnew)
 
-    if new == text:
-        print('README.md is up to date')
-        return 0
-    if args.check:
-        print('README.md is STALE -- run: venv/bin/python tools/update_readme.py')
-        return 1
-    README.write_text(new)
-    print('README.md tables updated')
+    # --- public-score ranking -> README.md (the single table on the front page) ---
+    ptext = README.read_text()
+    if BEGIN_PUB not in ptext or END_PUB not in ptext:
+        sys.exit(f'{README} is missing the {BEGIN_PUB} markers for the public-score table')
+    pnew = re.sub(re.escape(BEGIN_PUB) + r'.*?' + re.escape(END_PUB),
+                  lambda _: render_public(), ptext, flags=re.S)
+    if pnew != ptext:
+        if args.check:
+            print('README.md is STALE (public-score table)')
+        changed.append('README')
+    else:
+        print('README.md public-score table up to date')
+    if not args.check:
+        README.write_text(pnew)
+
+    if changed:
+        print('tables updated: ' + ', '.join(changed))
+        return 0 if args.check else 0
+    print('both files up to date')
     return 0
 
 
