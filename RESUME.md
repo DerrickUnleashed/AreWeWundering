@@ -1419,6 +1419,63 @@ READY would destroy the evidence that this failure mode exists and keeps recurri
 README resolves it through the measured-anchor rule and through the real grader reading,
 which is where a reader should look.
 
+## EDA: the last preprocessing direction, refuted (2026-10-04)
+
+The first EDA in the project. It ran against one rule from `AGENTS.md` §12 Phase 1 — *no
+plot that does not change a decision* — and it changed two decisions, both of them to
+"leave it alone".
+
+### Output calibration: REJECTED, `solution.py` is already optimal
+
+`solution.py` already applies `METRIC_CLIP = 2.0`, and 0.0000% of scored predictions reach
+it, so clipping is a no-op. Pearson is invariant to positive **scaling**, so no rescaling can
+ever help either. Only a nonlinear monotone transform could, and **every one of them lost**,
+monotonically in how much they squashed: clip ±1.6 −3.0σ, clip ±1.2 −53σ, clip ±1.0 −117σ,
+power 0.3 −151σ, tanh −74σ. Squashing only destroys tail information the target genuinely has.
+
+The decile decomposition says there is nothing to recover: WP **rises** with |target|
+(0.17 → 0.84) and the top decile carries **25.3%** of the metric weight. We are strongest
+exactly where the metric weights most. The weak rows are low-|target| ones, and 9.7% of
+targets are exactly 0.0 and carry **zero** weight — rows whose sign is not merely hard but
+unweighted.
+
+### Feature ranking: REJECTED, and a linear probe was the wrong instrument
+
+`feature_signal.py` found that ranking a feature beats using it raw, weighted, on 8 of the
+top 14. That is outside a linear first layer's hypothesis class, so it looked like the one
+legitimate preprocessing direction left. Three checks later:
+
+1. **At 30 sequences the gains were ~5× inflated.** i0_p8's weighted gain fell from +0.3369
+   to +0.0630 at 300 sequences. The small sample was badly optimistic.
+
+2. **The MARGINAL value is what decides, and the per-feature number is the wrong one.** The
+   112 columns are heavily correlated, so a per-feature gain can be pure redundancy.
+   `feature_rank_value.py` fits ridge on identical rows and weights, 300 sequences, and asks
+   whether ranks explain variance the raw features do not:
+
+   | model | weighted R² |
+   |---|---:|
+   | raw 112 | 0.088471 |
+   | raw + 16 rank channels | 0.094709 (+0.0062) |
+   | **raw + 112 raw squares** | **0.097749 (+0.0093)** |
+
+   **Squares beat ranks.** rank(f) is a *monotone* function of f, and our first layer is
+   followed by a tanh recurrence, so the network already realises monotone functions of a
+   single row. Variance attributable to rank *specifically*: **−0.0030**.
+
+3. **The control is what caught it.** The first version compared raw against raw+ranks and
+   returned "BUILD IT". That was wrong: a *linear* probe models only the first layer, while
+   the network is nonlinear immediately downstream. The probe was understating the network
+   the whole time. Adding x² as a control arm turned a false positive into a correct one.
+
+### What this closes
+
+Linear preprocessing folds into layer 1 for free (`AGENTS.md` §10.3). This shows the
+**nonlinear** transforms fold into the layer after it just as cheaply. Combined with the
+capacity plateau, the loss-diverse-ensemble refutations, the third-teacher-member null, the
+`distill_weight` sweep that turned over at 3.0, and the output-calibration null, there is no
+preprocessing or architecture lever left with evidence behind it.
+
 ## Six experiments upstream (2026-10-03)
 
 All six **finished**. All were launched against the finding below rather than against the
