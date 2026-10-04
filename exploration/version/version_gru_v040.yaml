@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v040
   parent: gru_v039
-  status: running
+  status: finished
 description: v039 (our best at 0.6594) trained for 8 epochs instead of 3, keeping
   the two-member dozken teacher and distill_weight 2.0.
 hypothesis: 'The two best public runs are v039 (better teacher, 0.6594) and v037 (8
@@ -191,15 +191,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 97499
+  best_val_wp: 0.6992548188097518
+  best_val_t0: 0.6969846753861533
+  best_val_t1: 0.7015249622333504
+  full_valid_wp: 0.6891457951741398
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 16.1392
+  finished_utc: '2026-10-04T03:20:33Z'
   note: Teacher identity is the only lever that won (v039, 0.6594); everything else
     plateaued at ~0.659. So v04x push upstream. Base = v039. training.epochs 3 ->
     8. Nothing else differs from v039.
