@@ -12,67 +12,69 @@ memory for every submission are in `exploration/leaderboard.json`.
 
 <!-- BEGIN GENERATED: public-score ranking -->
 
-### Ranked by public (leaderboard) score
+### Every model, ranked by public score
 
-This is the ranking that counts for the prize. It does **not** agree with the
-table above, and the disagreements are the interesting part:
+One table. The **Public score / Status** column carries a public score where
+one exists, and a status where it does not, so models that are ready to submit
+or ready to package appear here rather than in a second table that could go
+stale. Scored rows sort by score; unscored rows sort after, by `full_valid_wp`,
+which is **not** comparable to the public column.
 
-- **v022** has the 2nd-best `full_valid_wp` (0.685228) and only the 5th-best
-  public score. Our local metric overrates it.
-- **v025** is a local *regression* against v023 (-1.5 sigma) and our 2nd-best
-  public result. The local metric underrates it.
+| Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |
 
-| Rank | Ver | full_valid_wp | Public score | vs best | Grader | Outcome |
-|---:|---|---:|---:|---:|---:|---|
-| 1 | **v039** | 0.688212 | **0.6594** | +0.0000 | 47m42s (80%) | scored |
-| 2 | **v041** | 0.689036 | **0.6593** | -0.0001 | 46m51s (78%) | scored |
-| 3 | **v037** | 0.688370 | **0.6592** | -0.0002 | 48m06s (80%) | scored |
-| 4 | **v038** | 0.687577 | **0.6588** | -0.0006 | 48m06s (80%) | scored |
-| 5 | **v032** | 0.687219 | **0.6587** | -0.0007 | 45m32s (76%) | scored |
-| 6 | **v031** | 0.687376 | **0.6587** | -0.0007 | 45m41s (76%) | scored |
-| 7 | **v036** | 0.687535 | **0.6586** | -0.0008 | 48m06s (80%) | scored |
-| 8 | **v035** | 0.687177 | **0.6586** | -0.0008 | 44m52s (75%) | scored |
-| 9 | **v030** | 0.686919 | **0.6585** | -0.0009 | 47m11s (79%) | scored |
-| 10 | **v028** | 0.686510 | **0.6585** | -0.0009 | 46m52s (78%) | scored |
-| 11 | **v025** | 0.684438 | **0.6580** | -0.0014 | 46m07s (77%) | scored |
-| 12 | **v034** | 0.686000 | **0.6579** | -0.0015 | 47m17s (79%) | scored |
-| 13 | **v043** | 0.687944 | **0.6569** | -0.0025 | 45m52s (76%) | scored |
-| 14 | **v029** | 0.684683 | **0.6568** | -0.0026 | 44m27s (74%) | scored |
-| 15 | **v023** | 0.684681 | **0.6568** | -0.0026 | 45m36s (76%) | scored |
-| 16 | **v022** | 0.685228 | **0.6565** | -0.0029 | 50m46s (85%) | scored |
-| 17 | **v024** | 0.684818 | **0.6560** | -0.0034 | 50m17s (84%) | scored |
-| 18 | **v016** | 0.681753 | **0.6541** | -0.0053 | 30m56s (52%) | scored |
-| 19 | **v017** | 0.681866 | **0.6540** | -0.0054 | 25m37s (43%) | scored |
-| 20 | **v018** | 0.680603 | **0.6518** | -0.0076 | 29m21s (49%) | scored |
-| 21 | **v014** | 0.679676 | **0.6517** | -0.0077 | 40m12s (67%) | scored |
-| 22 | **v015** | -- | **0.6515** | -0.0079 | 30m31s (51%) | scored |
-| 23 | **v011** | 0.679986 | **0.6515** | -0.0079 | 30m12s (50%) | scored |
-| 24 | **v020** | 0.681773 | **0.6513** | -0.0081 | 29m52s (50%) | scored |
-| 25 | **v012** | 0.678784 | **0.6512** | -0.0082 | 29m47s (50%) | scored |
-| 26 | **v019** | 0.678374 | **0.6510** | -0.0084 | 30m32s (51%) | scored |
-| 27 | **v021** | 0.678575 | **0.6505** | -0.0089 | 55m32s (93%) | scored |
-| 28 | **v013** | 0.676198 | **0.6490** | -0.0104 | 28m36s (48%) | scored |
-| 29 | **v009** | 0.674456 | **0.6483** | -0.0111 | 39m52s (66%) | scored |
-| 30 | **v007** | 0.674258 | **0.6481** | -0.0113 | 42m16s (70%) | scored |
-| 31 | **v005** | 0.674037 | **0.6481** | -0.0113 | 36m56s (62%) | scored |
-| 32 | **v006** | 0.674149 | **0.6475** | -0.0119 | 35m32s (59%) | scored |
-| 33 | **v008** | 0.674445 | **0.6473** | -0.0121 | 41m17s (69%) | scored |
-| 34 | **v003** | 0.673711 | **0.6457** | -0.0137 | 30m57s (52%) | scored |
-| 35 | **v004** | 0.672206 | **0.6446** | -0.0148 | 43m16s (72%) | scored |
-| 36 | **v002** | 0.674350 | **0.6435** | -0.0159 | 35m02s (58%) | scored |
-| 37 | **v010** | 0.670696 | **0.6427** | -0.0167 | 34m37s (58%) | scored |
-| 38 | **v001** | 0.674315 | **0.6416** | -0.0178 | 34m02s (57%) | scored |
-| 39 | **v033** | 0.660415 | **0.6274** | -0.0320 | 47m22s (79%) | scored |
+| Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |
+| 1 | **v039** | 0.688212 | **0.6594** | +0.0000 | 47m42s (80%) |
+| 2 | **v041** | 0.689036 | **0.6593** | -0.0001 | 46m51s (78%) |
+| 3 | **v037** | 0.688370 | **0.6592** | -0.0002 | 48m06s (80%) |
+| 4 | **v038** | 0.687577 | **0.6588** | -0.0006 | 48m06s (80%) |
+| 5 | **v031** | 0.687376 | **0.6587** | -0.0007 | 45m41s (76%) |
+| 6 | **v032** | 0.687219 | **0.6587** | -0.0007 | 45m32s (76%) |
+| 7 | **v035** | 0.687177 | **0.6586** | -0.0008 | 44m52s (75%) |
+| 8 | **v036** | 0.687535 | **0.6586** | -0.0008 | 48m06s (80%) |
+| 9 | **v028** | 0.686510 | **0.6585** | -0.0009 | 46m52s (78%) |
+| 10 | **v030** | 0.686919 | **0.6585** | -0.0009 | 47m11s (79%) |
+| 11 | **v025** | 0.684438 | **0.6580** | -0.0014 | 46m07s (77%) |
+| 12 | **v034** | 0.686000 | **0.6579** | -0.0015 | 47m17s (79%) |
+| 13 | **v043** | 0.687944 | **0.6569** | -0.0025 | 45m52s (76%) |
+| 14 | **v023** | 0.684681 | **0.6568** | -0.0026 | 45m36s (76%) |
+| 15 | **v029** | 0.684683 | **0.6568** | -0.0026 | 44m27s (74%) |
+| 16 | **v022** | 0.685228 | **0.6565** | -0.0029 | 50m46s (85%) |
+| 17 | **v024** | 0.684818 | **0.6560** | -0.0034 | 50m17s (84%) |
+| 18 | **v016** | 0.681753 | **0.6541** | -0.0053 | 30m56s (52%) |
+| 19 | **v017** | 0.681866 | **0.6540** | -0.0054 | 25m37s (43%) |
+| 20 | **v018** | 0.680603 | **0.6518** | -0.0076 | 29m21s (49%) |
+| 21 | **v014** | 0.679676 | **0.6517** | -0.0077 | 40m12s (67%) |
+| 22 | **v011** | 0.679986 | **0.6515** | -0.0079 | 30m12s (50%) |
+| 23 | **v015** | -- | **0.6515** | -0.0079 | 30m31s (51%) |
+| 24 | **v020** | 0.681773 | **0.6513** | -0.0081 | 29m52s (50%) |
+| 25 | **v012** | 0.678784 | **0.6512** | -0.0082 | 29m47s (50%) |
+| 26 | **v019** | 0.678374 | **0.6510** | -0.0084 | 30m32s (51%) |
+| 27 | **v021** | 0.678575 | **0.6505** | -0.0089 | 55m32s (93%) |
+| 28 | **v013** | 0.676198 | **0.6490** | -0.0104 | 28m36s (48%) |
+| 29 | **v009** | 0.674456 | **0.6483** | -0.0111 | 39m52s (66%) |
+| 30 | **v005** | 0.674037 | **0.6481** | -0.0113 | 36m56s (62%) |
+| 31 | **v007** | 0.674258 | **0.6481** | -0.0113 | 42m16s (70%) |
+| 32 | **v006** | 0.674149 | **0.6475** | -0.0119 | 35m32s (59%) |
+| 33 | **v008** | 0.674445 | **0.6473** | -0.0121 | 41m17s (69%) |
+| 34 | **v003** | 0.673711 | **0.6457** | -0.0137 | 30m57s (52%) |
+| 35 | **v004** | 0.672206 | **0.6446** | -0.0148 | 43m16s (72%) |
+| 36 | **v002** | 0.674350 | **0.6435** | -0.0159 | 35m02s (58%) |
+| 37 | **v010** | 0.670696 | **0.6427** | -0.0167 | 34m37s (58%) |
+| 38 | **v001** | 0.674315 | **0.6416** | -0.0178 | 34m02s (57%) |
+| 39 | **v033** | 0.660415 | **0.6274** | -0.0320 | 47m22s (79%) |
+| — | **v044** | 0.689846 | awaiting score | -- | — |
+| — | **v040** | 0.689146 | awaiting score | -- | — |
+| — | **v045** | 0.689116 | awaiting score | -- | — |
+| — | **v042** | 0.688268 | awaiting score | -- | — |
+| — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
+| — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 
-**Killed by the grader, no score at all:** **v026** (0.684335 local, 69m57s (117%)), **v027** (0.683058 local, 69m57s (117%)).
-
-These are the two largest models this project ever built, and they
-are the clearest evidence for the capacity result: locally they were
-2.2 and 10.2 sigma BELOW v028, and on the grader neither could finish
-at all. Two independent lines agreeing is why the student stays near
-225k parameters -- and why a local score alone never justified shipping
-a big one.
-
+**The rows marked `killed at ...` are the clearest evidence for the
+capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
+2.2 and 10.2 sigma BELOW v028, and on the grader neither could finish at
+all -- two independent lines pointing the same way, which is why the
+student stays near 225k parameters and why a good local score alone never
+justified shipping a large one.
 
 <!-- END GENERATED: public-score ranking -->
 
