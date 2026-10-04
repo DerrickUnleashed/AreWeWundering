@@ -29,12 +29,12 @@ reference metric in `tools/metric_ref.py`.
 
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
-| 1 | **v044** | v039 with epochs 3 -> 8 AND distill_weight... | 0.689846 | Ready to Submit | -- | 42m30s (71%) | -- |
-| 2 | **v040** | v039 (our best at 0.6594) trained for 8... | 0.689146 | Ready to Submit | -- | 42m12s (70%) | -- |
-| 3 | **v045** | v041 with hidden 128 -> 192, i.e | 0.689116 | Marginal (93% of budget, anchored on v021) - review before upload | -- | 55m32s (93%) | -- |
+| 1 | **v044** | v039 with epochs 3 -> 8 AND distill_weight... | 0.689846 | Submitted | 0.6599 | 47m41s (79%) | 628 MB |
+| 2 | **v040** | v039 (our best at 0.6594) trained for 8... | 0.689146 | Submitted | 0.6596 | 44m57s (75%) | 628 MB |
+| 3 | **v045** | v041 with hidden 128 -> 192, i.e | 0.689116 | Submitted | 0.6595 | 55m37s (93%) | 634 MB |
 | 4 | **v041** | v039 with distill_weight 2.0 -> 3.0, i.e | 0.689036 | Submitted | 0.6593 | 46m51s (78%) | 628 MB |
 | 5 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Submitted | 0.6592 | 48m06s (80%) | 628 MB |
-| 6 | **v042** | v039 with a THREE-member teacher: dozken... | 0.688268 | Ready to Submit | -- | 42m12s (70%) | -- |
+| 6 | **v042** | v039 with a THREE-member teacher: dozken... | 0.688268 | Submitted | 0.6600 | 44m31s (74%) | 628 MB |
 | 7 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Submitted | 0.6594 | 47m42s (80%) | 628 MB |
 | 8 | **v043** | v039 with ONLY dozken reset4k as teacher,... | 0.687944 | Submitted | 0.6569 | 45m52s (76%) | 628 MB |
 | 9 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Submitted | 0.6588 | 48m06s (80%) | 628 MB |
