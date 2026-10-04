@@ -3,15 +3,20 @@ identity:
   model: gru
   version: v047
   parent: gru_v042
-  status: planned
-identity:
-  model: gru
-  version: v047
-  parent: gru_v042
-  status: planned
-description: v042 with training.state_reset 2000 -> 4000, so training and serving finally AGREE.
-hypothesis: 'Every version from v021 has trained with state_reset=2000 and served with 4000, an accidental skew nobody intended. Measuring it showed serving at 4000 beats serving at 2000 by +0.001221, which is 7.7 sigma and the largest single effect we have measured in months. That raises a sharp question: is the gain from the LONGER horizon at serving, or from the train/serve MISMATCH? v042 is the mismatch arm and v047 is the matched arm at the same 4000 interval. If matched wins, the mismatch was luck and should be closed. If matched loses, the mismatch is a real effect worth keeping and pushing further (v048).'
-change_vs_parent: training.state_reset 2000 -> 4000. inference.state_reset stays 4000, so this version trains and serves on the SAME interval for the first time in the project.
+  status: running
+description: v042 with training.state_reset 2000 -> 4000, so training and serving
+  finally AGREE.
+hypothesis: 'Every version from v021 has trained with state_reset=2000 and served
+  with 4000, an accidental skew nobody intended. Measuring it showed serving at 4000
+  beats serving at 2000 by +0.001221, which is 7.7 sigma and the largest single effect
+  we have measured in months. That raises a sharp question: is the gain from the LONGER
+  horizon at serving, or from the train/serve MISMATCH? v042 is the mismatch arm and
+  v047 is the matched arm at the same 4000 interval. If matched wins, the mismatch
+  was luck and should be closed. If matched loses, the mismatch is a real effect worth
+  keeping and pushing further (v048).'
+change_vs_parent: training.state_reset 2000 -> 4000. inference.state_reset stays 4000,
+  so this version trains and serves on the SAME interval for the first time in the
+  project.
 data:
   train_shards: cache/train
   valid_shards: cache/valid
@@ -146,7 +151,7 @@ model:
   dropout: 0.0
   layernorm: true
   head: mlp
-  param_count: null
+  param_count: 225922
 loss:
   type: seq_weighted_pearson
   mask: soft
@@ -200,7 +205,13 @@ results:
   latency_us_p99: null
   train_hours: null
   finished_utc: null
-  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen from the evidence, not by resampling a dead axis: preprocessing is closed on both the linear and the nonlinear side, capacity is plateaued, teacher identity saturates at two members, distill_weight turns over at 3.0, and output calibration is a null. training.state_reset 2000 -> 4000. inference.state_reset stays 4000, so this version trains and serves on the SAME interval for the first time in the project.'
+  note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
+    from the evidence, not by resampling a dead axis: preprocessing is closed on both
+    the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
+    at two members, distill_weight turns over at 3.0, and output calibration is a
+    null. training.state_reset 2000 -> 4000. inference.state_reset stays 4000, so
+    this version trains and serves on the SAME interval for the first time in the
+    project.'
 artifacts:
   log: exploration/logs/log_gru_v047.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v047
