@@ -481,12 +481,6 @@ def render_public():
            '|---:|---|---:|---|---:|---|']
     _to = [k for k, e in load_leaderboard().items()
            if isinstance(e, dict) and e.get('outcome') == 'SCORE:TIMEOUT']
-    if _to:
-        # The timeouts are ROWS above, but the argument they make is not obvious from a
-        # row, and it is the single clearest piece of evidence for the capacity result.
-        # Generated from the data so a future timeout cannot be added without the note.
-        out[-1] = '| Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |'
-        out.insert(len(out) - 1, '')
 
     lb = load_leaderboard()
     scored, pending, unbuilt = [], [], []
