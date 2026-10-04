@@ -345,5 +345,41 @@
     "submitted_utc": "2026-10-04T01:42Z",
     "uploaded_filename": "submission_gru_v043.zip",
     "note": "The SINGLE reset4k teacher arm, packaged as the control that makes 'the pair is better' interpretable. Locally a null (-0.000268, -1.7 sigma) and publicly -0.0025 against v039 -- the worst score of any model we have submitted since v033. This is the useful half of the pair: it confirms that reset4k alone really is the weaker teacher on our data, in BOTH metrics and in the same ORDER as the local ladder, which is what stops 'the pair won' from being indistinguishable from 'the pair happened to pick the better member'. Note the asymmetry this exposes: a +0.000824 local gain did not transfer at all (-0.0001), while a -0.000268 local loss transferred at full size (-0.0025)."
+  },
+  "v040": {
+    "public_score": null,
+    "grader_seconds": null,
+    "memory_mb": null,
+    "submitted_utc": "2026-10-04",
+    "uploaded_filename": "submission_gru_v040.zip",
+    "outcome": "SUBMITTED:PENDING",
+    "note": "SUBMITTED, AWAITING SCORE. Pair teacher, 8 epochs, distill_weight 2.0 -- v044's schedule without the higher distillation weight."
+  },
+  "v042": {
+    "public_score": null,
+    "grader_seconds": null,
+    "memory_mb": null,
+    "submitted_utc": "2026-10-04",
+    "uploaded_filename": "submission_gru_v042.zip",
+    "outcome": "SUBMITTED:PENDING",
+    "note": "SUBMITTED, AWAITING SCORE. Three-member teacher. Locally a NULL (+0.000056, +0.4 sigma) against its parent, which is the finding: teacher identity saturates at two members."
+  },
+  "v045": {
+    "public_score": null,
+    "grader_seconds": null,
+    "memory_mb": null,
+    "submitted_utc": "2026-10-04",
+    "uploaded_filename": "submission_gru_v045.zip",
+    "outcome": "SUBMITTED:PENDING",
+    "note": "SUBMITTED, AWAITING SCORE. Hidden 192, i.e. the student's width matched to the teacher's 435,943 params. Locally a NULL (+0.000080, +0.5 sigma), so the teacher-student gap is NOT a capacity problem. Also the one marginal latency case, 93% of budget."
+  },
+  "v044": {
+    "public_score": null,
+    "grader_seconds": null,
+    "memory_mb": null,
+    "submitted_utc": "2026-10-04",
+    "uploaded_filename": "submission_gru_v044.zip",
+    "outcome": "SUBMITTED:PENDING",
+    "note": "SUBMITTED, AWAITING SCORE. Best model in the project: pair teacher + distill_weight 3.0 + 8 epochs. Note the asymmetry recorded against v041/v043 -- a local gain of this size (+10.3 sigma) has no reliable public counterpart, so expect the score to land near v039's 0.6594 rather than above it."
   }
 }
