@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v050
   parent: gru_v042
-  status: running
+  status: finished
 description: v042's EXACT recipe at seed 1338 instead of 1337. A control, not an attempt
   to improve the score.
 hypothesis: 'We currently cannot tell a real +0.0003 from noise. Six submissions of
@@ -194,15 +194,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.6979069331730031
+  best_val_t0: 0.6944939628558672
+  best_val_t1: 0.7013199034901391
+  full_valid_wp: 0.6885987632361161
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 10.2654
+  finished_utc: '2026-10-04T21:02:39Z'
   note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
     from the evidence, not by resampling a dead axis: preprocessing is closed on both
     the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
