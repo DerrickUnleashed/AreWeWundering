@@ -1033,6 +1033,10 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
     def prepare(Xb):
         return np.stack([transform.batch(Xb[b]) for b in range(Xb.shape[0])])
 
+    # recurrent state, CARRIED ACROSS STEPS. Initialised once here, not per step;
+    # `Rb` decides which lanes are cleared at each chunk boundary.
+    h = [torch.zeros(1, tcfg['batch_sequences'], model.hidden, device=device)
+         for _ in range(model.layers)]
     t_start = time.time()
     for step in range(start_step, total_steps):
         lr = lr_at(step, total_steps, ocfg.get('warmup_steps', 0), ocfg['lr'])
@@ -1042,16 +1046,27 @@ def run_training(cfg, cfg_path, device, smoke, resume, checkpoint_override=None)
         Xt = torch.from_numpy(prepare(Xb)).to(device)
         Yt = torch.from_numpy(Yb).to(device)
         Mt = torch.from_numpy(Mb).to(device)
-        h = [torch.zeros(1, Xb.shape[0], model.hidden, device=device) for _ in range(model.layers)]
         with torch.no_grad():
-            # Rb marks lanes that must start this chunk from a ZERO state: either a
-            # new sequence, or a periodic state_reset boundary. Inference does the
-            # same at the same positions (see PredictionModel.predict).
+            # Rb marks lanes that must start this chunk from a ZERO state: either a new
+            # sequence, or a periodic state_reset boundary. Inference does the same at
+            # the same positions (see PredictionModel.predict).
+            #
+            # `h` is CARRIED ACROSS STEPS and initialised ONCE before the loop. It used
+            # to be rebuilt as zeros INSIDE the loop and the returned state discarded,
+            # which made R a no-op mask on an already-zero tensor. Two consequences, both
+            # silent: the recurrence never saw more than chunk_len steps of context during
+            # training while serving carried state_reset steps (a 4x train/serve memory
+            # mismatch on this config), and `training.state_reset` could not change the
+            # weights AT ALL -- v047 and v048 came out byte-identical to v042 while
+            # appearing to be a three-point sweep. See RESUME.md.
             for i, flag in enumerate(Rb):
                 if flag:
                     for layer in h:
                         layer[:, i, :].zero_()
-        pred, _ = model.forward_chunk(Xt, h)
+        pred, hn = model.forward_chunk(Xt, h)
+        # TRUNCATED BPTT: detach at the chunk boundary, or the autograd graph grows
+        # across the entire sequence and backprop reaches back to step 0.
+        h = [t.detach() for t in hn]
         # reset the running statistic every stats_window steps: lanes recycle onto
         # new sequences asynchronously, so there is no clean batch boundary to reset
         # on, and an unbounded statistic would pool the whole dataset.
