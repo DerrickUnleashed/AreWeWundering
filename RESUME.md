@@ -1424,6 +1424,75 @@ READY would destroy the evidence that this failure mode exists and keeps recurri
 README resolves it through the measured-anchor rule and through the real grader reading,
 which is where a reader should look.
 
+## The recurrent state never carried across chunks (2026-10-05)
+
+**The most consequential bug in the project, and it was invisible for 40+ versions.**
+
+### What the code did
+
+    h = [torch.zeros(1, Xb.shape[0], model.hidden) for _ in range(model.layers)]
+    ... zero the lanes that Rb flags ...
+    pred, _ = model.forward_chunk(Xt, h)          # returned state DISCARDED
+
+`Rb` marks the lanes that must start a chunk from a zero state. It was being applied to a
+tensor that was already entirely zeros, and the state the GRU produced was thrown away
+rather than carried. So the recurrence saw **at most `chunk_len` = 1000 steps of history**,
+every step, forever.
+
+### Two silent consequences
+
+**1. A 4x train/serve memory mismatch on every model ever shipped.** Serving clears state
+every `inference.state_reset` = 4000 steps, so the deployed model runs on up to 4000 steps
+of context. Training gave it 1000. `AGENTS.md` §12 Phase 3 specified "stateful truncated
+BPTT: hidden state carried across chunks" from the very first day, and it was never
+implemented.
+
+**2. `training.state_reset` could not change the weights at all.** v047 (4000) and v048
+(10000) came out **byte-identical** to v042 (2000) — all 18 tensors equal to the bit:
+
+    param                       v042[0]         v047[0]         v048[0]   identical?
+    grus.0.bias_hh_l0          -0.088002      -0.088002      -0.088002   True
+    ... all 18 tensors ...
+
+Their reported scores differed only because the **evaluation** path (line 947) does honour
+`state_reset`, so the same weights were scored on three different reset grids. Roughly
+**24 of the last ~35 GPU-hours produced one model**, presented as a three-point sweep.
+
+### How it was found, and how nearly it was missed
+
+The ensemble probe reported three models with identical local WP to six decimal places.
+That is implausible for three different training runs, so it was worth checking. Two false
+alarms came first — an "export bug" conclusion that was really my own test using
+`ls | tail -1` (the *lowest*-val checkpoint), and then an `--out` flag the exporter does not
+have, so the export silently never ran. Both were my errors, not the codebase's. The third
+check — comparing actual tensor values across the three checkpoints — was the one that held.
+
+**Lesson worth more than the bug: an identical number across supposedly-different runs is a
+finding, not a coincidence to be explained away.** It was the only signal, and the two
+attempts to explain it away were both more expensive than checking it.
+
+### The fix, and the proof
+
+`h` is initialised once before the step loop and carried; the returned state is detached at
+the chunk boundary (truncated BPTT — without the detach the graph grows across the whole
+sequence and backprop reaches step 0). Applied to the template and all 41 existing scripts.
+
+The loader's `R` mask was always correct — it produced 30 / 15 / 6 resets per 60 chunks for
+2000 / 4000 / 10000. **The mask was fine; the consumer was broken.** That is why no amount
+of inspecting the data path would have found it.
+
+Proof runs v051 (sr 2000) and v052 (sr 10000), one epoch, identical seed and data:
+their losses now **diverge** from step 25 onward (2.331575 vs 2.331618). Before the patch
+they were bit-identical, which is the definition of a dead axis.
+
+### What this invalidates
+
+Every result in this project was produced by a model trained on 1000 steps of context and
+served on 4000. The plateau at ~0.660, the "preprocessing is closed" conclusions, the
+"capacity is closed" conclusions and the state_reset results themselves all describe a
+system that was not the one being shipped. They are not wrong, they are about a different
+model than the one we thought we were measuring.
+
 ## EDA: the last preprocessing direction, refuted (2026-10-04)
 
 The first EDA in the project. It ran against one rule from `AGENTS.md` §12 Phase 1 — *no
