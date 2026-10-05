@@ -201,8 +201,8 @@ results:
   best_val_t0: 0.6943363079627808
   best_val_t1: 0.7012201935509415
   full_valid_wp: 0.688458181432422
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 39.58
+  latency_us_p99: 61.54
   train_hours: 10.2684
   finished_utc: '2026-10-04T21:02:37Z'
   note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
@@ -215,4 +215,4 @@ results:
 artifacts:
   log: exploration/logs/log_gru_v047.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v047
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v047
