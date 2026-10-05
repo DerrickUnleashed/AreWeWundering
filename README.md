@@ -23,53 +23,53 @@ which is **not** comparable to the public column.
 | Rank | Ver | full_valid_wp | Public score / Status | vs best | Grader |
 |---:|---|---:|---|---:|---|
 | 1 | **v042** | 0.688268 | **0.6600** | +0.0000 | 44m31s (74%) |
-| 2 | **v044** | 0.689846 | **0.6599** | -0.0001 | 47m41s (79%) |
-| 3 | **v040** | 0.689146 | **0.6596** | -0.0004 | 44m57s (75%) |
-| 4 | **v045** | 0.689116 | **0.6595** | -0.0005 | 55m37s (93%) |
-| 5 | **v039** | 0.688212 | **0.6594** | -0.0006 | 47m42s (80%) |
-| 6 | **v041** | 0.689036 | **0.6593** | -0.0007 | 46m51s (78%) |
-| 7 | **v037** | 0.688370 | **0.6592** | -0.0008 | 48m06s (80%) |
-| 8 | **v038** | 0.687577 | **0.6588** | -0.0012 | 48m06s (80%) |
-| 9 | **v031** | 0.687376 | **0.6587** | -0.0013 | 45m41s (76%) |
-| 10 | **v032** | 0.687219 | **0.6587** | -0.0013 | 45m32s (76%) |
-| 11 | **v035** | 0.687177 | **0.6586** | -0.0014 | 44m52s (75%) |
-| 12 | **v036** | 0.687535 | **0.6586** | -0.0014 | 48m06s (80%) |
-| 13 | **v028** | 0.686510 | **0.6585** | -0.0015 | 46m52s (78%) |
-| 14 | **v030** | 0.686919 | **0.6585** | -0.0015 | 47m11s (79%) |
-| 15 | **v025** | 0.684438 | **0.6580** | -0.0020 | 46m07s (77%) |
-| 16 | **v034** | 0.686000 | **0.6579** | -0.0021 | 47m17s (79%) |
-| 17 | **v043** | 0.687944 | **0.6569** | -0.0031 | 45m52s (76%) |
-| 18 | **v023** | 0.684681 | **0.6568** | -0.0032 | 45m36s (76%) |
-| 19 | **v029** | 0.684683 | **0.6568** | -0.0032 | 44m27s (74%) |
-| 20 | **v022** | 0.685228 | **0.6565** | -0.0035 | 50m46s (85%) |
-| 21 | **v024** | 0.684818 | **0.6560** | -0.0040 | 50m17s (84%) |
-| 22 | **v016** | 0.681753 | **0.6541** | -0.0059 | 30m56s (52%) |
-| 23 | **v017** | 0.681866 | **0.6540** | -0.0060 | 25m37s (43%) |
-| 24 | **v018** | 0.680603 | **0.6518** | -0.0082 | 29m21s (49%) |
-| 25 | **v014** | 0.679676 | **0.6517** | -0.0083 | 40m12s (67%) |
-| 26 | **v011** | 0.679986 | **0.6515** | -0.0085 | 30m12s (50%) |
-| 27 | **v015** | -- | **0.6515** | -0.0085 | 30m31s (51%) |
-| 28 | **v020** | 0.681773 | **0.6513** | -0.0087 | 29m52s (50%) |
-| 29 | **v012** | 0.678784 | **0.6512** | -0.0088 | 29m47s (50%) |
-| 30 | **v019** | 0.678374 | **0.6510** | -0.0090 | 30m32s (51%) |
-| 31 | **v021** | 0.678575 | **0.6505** | -0.0095 | 55m32s (93%) |
-| 32 | **v013** | 0.676198 | **0.6490** | -0.0110 | 28m36s (48%) |
-| 33 | **v009** | 0.674456 | **0.6483** | -0.0117 | 39m52s (66%) |
-| 34 | **v005** | 0.674037 | **0.6481** | -0.0119 | 36m56s (62%) |
-| 35 | **v007** | 0.674258 | **0.6481** | -0.0119 | 42m16s (70%) |
-| 36 | **v006** | 0.674149 | **0.6475** | -0.0125 | 35m32s (59%) |
-| 37 | **v008** | 0.674445 | **0.6473** | -0.0127 | 41m17s (69%) |
-| 38 | **v003** | 0.673711 | **0.6457** | -0.0143 | 30m57s (52%) |
-| 39 | **v004** | 0.672206 | **0.6446** | -0.0154 | 43m16s (72%) |
-| 40 | **v002** | 0.674350 | **0.6435** | -0.0165 | 35m02s (58%) |
-| 41 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
-| 42 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
-| 43 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
-| — | **v046** | 0.689030 | Ready to Submit | -- | — |
-| — | **v049** | 0.688784 | Ready to Submit | -- | — |
-| — | **v048** | 0.688708 | Ready to Submit | -- | — |
-| — | **v050** | 0.688599 | Ready to Submit | -- | — |
-| — | **v047** | 0.688458 | Ready to Submit | -- | — |
+| 2 | **v047** | 0.688458 | **0.6600** | +0.0000 | 50m32s (84%) |
+| 3 | **v048** | 0.688708 | **0.6600** | +0.0000 | 45m27s (76%) |
+| 4 | **v044** | 0.689846 | **0.6599** | -0.0001 | 47m41s (79%) |
+| 5 | **v046** | 0.689030 | **0.6598** | -0.0002 | 48m32s (81%) |
+| 6 | **v049** | 0.688784 | **0.6598** | -0.0002 | 46m07s (77%) |
+| 7 | **v040** | 0.689146 | **0.6596** | -0.0004 | 44m57s (75%) |
+| 8 | **v050** | 0.688599 | **0.6596** | -0.0004 | 45m57s (77%) |
+| 9 | **v045** | 0.689116 | **0.6595** | -0.0005 | 55m37s (93%) |
+| 10 | **v039** | 0.688212 | **0.6594** | -0.0006 | 47m42s (80%) |
+| 11 | **v041** | 0.689036 | **0.6593** | -0.0007 | 46m51s (78%) |
+| 12 | **v037** | 0.688370 | **0.6592** | -0.0008 | 48m06s (80%) |
+| 13 | **v038** | 0.687577 | **0.6588** | -0.0012 | 48m06s (80%) |
+| 14 | **v031** | 0.687376 | **0.6587** | -0.0013 | 45m41s (76%) |
+| 15 | **v032** | 0.687219 | **0.6587** | -0.0013 | 45m32s (76%) |
+| 16 | **v035** | 0.687177 | **0.6586** | -0.0014 | 44m52s (75%) |
+| 17 | **v036** | 0.687535 | **0.6586** | -0.0014 | 48m06s (80%) |
+| 18 | **v028** | 0.686510 | **0.6585** | -0.0015 | 46m52s (78%) |
+| 19 | **v030** | 0.686919 | **0.6585** | -0.0015 | 47m11s (79%) |
+| 20 | **v025** | 0.684438 | **0.6580** | -0.0020 | 46m07s (77%) |
+| 21 | **v034** | 0.686000 | **0.6579** | -0.0021 | 47m17s (79%) |
+| 22 | **v043** | 0.687944 | **0.6569** | -0.0031 | 45m52s (76%) |
+| 23 | **v023** | 0.684681 | **0.6568** | -0.0032 | 45m36s (76%) |
+| 24 | **v029** | 0.684683 | **0.6568** | -0.0032 | 44m27s (74%) |
+| 25 | **v022** | 0.685228 | **0.6565** | -0.0035 | 50m46s (85%) |
+| 26 | **v024** | 0.684818 | **0.6560** | -0.0040 | 50m17s (84%) |
+| 27 | **v016** | 0.681753 | **0.6541** | -0.0059 | 30m56s (52%) |
+| 28 | **v017** | 0.681866 | **0.6540** | -0.0060 | 25m37s (43%) |
+| 29 | **v018** | 0.680603 | **0.6518** | -0.0082 | 29m21s (49%) |
+| 30 | **v014** | 0.679676 | **0.6517** | -0.0083 | 40m12s (67%) |
+| 31 | **v011** | 0.679986 | **0.6515** | -0.0085 | 30m12s (50%) |
+| 32 | **v015** | -- | **0.6515** | -0.0085 | 30m31s (51%) |
+| 33 | **v020** | 0.681773 | **0.6513** | -0.0087 | 29m52s (50%) |
+| 34 | **v012** | 0.678784 | **0.6512** | -0.0088 | 29m47s (50%) |
+| 35 | **v019** | 0.678374 | **0.6510** | -0.0090 | 30m32s (51%) |
+| 36 | **v021** | 0.678575 | **0.6505** | -0.0095 | 55m32s (93%) |
+| 37 | **v013** | 0.676198 | **0.6490** | -0.0110 | 28m36s (48%) |
+| 38 | **v009** | 0.674456 | **0.6483** | -0.0117 | 39m52s (66%) |
+| 39 | **v005** | 0.674037 | **0.6481** | -0.0119 | 36m56s (62%) |
+| 40 | **v007** | 0.674258 | **0.6481** | -0.0119 | 42m16s (70%) |
+| 41 | **v006** | 0.674149 | **0.6475** | -0.0125 | 35m32s (59%) |
+| 42 | **v008** | 0.674445 | **0.6473** | -0.0127 | 41m17s (69%) |
+| 43 | **v003** | 0.673711 | **0.6457** | -0.0143 | 30m57s (52%) |
+| 44 | **v004** | 0.672206 | **0.6446** | -0.0154 | 43m16s (72%) |
+| 45 | **v002** | 0.674350 | **0.6435** | -0.0165 | 35m02s (58%) |
+| 46 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
+| 47 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
+| 48 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 
@@ -84,29 +84,34 @@ justified shipping a large one.
 
 ## Extreme cases and how they change how you read this table
 
-1. **The seed spread is as large as every effect we have chased, and we only measured it
-   because we ran a control.** v050 is v042's *exact* recipe at seed 1338 — one variable
-   changed, no idea attached. It came in **+0.000331 (+2.1σ)**, i.e. the seed-to-seed spread
-   of a config we already knew was stable is the same size as the documented 2σ detection
-   threshold (±0.000318). That makes the whole batch that produced it unreadable:
+1. **Five different changes produced exactly the range that re-rolling the seed does.**
+   Six runs of one recipe family, all five changes measured against a control:
 
-   | run | change vs v042 | full_valid_wp | vs the control |
-   |---|---|---:|---:|
-   | v046 | epochs 3 → 8 | 0.689030 | **+0.000431 — above the seed spread** |
-   | v049 | `distill_weight` 2.0 → 3.0 | 0.688784 | +0.000186 — within noise |
-   | v048 | train `state_reset` → 10000 | 0.688708 | +0.000109 — within noise |
-   | v050 | **seed 1338 (control)** | 0.688599 | — |
-   | v047 | train `state_reset` → 4000 (**matched**) | 0.688458 | −0.000141 — below |
+   | run | change vs v042 | local | public | local rank | public rank |
+   |---|---|---:|---:|---:|---:|
+   | v046 | epochs 3 → 8 | 0.689030 | 0.6598 | **1** | 4 |
+   | v049 | `distill_weight` 2 → 3 | 0.688784 | 0.6598 | 2 | 4 |
+   | v048 | train `state_reset` → 10000 | 0.688708 | 0.6600 | 3 | **1** |
+   | v050 | **seed 1338 — the CONTROL** | 0.688599 | 0.6596 | 4 | 6 |
+   | v047 | train = serve = 4000 (**no skew at all**) | 0.688458 | 0.6600 | 5 | **1** |
+   | v042 | parent, seed 1337 | 0.688268 | 0.6600 | **6** | **1** |
 
-   Three of the four changes are inside the noise. **And v047 is the first run in this
-   project with no train/serve skew at all** — it trains at 4000 and serves at 4000 — and it
-   landed *below* the control, which is trained at 2000 and served at 4000. So closing the
-   `state_reset` skew does not recover its benefit; the mismatch is doing something real, or
-   matching it is at best neutral.
+   - public spread of all six: **0.0004**
+   - public spread between v042 and v050 alone, *identical recipe, different seed*: **0.0004**
+   - **The seed pair accounts for 100% of the entire public range of the batch.**
 
-   *Rule: judge against a seed control, not against a parent. And treat ±0.0003 as
-   undetectable — which retroactively validates everything below that size being a waste of
-   a submission.*
+   So schedule length, both `state_reset` changes, and `distill_weight` 3.0 are each
+   **indistinguishable from changing the seed.** Not "noisy" — indistinguishable. The best
+   local model finished 4th of 6; the *worst* local model tied for best. And the run that
+   closed the `state_reset` skew, which we had every reason to expect to lose, tied for best.
+
+   Local-to-public correlation over the six is **−0.41 Pearson / −0.31 Spearman**. With n=6
+   that is weak evidence on its own and I would not claim it. The claim that is solid is the
+   seed pair: one config, two seeds, 0.0004 apart publicly, equal to the whole batch range.
+
+   *Rule: with the public spread at or below seed noise, `full_valid_wp` cannot select a
+   model here, and neither can any of these four levers. Stop paying for local runs whose
+   effect is smaller than 0.0004, and stop spending submissions on differences inside it.*
 
 2. **This falsifies what we concluded from v041 and v043 alone.** After those two scored we
    wrote that local *gains* never transfer while local *losses* arrive amplified, and

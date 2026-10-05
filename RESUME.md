@@ -33,11 +33,11 @@ reference metric in `tools/metric_ref.py`.
 | 2 | **v040** | v039 (our best at 0.6594) trained for 8... | 0.689146 | Submitted | 0.6596 | 44m57s (75%) | 628 MB |
 | 3 | **v045** | v041 with hidden 128 -> 192, i.e | 0.689116 | Submitted | 0.6595 | 55m37s (93%) | 634 MB |
 | 4 | **v041** | v039 with distill_weight 2.0 -> 3.0, i.e | 0.689036 | Submitted | 0.6593 | 46m51s (78%) | 628 MB |
-| 5 | **v046** | v042 (our best PUBLIC score, 0.6600)... | 0.689030 | Ready to Submit | -- | 42m06s (70%) | -- |
-| 6 | **v049** | v042's three-member teacher with... | 0.688784 | Ready to Submit | -- | 42m06s (70%) | -- |
-| 7 | **v048** | v042 with training.state_reset 2000 ->... | 0.688708 | Ready to Submit | -- | 42m12s (70%) | -- |
-| 8 | **v050** | v042's EXACT recipe at seed 1338 instead of... | 0.688599 | Ready to Submit | -- | 42m18s (70%) | -- |
-| 9 | **v047** | v042 with training.state_reset 2000 ->... | 0.688458 | Ready to Submit | -- | 42m06s (70%) | -- |
+| 5 | **v046** | v042 (our best PUBLIC score, 0.6600)... | 0.689030 | Submitted | 0.6598 | 48m32s (81%) | 628 MB |
+| 6 | **v049** | v042's three-member teacher with... | 0.688784 | Submitted | 0.6598 | 46m07s (77%) | 628 MB |
+| 7 | **v048** | v042 with training.state_reset 2000 ->... | 0.688708 | Submitted | 0.6600 | 45m27s (76%) | 628 MB |
+| 8 | **v050** | v042's EXACT recipe at seed 1338 instead of... | 0.688599 | Submitted | 0.6596 | 45m57s (77%) | 628 MB |
+| 9 | **v047** | v042 with training.state_reset 2000 ->... | 0.688458 | Submitted | 0.6600 | 50m32s (84%) | 628 MB |
 | 10 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Submitted | 0.6592 | 48m06s (80%) | 628 MB |
 | 11 | **v042** | v039 with a THREE-member teacher: dozken... | 0.688268 | Submitted | 0.6600 | 44m31s (74%) | 628 MB |
 | 12 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Submitted | 0.6594 | 47m42s (80%) | 628 MB |
