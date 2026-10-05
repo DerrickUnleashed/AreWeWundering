@@ -65,6 +65,11 @@ which is **not** comparable to the public column.
 | 41 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
 | 42 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
 | 43 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| — | **v046** | 0.689030 | Ready to Submit | -- | — |
+| — | **v049** | 0.688784 | Ready to Submit | -- | — |
+| — | **v048** | 0.688708 | Ready to Submit | -- | — |
+| — | **v050** | 0.688599 | Ready to Submit | -- | — |
+| — | **v047** | 0.688458 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 
@@ -79,26 +84,29 @@ justified shipping a large one.
 
 ## Extreme cases and how they change how you read this table
 
-1. **The local metric does not rank these models, and the apparent correlation is one bad
-   run.** The six most recent submissions all trained against the same recipe family:
+1. **The seed spread is as large as every effect we have chased, and we only measured it
+   because we ran a control.** v050 is v042's *exact* recipe at seed 1338 — one variable
+   changed, no idea attached. It came in **+0.000331 (+2.1σ)**, i.e. the seed-to-seed spread
+   of a config we already knew was stable is the same size as the documented 2σ detection
+   threshold (±0.000318). That makes the whole batch that produced it unreadable:
 
-   | ver | local | σ vs parent | public | public rank |
-   |---|---:|---:|---:|---:|
-   | v044 | 0.689846 | +10.3 | 0.6599 | 2 of 6 |
-   | v040 | 0.689146 | +5.9 | 0.6596 | 3 of 6 |
-   | v045 | 0.689116 | +0.5 | 0.6595 | 4 of 6 |
-   | v041 | 0.689036 | +5.2 | 0.6593 | 5 of 6 |
-   | **v042** | 0.688268 | **+0.4 (null)** | **0.6600** | **1 of 6** |
-   | v043 | 0.687944 | −1.7 (null) | 0.6569 | 6 of 6 |
+   | run | change vs v042 | full_valid_wp | vs the control |
+   |---|---|---:|---:|
+   | v046 | epochs 3 → 8 | 0.689030 | **+0.000431 — above the seed spread** |
+   | v049 | `distill_weight` 2.0 → 3.0 | 0.688784 | +0.000186 — within noise |
+   | v048 | train `state_reset` → 10000 | 0.688708 | +0.000109 — within noise |
+   | v050 | **seed 1338 (control)** | 0.688599 | — |
+   | v047 | train `state_reset` → 4000 (**matched**) | 0.688458 | −0.000141 — below |
 
-   Pearson between local and public over the six is **+0.64**, which looks reassuring.
-   **Exclude v043 and it is −0.13.** v043 is the worst run on *both* metrics and is
-   carrying the entire correlation by itself. Among the five genuinely competitive runs —
-   all within 0.0016 of each other locally — the public ordering is scrambled, and **the
-   best public score came from a local null while the worst competitive run was a +5.2σ
-   win.** *Rule: below roughly 0.0016 of local spread, treat `full_valid_wp` as unable to
-   separate candidates. It is still the right instrument for detecting a real regression —
-   v043 proves that — but it cannot rank near-ties.*
+   Three of the four changes are inside the noise. **And v047 is the first run in this
+   project with no train/serve skew at all** — it trains at 4000 and serves at 4000 — and it
+   landed *below* the control, which is trained at 2000 and served at 4000. So closing the
+   `state_reset` skew does not recover its benefit; the mismatch is doing something real, or
+   matching it is at best neutral.
+
+   *Rule: judge against a seed control, not against a parent. And treat ±0.0003 as
+   undetectable — which retroactively validates everything below that size being a waste of
+   a submission.*
 
 2. **This falsifies what we concluded from v041 and v043 alone.** After those two scored we
    wrote that local *gains* never transfer while local *losses* arrive amplified, and
