@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v049
   parent: gru_v042
-  status: running
+  status: finished
 description: v042's three-member teacher with distill_weight 2.0 -> 3.0, crossing
   our two best public recipes.
 hypothesis: 'v042 (triple teacher, dw 2.0) is the public winner at 0.6600 and v044
@@ -193,15 +193,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 38999
+  best_val_wp: 0.6983284597472386
+  best_val_t0: 0.6957952773183378
+  best_val_t1: 0.7008616421761392
+  full_valid_wp: 0.6887843784410896
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 10.2735
+  finished_utc: '2026-10-04T21:03:04Z'
   note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
     from the evidence, not by resampling a dead axis: preprocessing is closed on both
     the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
