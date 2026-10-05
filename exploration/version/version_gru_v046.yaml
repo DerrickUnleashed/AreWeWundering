@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v046
   parent: gru_v042
-  status: running
+  status: finished
 description: v042 (our best PUBLIC score, 0.6600) trained for 8 epochs instead of
   3.
 hypothesis: 'v042 won the public board on the strength of a three-member teacher,
@@ -192,15 +192,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 100499
+  best_val_wp: 0.6990447876764597
+  best_val_t0: 0.6964362956002804
+  best_val_t1: 0.701653279752639
+  full_valid_wp: 0.6890297552898539
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 16.3657
+  finished_utc: '2026-10-05T03:08:24Z'
   note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
     from the evidence, not by resampling a dead axis: preprocessing is closed on both
     the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
