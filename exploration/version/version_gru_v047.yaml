@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v047
   parent: gru_v042
-  status: running
+  status: finished
 description: v042 with training.state_reset 2000 -> 4000, so training and serving
   finally AGREE.
 hypothesis: 'Every version from v021 has trained with state_reset=2000 and served
@@ -196,15 +196,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 39776
+  best_val_wp: 0.6977782507568611
+  best_val_t0: 0.6943363079627808
+  best_val_t1: 0.7012201935509415
+  full_valid_wp: 0.688458181432422
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 10.2684
+  finished_utc: '2026-10-04T21:02:37Z'
   note: 'Base = v042, our best PUBLIC score (0.6600, three-member teacher). Chosen
     from the evidence, not by resampling a dead axis: preprocessing is closed on both
     the linear and the nonlinear side, capacity is plateaued, teacher identity saturates
