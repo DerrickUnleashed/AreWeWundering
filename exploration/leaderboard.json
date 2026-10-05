@@ -381,5 +381,50 @@
     "uploaded_filename": "submission_gru_v044.zip",
     "outcome": "SCORED",
     "note": "Pair teacher, distill_weight 3.0, 8 epochs. Locally the best model in the project (0.689846, +10.3 sigma) and publicly second (+0.0005 vs v039). So the largest local gain of the batch DID transfer, at roughly a third of its size -- which is a much better outcome than v041 managed and quietly undercuts the 'local gains never transfer' reading of v041."
+  },
+  "v047": {
+    "public_score": 0.66,
+    "grader_seconds": 3032,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-05T20:14Z",
+    "uploaded_filename": "submission_gru_v047.zip",
+    "outcome": "SCORED",
+    "note": "TRAIN=SERVE=4000, the first run in this project with NO train/serve skew. Locally the WORST of the six (0.688458) and publicly TIED FOR BEST. This is the cleanest possible demonstration that full_valid_wp does not rank these models: the run that closed the state_reset skew, and which we had reason to expect to lose, is the one that tied v042."
+  },
+  "v048": {
+    "public_score": 0.66,
+    "grader_seconds": 2727,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-05T20:14Z",
+    "uploaded_filename": "submission_gru_v048.zip",
+    "outcome": "SCORED",
+    "note": "Training state_reset 10000, serving 4000. Locally +0.000109 over the seed control (within noise) and publicly tied best. Consistent with v047: the state_reset axis moves neither metric in any direction we can detect."
+  },
+  "v046": {
+    "public_score": 0.6598,
+    "grader_seconds": 2912,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-05T20:14Z",
+    "uploaded_filename": "submission_gru_v046.zip",
+    "outcome": "SCORED",
+    "note": "8 epochs. The ONLY run of the batch that cleared the measured local seed spread (+0.000431), and publicly it landed MID-PACK, below v042. The clearest case yet of a local win that did not transfer."
+  },
+  "v049": {
+    "public_score": 0.6598,
+    "grader_seconds": 2767,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-05T20:14Z",
+    "uploaded_filename": "submission_gru_v049.zip",
+    "outcome": "SCORED",
+    "note": "distill_weight 2.0 -> 3.0. Locally +0.000186 over the control, within seed noise; publicly 0.6598. A third confirmation that dw above 2.0 does nothing."
+  },
+  "v050": {
+    "public_score": 0.6596,
+    "grader_seconds": 2757,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-05T20:14Z",
+    "uploaded_filename": "submission_gru_v050.zip",
+    "outcome": "SCORED",
+    "note": "THE CONTROL: v042's exact recipe at seed 1338. Publicly 0.6596 against its own parent v042's 0.6600, so the PUBLIC seed-to-seed spread is 0.0004 -- the same size as the local seed spread of 0.000331. Identical config, different seed, and the public board moved by two thirds of our 2-sigma threshold. This is the number that makes every other comparison in the project unreadable."
   }
 }
