@@ -8,6 +8,25 @@ which is the working memory for the next session.
 Rules and conventions are in **[AGENTS.md](AGENTS.md)**. Raw scores, grader durations and
 memory for every submission are in `exploration/leaderboard.json`.
 
+> ## ⚠ Read this before trusting any number on this page
+>
+> **On 2026-10-05 we found that the recurrent state never carried across chunks during
+> training.** The trainer rebuilt the hidden state as zeros every step and discarded the
+> state the GRU returned, so the model saw at most **1,000 steps** of history while serving
+> runs it on **4,000**.
+>
+> Two consequences, both silent:
+>
+> 1. Every model on this page was trained on a quarter of the context it is served on.
+> 2. `training.state_reset` could not change the weights at all — v047 and v048 came out
+>    **byte-identical** to v042. About **24 of the last 35 GPU-hours produced one model.**
+>
+> It was found because an ensemble probe returned three models with identical scores to six
+> decimal places, which should not happen for three different runs. Fixed, with divergence
+> proofs in v051/v052/v053. **The scores below are real measurements of the models as shipped,
+> but they describe a system that was not the one we believed we were optimising.** Full
+> detail in [RESUME.md](RESUME.md).
+
 ## Public leaderboard
 
 <!-- BEGIN GENERATED: public-score ranking -->
@@ -72,6 +91,9 @@ which is **not** comparable to the public column.
 | 48 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
+| — | **v051** | -- | Training | -- | — |
+| — | **v052** | -- | Training | -- | — |
+| — | **v053** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
