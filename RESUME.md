@@ -90,6 +90,9 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 |---|---|---|---|---|
 | **v000** | framework smoke test (60 steps) | 0.570341 | Submitted | 0.4986 |
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
+| **v051** | PROOF RUN | -- | Training | -- |
+| **v052** | PROOF RUN | -- | Training | -- |
+| **v053** | v042 recipe on the PATCHED trainer with... | -- | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
