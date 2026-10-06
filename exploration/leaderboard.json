@@ -426,5 +426,32 @@
     "uploaded_filename": "submission_gru_v050.zip",
     "outcome": "SCORED",
     "note": "THE CONTROL: v042's exact recipe at seed 1338. Publicly 0.6596 against its own parent v042's 0.6600, so the PUBLIC seed-to-seed spread is 0.0004 -- the same size as the local seed spread of 0.000331. Identical config, different seed, and the public board moved by two thirds of our 2-sigma threshold. This is the number that makes every other comparison in the project unreadable."
+  },
+  "v051": {
+    "public_score": 0.6595,
+    "grader_seconds": 2807,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-06T13:22Z",
+    "uploaded_filename": "submission_gru_v051.zip",
+    "outcome": "SCORED",
+    "note": "train state_reset 2000, ONE epoch, patched trainer. Publicly the BEST of the three state_reset probes and the WORST of them locally (0.686628). Part of a perfect rank inversion -- see v052."
+  },
+  "v053": {
+    "public_score": 0.6592,
+    "grader_seconds": 2822,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-06T13:22Z",
+    "uploaded_filename": "submission_gru_v053.zip",
+    "outcome": "SCORED",
+    "note": "train state_reset 4000, matching the serving horizon, ONE epoch, patched trainer. Middle on BOTH metrics, which is the only thing it does consistently."
+  },
+  "v052": {
+    "public_score": 0.6588,
+    "grader_seconds": 2691,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-06T13:22Z",
+    "uploaded_filename": "submission_gru_v052.zip",
+    "outcome": "SCORED",
+    "note": "train state_reset 10000, ONE epoch, patched trainer. Publicly the WORST of the three and locally the BEST (0.687051) -- and the best of the three on FULL validation locally too. The completion of a PERFECT rank inversion: local order v052 > v053 > v051, public order exactly reversed."
   }
 }
