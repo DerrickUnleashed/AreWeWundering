@@ -770,7 +770,7 @@ honest reading is that we do not currently know whether it was wrong.
 `v032` = **v028's exact recipe at 5 epochs**. v028 has the best local score in the
 project (0.686510, +11.5σ) and carries the standard offset; v025 shows a +0.0024
 public uplift from training longer. If the two compose, the prediction is
-**0.6585 + 0.0024 = 0.6609**, against a 0.6711 leader we currently sit 0.0092 back.
+**0.6585 + 0.0024 = 0.6609**, against a 0.6711 leader we currently sit 0.0102 back.
 
 The hypothesis is written to be falsifiable rather than merely hopeful: if `v032`
 lands at v028's 0.6585, the epoch effect did not transfer to this recipe, which
@@ -1264,7 +1264,7 @@ rather than to construct an explanation after the fact.
 ours v032  0.6587   ties on public, 2nd locally
 ours v031  0.6587   ties on public, BEST locally (0.687376)
 dozken     0.6588
-#1         0.6711   → 0.0090 back
+#1         0.6711   → 0.0124 back
 ```
 
 **v031 and v032 are tied at 0.6587** and are within 0.0002 of dozken. Two independent
