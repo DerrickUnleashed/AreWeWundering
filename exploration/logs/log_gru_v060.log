@@ -263,3 +263,31 @@ step 725/39777 lr 2.00e-03 loss 0.560674 grad_norm 1.510 (311s)
 step 750/39777 lr 2.00e-03 loss 0.709009 grad_norm 1.121 (322s)
 step 775/39777 lr 2.00e-03 loss 0.589479 grad_norm 0.921 (334s)
 step 800/39777 lr 2.00e-03 loss 0.857950 grad_norm 2.952 (346s)
+step 825/39777 lr 2.00e-03 loss 0.856805 grad_norm 1.927 (361s)
+step 850/39777 lr 2.00e-03 loss 0.686697 grad_norm 1.058 (382s)
+step 875/39777 lr 2.00e-03 loss 0.995784 grad_norm 1.784 (396s)
+step 900/39777 lr 2.00e-03 loss 0.878848 grad_norm 1.204 (407s)
+step 925/39777 lr 2.00e-03 loss 0.560880 grad_norm 0.637 (417s)
+step 950/39777 lr 2.00e-03 loss 0.484519 grad_norm 1.244 (428s)
+step 975/39777 lr 2.00e-03 loss 0.841089 grad_norm 1.350 (439s)
+step 1000/39777 lr 2.00e-03 loss 0.989291 grad_norm 3.526 (450s)
+step 1025/39777 lr 2.00e-03 loss 0.713053 grad_norm 1.432 (460s)
+step 1050/39777 lr 2.00e-03 loss 0.743823 grad_norm 1.366 (471s)
+step 1075/39777 lr 2.00e-03 loss 0.668969 grad_norm 0.839 (482s)
+step 1100/39777 lr 2.00e-03 loss 0.571036 grad_norm 0.839 (494s)
+step 1125/39777 lr 2.00e-03 loss 0.601633 grad_norm 1.388 (506s)
+step 1150/39777 lr 2.00e-03 loss 0.731361 grad_norm 1.308 (517s)
+step 1175/39777 lr 2.00e-03 loss 0.631333 grad_norm 1.056 (528s)
+step 1200/39777 lr 2.00e-03 loss 0.675043 grad_norm 1.001 (540s)
+step 1225/39777 lr 2.00e-03 loss 0.667193 grad_norm 0.720 (551s)
+step 1250/39777 lr 2.00e-03 loss 0.786619 grad_norm 2.055 (562s)
+step 1275/39777 lr 2.00e-03 loss 0.665559 grad_norm 2.419 (573s)
+step 1300/39777 lr 2.00e-03 loss 0.619053 grad_norm 0.918 (584s)
+step 1325/39777 lr 2.00e-03 loss 0.735884 grad_norm 1.680 (595s)
+step 1350/39777 lr 2.00e-03 loss 0.602407 grad_norm 0.861 (606s)
+step 1375/39777 lr 2.00e-03 loss 0.566311 grad_norm 1.569 (616s)
+step 1400/39777 lr 2.00e-03 loss 0.797612 grad_norm 1.683 (627s)
+step 1425/39777 lr 2.00e-03 loss 0.591409 grad_norm 1.329 (638s)
+step 1450/39777 lr 2.00e-03 loss 0.689280 grad_norm 1.486 (648s)
+step 1475/39777 lr 2.00e-03 loss 0.653429 grad_norm 0.733 (660s)
+eval:   0%|          | 0/200 [00:00<?, ?it/s]eval:   2%|2         | 4/200 [00:00<00:44,  4.40it/s]eval:   4%|4         | 8/200 [00:01<00:43,  4.37it/s]eval:   6%|6         | 12/200 [00:02<00:44,  4.26it/s]eval:   8%|8         | 16/200 [00:03<00:42,  4.37it/s]eval:  10%|#         | 20/200 [00:04<00:40,  4.39it/s]eval:  12%|#2        | 24/200 [00:05<00:39,  4.45it/s]eval:  14%|#4        | 28/200 [00:06<00:40,  4.25it/s]
