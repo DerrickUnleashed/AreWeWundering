@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v056
   parent: gru_v054
-  status: smoke
+  status: running
 description: 'v054''s recipe with the REGULARISATION/HEAD axis opened: inter-layer
   dropout 0.1, plus a BatchNorm+dropout head of width 256. The recurrent trunk (GRU
   2x128, input_proj 64) is untouched. Motivation is external: 97 submissions in the
