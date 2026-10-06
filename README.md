@@ -32,6 +32,27 @@ memory for every submission are in `exploration/leaderboard.json`.
 > Full detail, including the two false alarms I produced on the way (both my own test
 > errors, not faults in the code), is in [RESUME.md](RESUME.md).
 
+> ## ⚠ A second silent bug: 56 configs described models that were never built
+>
+> While opening up the regularisation axis for v056 we found that the model class built its
+> head as `nn.Linear(hidden, 2)` and **neither construction site passed `head_hidden` at
+> all**. So `head: mlp`, `head_hidden` and `layernorm` were recorded in **56 yaml files and
+> never once applied to a model**. Every model in this project ran a plain single linear
+> readout, whatever its config claimed.
+>
+> This matters beyond the head itself:
+>
+> - **"A deeper head doesn't help" was never properly tested.** v034 was the *only* model
+>   that carried a real 2-layer head (hand-written, `head_hidden=384`), and it scored
+>   **−0.0005** — alone, with no batch norm and no dropout. That single confounded run is
+>   what made the axis look closed.
+> - The cause was two construction sites passing **different keyword sets**. Fixed in v056 by
+>   `build_model()`, now the only path from a yaml `model:` block to a `GRUModel`.
+>
+> Combined with the state-carry bug above: **two of the three things our configs claimed to
+> control were not being applied.** When a config knob looks inert, check that it is read
+> before believing a null result about it.
+
 ## Public leaderboard
 
 <!-- BEGIN GENERATED: public-score ranking -->
@@ -100,6 +121,8 @@ which is **not** comparable to the public column.
 | — | **v054** | 0.688151 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
+| — | **v055** | -- | Training | -- | — |
+| — | **v056** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -132,6 +155,55 @@ justified shipping a large one.
 >
 > Not claimed: that longer horizons are useless. v054 tested 4000; the one-epoch sweep put
 > 10000 best on full validation, and that arm was never run at length.
+
+## Feature preprocessing: tried, and it never worked
+
+Three dedicated single-variable runs, each against the matched v002 base (z-score only):
+
+| run | feature added | local Δ | σ | public Δ |
+|---|---|---:|---:|---:|
+| v007 | first differences of i0 book/trades | −0.000092 | −0.6σ | +0.0046 |
+| v008 | cross-instrument spreads/imbalances | +0.000095 | +0.6σ | +0.0038 |
+| v009 | `sign(x)·log1p(\|x\|)` on every feature | +0.000106 | +0.7σ | +0.0048 |
+
+Locally all three are indistinguishable from zero. The public "+0.004" looked real until you
+notice that **v005 and v006 are seed replicates of v002**: the base recipe's own public spread
+is **0.6435 / 0.6481 / 0.6475**, a range of **0.0046**. The v007 "gain" is exactly the size of
+the noise it was being compared against. v007 and v008 land *inside* the base's seed range.
+
+This is expected rather than surprising: the organisers already ship **standardised** features
+and layer 1 is a `Linear`, so any per-column affine transform is **exactly re-learnable by the
+first weight matrix** — mathematically redundant, not merely unhelpful.
+
+**What is still untested:** anything nonlinear or multi-row. Of that family, output calibration
+(every nonlinear transform of the prediction) and feature ranking (`raw + squares` beat
+`raw + rank channels`) both came back negative.
+
+**Caveat on `first_differences`:** it is in every shipped model, but no clean evidence shows it
+earned its place — v007 did not beat its base. It is defensible as genuine nonlinear feature
+engineering, not as a measured win. It was never re-validated at length.
+
+## In flight
+
+| run | what it is | status |
+|---|---|---|
+| **v055** | v054 with `training.state_reset` 4000 → 10000. The one arm the 1-epoch sweep preferred on full validation, never run at length | training |
+| **v056** | regularisation axis: inter-layer dropout 0.1, `head_hidden` 256, **BatchNorm + dropout in the head**. Trunk untouched. Measured free (32.4 vs 32.6 µs/row) | training |
+
+Both are post-fix on the patched trainer, so `state_reset` genuinely moves the weights.
+
+## Architecture: one family, 56 versions
+
+Every model in this project is `arch: gru` — 56 of 56, across 11 different `(hidden, layers,
+input_proj)` shapes. Capacity increases have consistently failed to move public score: v045
+(2× wider student, +0.0002), v026 (2× larger, negative), v027 (4× larger, negative), and v054
+(removed a 4× train/serve context mismatch, −0.7σ). Swapping the recurrence is a
+capacity/expressiveness move and faces the same prior.
+
+The axis that **has** never been touched is **regularisation**: `dropout=0.0` in all 56
+versions, batch norm never tried at all. That is what v056 opens, using relative-effect
+evidence from the user's other competition (97 submissions, `batch_norm` the largest single
+knob at mean val_r² 0.367 with vs 0.121 without).
 
 ## Extreme cases and how they change how you read this table
 
