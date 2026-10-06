@@ -1,0 +1,282 @@
+### new run, log opened 2026-10-06T16:29:28+0530
+==============================================================================
+command            : python exploration/models/train_gru_v056.py --config exploration/version/version_gru_v056.yaml
+timestamp          : 2026-10-06T16:29:28+0530
+host               : macOS-27.0-arm64-arm-64bit  python 3.11.9
+packages           : torch 2.14.0  numpy 2.2.6  onnxruntime 1.23.2
+cuda               : False   mps: True
+git commit         : a3502bfe422489c8c7260908effed3511d144148
+seed               : 1337
+log                : exploration/logs/log_gru_v056.log
+config:
+schema_version: 1
+identity:
+  model: gru
+  version: v056
+  parent: gru_v054
+  status: smoke
+description: 'v054''s recipe with the REGULARISATION/HEAD axis opened: inter-layer
+  dropout 0.1, plus a BatchNorm+dropout head of width 256. The recurrent trunk (GRU
+  2x128, input_proj 64) is untouched. Motivation is external: 97 submissions in the
+  user''s OTHER competition (/Users/derricksamuel/Desktop/Projects/wunderfund) found
+  batch_norm the single largest knob (mean val_r2 0.367 with vs 0.121 without, n=90/7),
+  fc_num_layers=1 catastrophic (0.134, n=11) vs 2-4 layers (0.374-0.378), and dropout
+  0.1-0.2 fine while 0.3 was bad (0.301). This project has used dropout=0.0 in all
+  56 versions and never tried batch norm at all.'
+hypothesis: Regularisation, not capacity, is the untested axis here. Three separate
+  capacity increases have now failed to move public score (v045 2x wider student +0.0002,
+  v026/v027 2x and 4x larger, negative), and v054 showed that removing a 4x train/serve
+  memory mismatch changed nothing. If this also fails, the regularisation hypothesis
+  is dead too and the 0.0111 gap is data or objective, not model. If it works it is
+  the first gain in 56 versions from anything other than distillation.
+change_vs_parent: 'vs v054: model.dropout 0.0 -> 0.1; model.head_hidden 192 -> 256;
+  model.head_batch_norm False -> True; model.head_dropout 0.0 -> 0.1. GRU trunk, features,
+  loss, optim, schedule, seed and state_reset all IDENTICAL to v054. Latency measured
+  at 32.4 us/row ONNX-only under load vs 32.6 for the shipped 225,922-param shape,
+  i.e. free.'
+data:
+  train_shards: cache/train
+  valid_shards: cache/valid
+  seq_len: 20000
+  warmup_steps: 99
+  target_clip: 2.0
+  train_sequences: null
+features:
+  normalisation: robust_zscore
+  signed_log_volumes: false
+  first_differences:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+  - 73
+  - 74
+  - 75
+  - 76
+  - 77
+  - 78
+  - 79
+  - 80
+  - 81
+  - 82
+  - 83
+  - 84
+  - 85
+  - 86
+  - 87
+  - 88
+  - 89
+  - 90
+  - 91
+  - 92
+  - 93
+  - 94
+  - 95
+  - 96
+  - 97
+  - 98
+  - 99
+  - 100
+  - 101
+  - 102
+  - 103
+  - 104
+  - 105
+  - 106
+  - 107
+  - 108
+  - 109
+  - 110
+  - 111
+  cross_instrument: []
+  step_feature: false
+  clip_sigma: 10
+model:
+  arch: gru
+  input_proj: 64
+  hidden: 128
+  layers: 2
+  dropout: 0.1
+  layernorm: true
+  head: mlp
+  param_count: 238914
+  head_hidden: 256
+  head_layers: 2
+  head_batch_norm: true
+  head_dropout: 0.1
+loss:
+  type: seq_weighted_pearson
+  mask: soft
+  aux_mse_weight: 0.05
+  target_clip: 2.0
+  mask_floor: 0.1
+  mask_model: cache/train_scored.npy
+  distill_weight: 2.0
+  teacher_labels:
+  - cache/teacher/teacher_dozken_reset2k.npy
+  - cache/teacher/teacher_dozken_reset4k.npy
+  - cache/teacher/teacher_member_v037.npy
+optim:
+  name: adamw
+  lr: 0.002
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.99
+  schedule: cosine
+  warmup_steps: 500
+  grad_clip: 1.0
+  ema_decay: 0.999
+  precision: fp32
+training:
+  chunk_len: 1000
+  burn_in: 99
+  batch_sequences: 16
+  max_steps: null
+  smoke_steps: 60
+  epochs: 3
+  seed: 1337
+  eval_every_steps: 1500
+  eval_subset_sequences: 200
+  device: cpu
+  stateful: true
+  state_reset: 4000
+inference:
+  export: onnx
+  opset: 17
+  ort_threads: 1
+  target_us_per_row: 68.5
+  state_reset: 4000
+results:
+  best_step: 59
+  best_val_wp: -0.024981734291686947
+  best_val_t0: 0.030283624267199723
+  best_val_t1: -0.08024709285057362
+  full_valid_wp: null
+  latency_us_p50: null
+  latency_us_p99: null
+  train_hours: 0.0077
+  finished_utc: '2026-10-06T10:59:14Z'
+  note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
+    matched to serving, full length. Compare against v042 at 0.688268 local / 0.6600
+    public.'
+artifacts:
+  log: exploration/logs/log_gru_v056.log
+  checkpoint_dir: exploration/checkpoints/checkpoint_gru_v056
+  submission_dir: null
+
+==============================================================================
+device: cpu
+model: gru hidden=128 layers=2 input_proj=64 head_layers=2 head_hidden=256 head_bn=True head_dropout=0.1 in_dim=224 params=238,914
+max_steps derived: 13,259 steps/epoch x 3 epoch(s) = 39,777 steps over all 10,607 training sequences
+soft mask: cache/train_scored.npy (212,140,000 rows, floor 0.1)
+distillation: 3 member(s), 212,140,000 rows, weight 2.0
+train sequences=10607  valid sequences=200  steps=39777
+step 0/39777 lr 4.00e-06 loss 3.023096 grad_norm 12.111 (1s)
+step 25/39777 lr 1.04e-04 loss 2.504130 grad_norm 8.989 (10s)
+step 50/39777 lr 2.04e-04 loss 1.418446 grad_norm 5.624 (20s)
+step 75/39777 lr 3.04e-04 loss 1.232615 grad_norm 4.657 (29s)
+step 100/39777 lr 4.04e-04 loss 1.352865 grad_norm 7.214 (39s)
+step 125/39777 lr 5.04e-04 loss 1.148067 grad_norm 3.577 (48s)
+step 150/39777 lr 6.04e-04 loss 0.907933 grad_norm 3.127 (58s)
+step 175/39777 lr 7.04e-04 loss 1.054461 grad_norm 4.117 (67s)
+step 200/39777 lr 8.04e-04 loss 1.008119 grad_norm 3.737 (77s)
+step 225/39777 lr 9.04e-04 loss 0.768659 grad_norm 2.582 (86s)
+step 250/39777 lr 1.00e-03 loss 0.827624 grad_norm 2.456 (95s)
+step 275/39777 lr 1.10e-03 loss 0.854596 grad_norm 3.454 (105s)
+step 300/39777 lr 1.20e-03 loss 0.804604 grad_norm 2.328 (114s)
+step 325/39777 lr 1.30e-03 loss 1.046595 grad_norm 3.847 (123s)
+step 350/39777 lr 1.40e-03 loss 0.839595 grad_norm 2.489 (132s)
+step 375/39777 lr 1.50e-03 loss 0.797087 grad_norm 2.205 (141s)
+step 400/39777 lr 1.60e-03 loss 1.083090 grad_norm 3.642 (151s)
+step 425/39777 lr 1.70e-03 loss 0.730449 grad_norm 1.534 (160s)
+step 450/39777 lr 1.80e-03 loss 0.809837 grad_norm 2.142 (169s)
+step 475/39777 lr 1.90e-03 loss 0.584718 grad_norm 2.133 (178s)
+step 500/39777 lr 2.00e-03 loss 0.949497 grad_norm 4.146 (187s)
+step 525/39777 lr 2.00e-03 loss 0.772235 grad_norm 2.804 (196s)
+step 550/39777 lr 2.00e-03 loss 0.737640 grad_norm 2.413 (205s)
+step 575/39777 lr 2.00e-03 loss 0.598061 grad_norm 1.615 (214s)
+step 600/39777 lr 2.00e-03 loss 0.774225 grad_norm 2.809 (223s)
+step 625/39777 lr 2.00e-03 loss 0.890920 grad_norm 2.246 (232s)
+step 650/39777 lr 2.00e-03 loss 0.870083 grad_norm 2.497 (241s)
+step 675/39777 lr 2.00e-03 loss 0.606895 grad_norm 1.972 (251s)
+step 700/39777 lr 2.00e-03 loss 0.757445 grad_norm 2.678 (260s)
+step 725/39777 lr 2.00e-03 loss 0.605217 grad_norm 1.717 (269s)
+step 750/39777 lr 2.00e-03 loss 0.783910 grad_norm 1.821 (279s)
+step 775/39777 lr 2.00e-03 loss 0.636737 grad_norm 1.501 (288s)
+step 800/39777 lr 2.00e-03 loss 0.935893 grad_norm 2.584 (297s)
+step 825/39777 lr 2.00e-03 loss 0.887179 grad_norm 2.142 (307s)
+step 850/39777 lr 2.00e-03 loss 0.683432 grad_norm 1.050 (316s)
+step 875/39777 lr 2.00e-03 loss 1.029411 grad_norm 1.861 (326s)
+step 900/39777 lr 2.00e-03 loss 0.875247 grad_norm 1.413 (335s)
+step 925/39777 lr 2.00e-03 loss 0.663677 grad_norm 1.541 (345s)
+step 950/39777 lr 2.00e-03 loss 0.523315 grad_norm 1.711 (356s)
