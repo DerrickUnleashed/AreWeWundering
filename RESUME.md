@@ -41,7 +41,7 @@ reference metric in `tools/metric_ref.py`.
 | 10 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Submitted | 0.6592 | 48m06s (80%) | 628 MB |
 | 11 | **v042** | v039 with a THREE-member teacher: dozken... | 0.688268 | Submitted | 0.6600 | 44m31s (74%) | 628 MB |
 | 12 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Submitted | 0.6594 | 47m42s (80%) | 628 MB |
-| 13 | **v054** | v042 recipe EXACTLY, on the patched... | 0.688151 | Ready to Submit | -- | 42m54s (72%) | -- |
+| 13 | **v054** | v042 recipe EXACTLY, on the patched... | 0.688151 | Submitted | 0.6597 | 45m27s (76%) | 628 MB |
 | 14 | **v043** | v039 with ONLY dozken reset4k as teacher,... | 0.687944 | Submitted | 0.6569 | 45m52s (76%) | 628 MB |
 | 15 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Submitted | 0.6588 | 48m06s (80%) | 628 MB |
 | 16 | **v036** | v031's exact recipe with ONE change:... | 0.687535 | Submitted | 0.6586 | 48m06s (80%) | 629 MB |
