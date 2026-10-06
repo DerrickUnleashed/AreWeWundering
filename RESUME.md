@@ -47,10 +47,10 @@ reference metric in `tools/metric_ref.py`.
 | 16 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
 | 17 | **v032** | v028's exact recipe -- same architecture,... | 0.687219 | Submitted | 0.6587 | 45m32s (76%) | 628 MB |
 | 18 | **v035** | v031's exact recipe with ONE change: hidden... | 0.687177 | Submitted | 0.6586 | 44m52s (75%) | 626 MB |
-| 19 | **v052** | PROOF RUN | 0.687051 | Yet to package | -- | -- | -- |
+| 19 | **v052** | PROOF RUN | 0.687051 | Ready to Submit | -- | 46m00s (77%) | -- |
 | 20 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
-| 21 | **v053** | v042 recipe on the PATCHED trainer with... | 0.686871 | Yet to package | -- | -- | -- |
-| 22 | **v051** | PROOF RUN | 0.686628 | Yet to package | -- | -- | -- |
+| 21 | **v053** | v042 recipe on the PATCHED trainer with... | 0.686871 | Ready to Submit | -- | 46m06s (77%) | -- |
+| 22 | **v051** | PROOF RUN | 0.686628 | Ready to Submit | -- | 45m36s (76%) | -- |
 | 23 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
 | 24 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Submitted | 0.6579 | 47m17s (79%) | 629 MB |
 | 25 | **v022** | dozken arch + his teacher | 0.685228 | Submitted | 0.6565 | 50m46s (85%) | 631 MB |
