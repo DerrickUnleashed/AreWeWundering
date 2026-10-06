@@ -123,6 +123,11 @@ which is **not** comparable to the public column.
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v055** | -- | Training | -- | — |
 | — | **v056** | -- | Training | -- | — |
+| — | **v057** | -- | Training | -- | — |
+| — | **v058** | -- | Training | -- | — |
+| — | **v059** | -- | Training | -- | — |
+| — | **v060** | -- | Training | -- | — |
+| — | **v061** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -183,27 +188,31 @@ first weight matrix** — mathematically redundant, not merely unhelpful.
 earned its place — v007 did not beat its base. It is defensible as genuine nonlinear feature
 engineering, not as a measured win. It was never re-validated at length.
 
-## In flight
+## In flight — seven concurrent runs
 
-| run | what it is | status |
-|---|---|---|
-| **v055** | v054 with `training.state_reset` 4000 → 10000. The one arm the 1-epoch sweep preferred on full validation, never run at length | training |
-| **v056** | regularisation axis: inter-layer dropout 0.1, `head_hidden` 256, **BatchNorm + dropout in the head**. Trunk untouched. Measured free (32.4 vs 32.6 µs/row) | training |
+**The optimiser sweep.** Across 57 versions `lr`, `weight_decay`, `grad_clip` and `schedule`
+were **never varied** (`lr` 0.002 in 57/57, `grad_clip` 1.0 in 57/57, cosine 57/57,
+`weight_decay` 0.01 in 56). That is the largest untouched surface in the project, so it is now
+open. All five branch from **v054** and each is a verified single-variable change.
 
-Both are post-fix on the patched trainer, so `state_reset` genuinely moves the weights.
+| run | change vs v054 | params | prior |
+|---|---|---:|---|
+| **v057** | `grad_clip` 1.0 → 5.0 | 225,922 | 25.8% of steps are currently rescaled by 1/‖g‖; at 5.0 only 0.5% are |
+| **v058** | `weight_decay` 0.01 → **1e-4** | 225,922 | the decay axis has only ever been walked toward *worse* (v038) |
+| **v059** | `lr` 0.002 → 0.001 | 225,922 | never moved in 57 versions |
+| **v060** | `layers` 2 → 1 | 126,850 | capacity *reduction*; inherits the bad capacity prior |
+| **v061** | head `GELU` → `ReLU` | 238,914 | cleanest of the set — identical params, FLOPs and latency, only the nonlinearity differs |
 
-## Architecture: one family, 56 versions
+**v061 branches from v056, not v054** — v054's head is a plain `Linear` with no activation, so
+there is nothing to swap. v056 is the only model with a real GELU head.
 
-Every model in this project is `arch: gru` — 56 of 56, across 11 different `(hidden, layers,
-input_proj)` shapes. Capacity increases have consistently failed to move public score: v045
-(2× wider student, +0.0002), v026 (2× larger, negative), v027 (4× larger, negative), and v054
-(removed a 4× train/serve context mismatch, −0.7σ). Swapping the recurrence is a
-capacity/expressiveness move and faces the same prior.
+**Also running:** v055 (`state_reset` 10000, full length) and v056 (regularisation: dropout +
+BatchNorm head).
 
-The axis that **has** never been touched is **regularisation**: `dropout=0.0` in all 56
-versions, batch norm never tried at all. That is what v056 opens, using relative-effect
-evidence from the user's other competition (97 submissions, `batch_norm` the largest single
-knob at mean val_r² 0.367 with vs 0.121 without).
+Honest expectation, recorded before any result arrives: **all five are hygiene, not a
+breakthrough.** v038's weight-decay change moved −0.0005 local / −0.0004 public. We are chasing
+a **0.0111** gap, and the whole set together is unlikely to move more than ~0.001. They are
+worth running because the surface has never been touched, not because they are likely to win.
 
 ## Extreme cases and how they change how you read this table
 

@@ -96,6 +96,11 @@ Rows that cannot be ranked on `full_valid_wp`, each for a stated reason: a conta
 | **v020** | FIX loss + train+valid data  [SCORE CONTAMINATED: trained on cache/trainval, which appends valid[200:1872] -- 1,673 of the 1,873 validation sequences -- so this score is measured on 89% of its own training data and is not comparable with train-only runs] | 0.687502 | Submitted | 0.6513 |
 | **v055** | v054's exact recipe with ONE change:... | -0.125819 | Training | -- |
 | **v056** | v054's recipe with the REGULARISATION/HEAD... | -0.024982 | Training | -- |
+| **v057** | v054 EXACTLY with ONE change:... | -0.126503 | Training | -- |
+| **v058** | v054 EXACTLY with ONE change:... | -0.125803 | Training | -- |
+| **v059** | v054 EXACTLY with ONE change: optim.lr... | -0.136014 | Training | -- |
+| **v060** | v054 EXACTLY with ONE change: model.layers... | 0.148665 | Training | -- |
+| **v061** | v056 EXACTLY with ONE change:... | -0.020808 | Training | -- |
 
 <!-- END GENERATED: leaderboard -->
 
