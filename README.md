@@ -55,49 +55,49 @@ which is **not** comparable to the public column.
 | 7 | **v040** | 0.689146 | **0.6596** | -0.0004 | 44m57s (75%) |
 | 8 | **v050** | 0.688599 | **0.6596** | -0.0004 | 45m57s (77%) |
 | 9 | **v045** | 0.689116 | **0.6595** | -0.0005 | 55m37s (93%) |
-| 10 | **v039** | 0.688212 | **0.6594** | -0.0006 | 47m42s (80%) |
-| 11 | **v041** | 0.689036 | **0.6593** | -0.0007 | 46m51s (78%) |
-| 12 | **v037** | 0.688370 | **0.6592** | -0.0008 | 48m06s (80%) |
-| 13 | **v038** | 0.687577 | **0.6588** | -0.0012 | 48m06s (80%) |
-| 14 | **v031** | 0.687376 | **0.6587** | -0.0013 | 45m41s (76%) |
-| 15 | **v032** | 0.687219 | **0.6587** | -0.0013 | 45m32s (76%) |
-| 16 | **v035** | 0.687177 | **0.6586** | -0.0014 | 44m52s (75%) |
-| 17 | **v036** | 0.687535 | **0.6586** | -0.0014 | 48m06s (80%) |
-| 18 | **v028** | 0.686510 | **0.6585** | -0.0015 | 46m52s (78%) |
-| 19 | **v030** | 0.686919 | **0.6585** | -0.0015 | 47m11s (79%) |
-| 20 | **v025** | 0.684438 | **0.6580** | -0.0020 | 46m07s (77%) |
-| 21 | **v034** | 0.686000 | **0.6579** | -0.0021 | 47m17s (79%) |
-| 22 | **v043** | 0.687944 | **0.6569** | -0.0031 | 45m52s (76%) |
-| 23 | **v023** | 0.684681 | **0.6568** | -0.0032 | 45m36s (76%) |
-| 24 | **v029** | 0.684683 | **0.6568** | -0.0032 | 44m27s (74%) |
-| 25 | **v022** | 0.685228 | **0.6565** | -0.0035 | 50m46s (85%) |
-| 26 | **v024** | 0.684818 | **0.6560** | -0.0040 | 50m17s (84%) |
-| 27 | **v016** | 0.681753 | **0.6541** | -0.0059 | 30m56s (52%) |
-| 28 | **v017** | 0.681866 | **0.6540** | -0.0060 | 25m37s (43%) |
-| 29 | **v018** | 0.680603 | **0.6518** | -0.0082 | 29m21s (49%) |
-| 30 | **v014** | 0.679676 | **0.6517** | -0.0083 | 40m12s (67%) |
-| 31 | **v011** | 0.679986 | **0.6515** | -0.0085 | 30m12s (50%) |
-| 32 | **v015** | -- | **0.6515** | -0.0085 | 30m31s (51%) |
-| 33 | **v020** | 0.681773 | **0.6513** | -0.0087 | 29m52s (50%) |
-| 34 | **v012** | 0.678784 | **0.6512** | -0.0088 | 29m47s (50%) |
-| 35 | **v019** | 0.678374 | **0.6510** | -0.0090 | 30m32s (51%) |
-| 36 | **v021** | 0.678575 | **0.6505** | -0.0095 | 55m32s (93%) |
-| 37 | **v013** | 0.676198 | **0.6490** | -0.0110 | 28m36s (48%) |
-| 38 | **v009** | 0.674456 | **0.6483** | -0.0117 | 39m52s (66%) |
-| 39 | **v005** | 0.674037 | **0.6481** | -0.0119 | 36m56s (62%) |
-| 40 | **v007** | 0.674258 | **0.6481** | -0.0119 | 42m16s (70%) |
-| 41 | **v006** | 0.674149 | **0.6475** | -0.0125 | 35m32s (59%) |
-| 42 | **v008** | 0.674445 | **0.6473** | -0.0127 | 41m17s (69%) |
-| 43 | **v003** | 0.673711 | **0.6457** | -0.0143 | 30m57s (52%) |
-| 44 | **v004** | 0.672206 | **0.6446** | -0.0154 | 43m16s (72%) |
-| 45 | **v002** | 0.674350 | **0.6435** | -0.0165 | 35m02s (58%) |
-| 46 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
-| 47 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
-| 48 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| 10 | **v051** | 0.686628 | **0.6595** | -0.0005 | 46m47s (78%) |
+| 11 | **v039** | 0.688212 | **0.6594** | -0.0006 | 47m42s (80%) |
+| 12 | **v041** | 0.689036 | **0.6593** | -0.0007 | 46m51s (78%) |
+| 13 | **v037** | 0.688370 | **0.6592** | -0.0008 | 48m06s (80%) |
+| 14 | **v053** | 0.686871 | **0.6592** | -0.0008 | 47m02s (78%) |
+| 15 | **v038** | 0.687577 | **0.6588** | -0.0012 | 48m06s (80%) |
+| 16 | **v052** | 0.687051 | **0.6588** | -0.0012 | 44m51s (75%) |
+| 17 | **v031** | 0.687376 | **0.6587** | -0.0013 | 45m41s (76%) |
+| 18 | **v032** | 0.687219 | **0.6587** | -0.0013 | 45m32s (76%) |
+| 19 | **v035** | 0.687177 | **0.6586** | -0.0014 | 44m52s (75%) |
+| 20 | **v036** | 0.687535 | **0.6586** | -0.0014 | 48m06s (80%) |
+| 21 | **v028** | 0.686510 | **0.6585** | -0.0015 | 46m52s (78%) |
+| 22 | **v030** | 0.686919 | **0.6585** | -0.0015 | 47m11s (79%) |
+| 23 | **v025** | 0.684438 | **0.6580** | -0.0020 | 46m07s (77%) |
+| 24 | **v034** | 0.686000 | **0.6579** | -0.0021 | 47m17s (79%) |
+| 25 | **v043** | 0.687944 | **0.6569** | -0.0031 | 45m52s (76%) |
+| 26 | **v023** | 0.684681 | **0.6568** | -0.0032 | 45m36s (76%) |
+| 27 | **v029** | 0.684683 | **0.6568** | -0.0032 | 44m27s (74%) |
+| 28 | **v022** | 0.685228 | **0.6565** | -0.0035 | 50m46s (85%) |
+| 29 | **v024** | 0.684818 | **0.6560** | -0.0040 | 50m17s (84%) |
+| 30 | **v016** | 0.681753 | **0.6541** | -0.0059 | 30m56s (52%) |
+| 31 | **v017** | 0.681866 | **0.6540** | -0.0060 | 25m37s (43%) |
+| 32 | **v018** | 0.680603 | **0.6518** | -0.0082 | 29m21s (49%) |
+| 33 | **v014** | 0.679676 | **0.6517** | -0.0083 | 40m12s (67%) |
+| 34 | **v011** | 0.679986 | **0.6515** | -0.0085 | 30m12s (50%) |
+| 35 | **v015** | -- | **0.6515** | -0.0085 | 30m31s (51%) |
+| 36 | **v020** | 0.681773 | **0.6513** | -0.0087 | 29m52s (50%) |
+| 37 | **v012** | 0.678784 | **0.6512** | -0.0088 | 29m47s (50%) |
+| 38 | **v019** | 0.678374 | **0.6510** | -0.0090 | 30m32s (51%) |
+| 39 | **v021** | 0.678575 | **0.6505** | -0.0095 | 55m32s (93%) |
+| 40 | **v013** | 0.676198 | **0.6490** | -0.0110 | 28m36s (48%) |
+| 41 | **v009** | 0.674456 | **0.6483** | -0.0117 | 39m52s (66%) |
+| 42 | **v005** | 0.674037 | **0.6481** | -0.0119 | 36m56s (62%) |
+| 43 | **v007** | 0.674258 | **0.6481** | -0.0119 | 42m16s (70%) |
+| 44 | **v006** | 0.674149 | **0.6475** | -0.0125 | 35m32s (59%) |
+| 45 | **v008** | 0.674445 | **0.6473** | -0.0127 | 41m17s (69%) |
+| 46 | **v003** | 0.673711 | **0.6457** | -0.0143 | 30m57s (52%) |
+| 47 | **v004** | 0.672206 | **0.6446** | -0.0154 | 43m16s (72%) |
+| 48 | **v002** | 0.674350 | **0.6435** | -0.0165 | 35m02s (58%) |
+| 49 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
+| 50 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
+| 51 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
 | — | **v054** | 0.688151 | Ready to Submit | -- | — |
-| — | **v052** | 0.687051 | Ready to Submit | -- | — |
-| — | **v053** | 0.686871 | Ready to Submit | -- | — |
-| — | **v051** | 0.686628 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 
@@ -135,30 +135,38 @@ justified shipping a large one.
 
 ## Extreme cases and how they change how you read this table
 
-1. **Four distinct models, and local ranking still does not predict public.** Corrected
-   from an earlier version of this note, which listed six. **v042, v047 and v048 are
-   byte-identical models** — the `state_reset` they differed on never reached the weights — so
-   that table contained one model three times, and the "no skew at all" credit given to v047
-   there was simply false. With the duplicates removed:
+1. **A perfect rank inversion on the state_reset axis — local is not just weak here, it
+   points the wrong way.** Three models, one epoch each, identical seed and data, differing
+   only in `training.state_reset`. All three are **post-patch**, so these are genuinely
+   different models (three distinct weight hashes), not the v042/v047/v048 duplicates:
 
-   | run | change vs v042 | local | public | local rank | public rank |
-   |---|---|---:|---:|---:|---:|
-   | v046 | epochs 3 → 8 | 0.689030 | 0.6598 | **1** | 2 |
-   | v049 | `distill_weight` 2 → 3 | 0.688784 | 0.6598 | 2 | 2 |
-   | v050 | **seed 1338 — the CONTROL** | 0.688599 | 0.6596 | 3 | 4 |
-   | v042 | parent, seed 1337 | 0.688268 | 0.6600 | **4** | **1** |
+   | run | `train sr` | `full_valid_wp` | public |
+   |---|---:|---:|---:|
+   | v051 | 2000 | 0.686628 | **0.6595** |
+   | v053 | 4000 | 0.686871 | 0.6592 |
+   | v052 | 10000 | **0.687051** | 0.6588 |
 
-   Local-to-public correlation is **−0.42 Pearson / −0.40 Spearman** on the four distinct
-   models — essentially unchanged from the −0.41/−0.31 I published over all six. So the
-   conclusion **survives** the correction even though the evidence I originally cited for it was
-   partly one model counted three times. The worst local model is still the best public model.
+   - local order (best first): **v052 → v053 → v051**
+   - public order (best first): **v051 → v053 → v052**
+   - Spearman(local, public) = **−1.000**, a *perfect* inversion
 
-   - public spread, all four: **0.0004**
-   - public spread, v042 vs v050 alone (*identical recipe, different seed*): **0.0004**
-   - **the seed pair accounts for 100% of the batch's entire public range**
+   Two things at once. First, the axis is **live publicly**: the 0.0007 spread is 1.7× the
+   0.0004 seed noise, so these are genuinely different on the board — unlike the previous
+   batch, where the seed pair alone explained 100% of the range. Second, and this is the
+   important half, **the better a model looks locally the worse it scores publicly.** The
+   local best (v052) is the public worst, and vice versa.
 
-   *Rule: with the public spread at or below seed noise, `full_valid_wp` cannot select a model
-   here. Stop paying for local runs whose effect is smaller than 0.0004.*
+   *Caveat, stated because n=3 cannot carry much:* a perfect inversion on three points is
+   1-in-6 under random ordering, so on its own it is not significant. It matters because it
+   is the **fourth independent measurement pointing the same way** — v041/v043 (+5.2σ gain →
+   −0.0001), the v046/v049/v050/v042 quartet (−0.42 Pearson on four distinct models), and now
+   this. The consistent finding is not a correlation coefficient; it is that **local
+   differences below ~0.001 carry no usable information about public score, and past ~0.0005
+   they may actively mislead.**
+
+   *Rule: do not select on `full_valid_wp` at this scale. When candidates are within a few
+   thousandths, submit several and let the board choose — we have 5 submissions/day and no
+   local method for telling them apart.*
 
 2. **Now that the state is actually carried, the axis is live — and train/serve parity is the
    optimum.** v051 / v053 / v052 are the sweep that v042/v047/v048 were believed to be, on the
