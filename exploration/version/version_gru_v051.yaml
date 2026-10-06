@@ -200,8 +200,8 @@ results:
   best_val_t0: 0.7728810322341705
   best_val_t1: 0.7133410686746112
   full_valid_wp: 0.6866280548739381
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 42.83
+  latency_us_p99: 59.08
   train_hours: 1.6865
   finished_utc: '2026-10-05T18:47:23Z'
   note: Divergence proof for the state-carry patch. 1 epoch on purpose -- the question
@@ -210,4 +210,4 @@ results:
 artifacts:
   log: exploration/logs/log_gru_v051.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v051
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v051
