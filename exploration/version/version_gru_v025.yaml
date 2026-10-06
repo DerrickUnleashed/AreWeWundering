@@ -12,7 +12,7 @@ hypothesis: The one lever we have never combined with distillation is EPOCH COUN
   on top of his cited batch size. v022/v023 ran 3 epochs; his notes say 5. Everything
   else is v023, which is our best entry (0.6568 public) and which the public board
   showed is TIED with the 42%-larger v022, so student size is settled and is not where
-  the remaining 0.0109 to 0.6677 lives. This tests whether training LONGER on the
+  the remaining 0.0109 to 0.6711 lives. This tests whether training LONGER on the
   same teacher closes any of it, at a cost of ~2.5 h rather than the ~8 h it would
   have taken before the batch-64 speedup.
 change_vs_parent: batch_sequences 16 -> 64 and epochs 3 -> 5. Same hidden 128, same
