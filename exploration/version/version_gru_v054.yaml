@@ -201,8 +201,8 @@ results:
   best_val_t0: 0.6936996286541338
   best_val_t1: 0.7003931275601221
   full_valid_wp: 0.6881512274207179
-  latency_us_p50: null
-  latency_us_p99: null
+  latency_us_p50: 40.37
+  latency_us_p99: 95.25
   train_hours: 16.1094
   finished_utc: '2026-10-06T09:20:34Z'
   note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
@@ -211,4 +211,4 @@ results:
 artifacts:
   log: exploration/logs/log_gru_v054.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v054
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v054
