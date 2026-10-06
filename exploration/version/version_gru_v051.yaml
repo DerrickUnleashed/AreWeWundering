@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v051
   parent: gru_v042
-  status: running
+  status: finished
 description: 'PROOF RUN. v042 recipe, identical except training.state_reset=2000,
   on the patched trainer that actually carries recurrent state across chunks. TRUNCATED
   TO 1 EPOCH: a divergence proof, not a score run.'
@@ -195,15 +195,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: null
-  best_val_wp: null
-  best_val_t0: null
-  best_val_t1: null
-  full_valid_wp: null
+  best_step: 13258
+  best_val_wp: 0.7431110504543909
+  best_val_t0: 0.7728810322341705
+  best_val_t1: 0.7133410686746112
+  full_valid_wp: 0.6866280548739381
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: null
-  finished_utc: null
+  train_hours: 1.6865
+  finished_utc: '2026-10-05T18:47:23Z'
   note: Divergence proof for the state-carry patch. 1 epoch on purpose -- the question
     is whether the WEIGHTS differ between state_reset 2000 and 10000, not what they
     score. Before the patch they came out byte-identical and the two runs were duplicates.
