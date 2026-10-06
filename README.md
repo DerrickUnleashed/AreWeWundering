@@ -94,12 +94,12 @@ which is **not** comparable to the public column.
 | 46 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
 | 47 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
 | 48 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| — | **v054** | 0.688151 | Ready to Submit | -- | — |
 | — | **v052** | 0.687051 | Ready to Submit | -- | — |
 | — | **v053** | 0.686871 | Ready to Submit | -- | — |
 | — | **v051** | 0.686628 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
-| — | **v054** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -109,6 +109,29 @@ student stays near 225k parameters and why a good local score alone never
 justified shipping a large one.
 
 <!-- END GENERATED: public-score ranking -->
+
+> ### The fix landed, and it was worth nothing — which is the useful part
+>
+> **v054 is v042's recipe exactly**, on the patched trainer, with training context matched
+> to serving (4000 = 4000), full three epochs:
+>
+> | | train context | `full_valid_wp` |
+> |---|---|---:|
+> | v042 (unpatched) | 1,000 | 0.688268 |
+> | v054 (patched) | 4,000 | 0.688151 |
+> | | | **−0.000117 (−0.7σ)** |
+>
+> **A null.** The 4× train/serve memory mismatch cost nothing at this recipe. So the plateau
+> at ~0.660 is **not** explained by the bug, and the model was never context-limited the way
+> the mismatch implied — surprising, given the target's 0.977 lag-1 autocorrelation.
+>
+> What the fix *was* worth is correctness, and it unblocked a dead axis: `training.state_reset`
+> now moves the weights, where before it was inert. v054 is also the first bundle whose model
+> trained with the state actually carrying, and it is the matched-horizon control any future
+> `state_reset` run should be measured against.
+>
+> Not claimed: that longer horizons are useless. v054 tested 4000; the one-epoch sweep put
+> 10000 best on full validation, and that arm was never run at length.
 
 ## Extreme cases and how they change how you read this table
 
