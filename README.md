@@ -22,10 +22,15 @@ memory for every submission are in `exploration/leaderboard.json`.
 >    **byte-identical** to v042. About **24 of the last 35 GPU-hours produced one model.**
 >
 > It was found because an ensemble probe returned three models with identical scores to six
-> decimal places, which should not happen for three different runs. Fixed, with divergence
-> proofs in v051/v052/v053. **The scores below are real measurements of the models as shipped,
-> but they describe a system that was not the one we believed we were optimising.** Full
-> detail in [RESUME.md](RESUME.md).
+> decimal places, which should not happen for three different runs.
+>
+> **It is now fixed and proven.** v051 / v053 / v052 — the same three configs — produced
+> three **distinct** models for the first time, and `training.state_reset` finally moves the
+> weights. So every score above was produced by a model trained in a way we did not believe
+> we were training, and the fix invalidates the reasoning behind most of the closed axes.
+>
+> Full detail, including the two false alarms I produced on the way (both my own test
+> errors, not faults in the code), is in [RESUME.md](RESUME.md).
 
 ## Public leaderboard
 
@@ -89,11 +94,12 @@ which is **not** comparable to the public column.
 | 46 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
 | 47 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
 | 48 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| — | **v052** | 0.687051 | Ready to Package | -- | — |
+| — | **v053** | 0.686871 | Ready to Package | -- | — |
+| — | **v051** | 0.686628 | Ready to Package | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
-| — | **v051** | -- | Training | -- | — |
-| — | **v052** | -- | Training | -- | — |
-| — | **v053** | -- | Training | -- | — |
+| — | **v054** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -106,34 +112,51 @@ justified shipping a large one.
 
 ## Extreme cases and how they change how you read this table
 
-1. **Five different changes produced exactly the range that re-rolling the seed does.**
-   Six runs of one recipe family, all five changes measured against a control:
+1. **Four distinct models, and local ranking still does not predict public.** Corrected
+   from an earlier version of this note, which listed six. **v042, v047 and v048 are
+   byte-identical models** — the `state_reset` they differed on never reached the weights — so
+   that table contained one model three times, and the "no skew at all" credit given to v047
+   there was simply false. With the duplicates removed:
 
    | run | change vs v042 | local | public | local rank | public rank |
    |---|---|---:|---:|---:|---:|
-   | v046 | epochs 3 → 8 | 0.689030 | 0.6598 | **1** | 4 |
-   | v049 | `distill_weight` 2 → 3 | 0.688784 | 0.6598 | 2 | 4 |
-   | v048 | train `state_reset` → 10000 | 0.688708 | 0.6600 | 3 | **1** |
-   | v050 | **seed 1338 — the CONTROL** | 0.688599 | 0.6596 | 4 | 6 |
-   | v047 | train = serve = 4000 (**no skew at all**) | 0.688458 | 0.6600 | 5 | **1** |
-   | v042 | parent, seed 1337 | 0.688268 | 0.6600 | **6** | **1** |
+   | v046 | epochs 3 → 8 | 0.689030 | 0.6598 | **1** | 2 |
+   | v049 | `distill_weight` 2 → 3 | 0.688784 | 0.6598 | 2 | 2 |
+   | v050 | **seed 1338 — the CONTROL** | 0.688599 | 0.6596 | 3 | 4 |
+   | v042 | parent, seed 1337 | 0.688268 | 0.6600 | **4** | **1** |
 
-   - public spread of all six: **0.0004**
-   - public spread between v042 and v050 alone, *identical recipe, different seed*: **0.0004**
-   - **The seed pair accounts for 100% of the entire public range of the batch.**
+   Local-to-public correlation is **−0.42 Pearson / −0.40 Spearman** on the four distinct
+   models — essentially unchanged from the −0.41/−0.31 I published over all six. So the
+   conclusion **survives** the correction even though the evidence I originally cited for it was
+   partly one model counted three times. The worst local model is still the best public model.
 
-   So schedule length, both `state_reset` changes, and `distill_weight` 3.0 are each
-   **indistinguishable from changing the seed.** Not "noisy" — indistinguishable. The best
-   local model finished 4th of 6; the *worst* local model tied for best. And the run that
-   closed the `state_reset` skew, which we had every reason to expect to lose, tied for best.
+   - public spread, all four: **0.0004**
+   - public spread, v042 vs v050 alone (*identical recipe, different seed*): **0.0004**
+   - **the seed pair accounts for 100% of the batch's entire public range**
 
-   Local-to-public correlation over the six is **−0.41 Pearson / −0.31 Spearman**. With n=6
-   that is weak evidence on its own and I would not claim it. The claim that is solid is the
-   seed pair: one config, two seeds, 0.0004 apart publicly, equal to the whole batch range.
+   *Rule: with the public spread at or below seed noise, `full_valid_wp` cannot select a model
+   here. Stop paying for local runs whose effect is smaller than 0.0004.*
 
-   *Rule: with the public spread at or below seed noise, `full_valid_wp` cannot select a
-   model here, and neither can any of these four levers. Stop paying for local runs whose
-   effect is smaller than 0.0004, and stop spending submissions on differences inside it.*
+2. **Now that the state is actually carried, the axis is live — and train/serve parity is the
+   optimum.** v051 / v053 / v052 are the sweep that v042/v047/v048 were believed to be, on the
+   patched trainer. Three **distinct** weight hashes where there was one model before:
+
+   | run | `training.state_reset` | weight md5 | subset WP (20 seq) |
+   |---|---:|---|---:|
+   | v051 | 2000 | `c0c7a09fe1df` | 0.743111 |
+   | **v053** | **4000** | `b6e7e333cc42` | **0.745197** |
+   | v052 | 10000 | `6c78235a5ce1` | 0.744482 |
+
+   **4000 is `inference.state_reset` — the horizon the model is served on.** Both shorter and
+   longer training horizons are worse, spread 0.002086 ≈ 13σ. So the train/serve memory
+   relationship is not a defect to minimise: **parity is the optimum.**
+
+   *Caveat, and it cuts against the subset reading.* On **full** validation the same three runs
+   order the other way — v052 (10000) 0.687051 > v053 (4000) 0.686871 > v051 (2000) 0.686628 —
+   monotonic in `state_reset` rather than an inverted U, and a spread of 0.000423 ≈ 2.7σ. Two
+   different metrics, two different shapes, from the same three models. That disagreement is
+   unresolved, and with a 2.7σ full-validation spread against a 0.0004 public seed noise,
+   **none of it is yet strong enough to act on.**
 
 2. **This falsifies what we concluded from v041 and v043 alone.** After those two scored we
    wrote that local *gains* never transfer while local *losses* arrive amplified, and
