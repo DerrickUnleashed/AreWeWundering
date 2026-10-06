@@ -23,7 +23,7 @@ hypothesis: 'The local-to-public offset is NOT a constant, and it moves with tra
   So combine the two things that are known to help. v028 has the best local score
   in the project (0.686510, +11.5 sigma) and carries the standard offset. v025 demonstrates
   a +0.0024 public uplift from training longer. If the two compose, the prediction
-  is 0.6585 + 0.0024 = 0.6609, against a 0.6711 leader where we currently sit 0.0092
+  is 0.6585 + 0.0024 = 0.6609, against a 0.6711 leader where we currently sit 0.0102
   back.
 
   Falsifiable and stated as such: this predicts a public score near 0.6609. If the
