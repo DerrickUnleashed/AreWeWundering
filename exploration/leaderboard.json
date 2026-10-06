@@ -453,5 +453,14 @@
     "uploaded_filename": "submission_gru_v052.zip",
     "outcome": "SCORED",
     "note": "train state_reset 10000, ONE epoch, patched trainer. Publicly the WORST of the three and locally the BEST (0.687051) -- and the best of the three on FULL validation locally too. The completion of a PERFECT rank inversion: local order v052 > v053 > v051, public order exactly reversed."
+  },
+  "v054": {
+    "public_score": 0.6597,
+    "grader_seconds": 2727,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-06T16:08Z",
+    "uploaded_filename": "submission_gru_v054.zip",
+    "outcome": "SCORED",
+    "note": "The state-carry FIX, priced publicly. v042's exact recipe on the patched trainer, with training context matched to serving at 4000. Local full_valid_wp 0.688151 vs v042's 0.688268, i.e. -0.000117 (-0.7 sigma) -- a NULL. Public 0.6597 vs 0.6600, i.e. -0.0003 against a 0.0004 seed noise -- ALSO a null. This is the ONLY axis in the project where the local metric and the public board agreed, and they agreed that nothing happened. Distinct weights from v042 (unlike v047/v048 which were byte-identical duplicates), so this is a clean measurement of a genuinely different model. Duration 45m27s = 76% of budget, against v042's 44m31s = 74%, consistent with the identical 225,922 params."
   }
 }
