@@ -119,15 +119,15 @@ which is **not** comparable to the public column.
 | 50 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
 | 51 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
 | 52 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| — | **v059** | 0.688676 | Ready to Submit | -- | — |
+| — | **v055** | 0.688667 | Ready to Submit | -- | — |
+| — | **v057** | 0.688293 | Ready to Package | -- | — |
+| — | **v058** | 0.688032 | Ready to Package | -- | — |
+| — | **v056** | 0.687772 | Ready to Package | -- | — |
+| — | **v061** | 0.687064 | Ready to Package | -- | — |
+| — | **v060** | 0.686824 | Ready to Package | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
-| — | **v055** | -- | Training | -- | — |
-| — | **v056** | -- | Training | -- | — |
-| — | **v057** | -- | Training | -- | — |
-| — | **v058** | -- | Training | -- | — |
-| — | **v059** | -- | Training | -- | — |
-| — | **v060** | -- | Training | -- | — |
-| — | **v061** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -194,31 +194,42 @@ first weight matrix** — mathematically redundant, not merely unhelpful.
 earned its place — v007 did not beat its base. It is defensible as genuine nonlinear feature
 engineering, not as a measured win. It was never re-validated at length.
 
-## In flight — seven concurrent runs
+## The optimiser sweep is over — and the subset picked the exact inverse of the winner
 
-**The optimiser sweep.** Across 57 versions `lr`, `weight_decay`, `grad_clip` and `schedule`
-were **never varied** (`lr` 0.002 in 57/57, `grad_clip` 1.0 in 57/57, cosine 57/57,
-`weight_decay` 0.01 in 56). That is the largest untouched surface in the project, so it is now
-open. All five branch from **v054** and each is a verified single-variable change.
+Seven runs, all finished. Graded on the **official** metric (`full_valid_wp`, all 1,873
+sequences, ±0.0003) against v054's 0.688151 — **not** on the 200-sequence subset:
 
-| run | change vs v054 | params | prior |
-|---|---|---:|---|
-| **v057** | `grad_clip` 1.0 → 5.0 | 225,922 | 25.8% of steps are currently rescaled by 1/‖g‖; at 5.0 only 0.5% are |
-| **v058** | `weight_decay` 0.01 → **1e-4** | 225,922 | the decay axis has only ever been walked toward *worse* (v038) |
-| **v059** | `lr` 0.002 → 0.001 | 225,922 | never moved in 57 versions |
-| **v060** | `layers` 2 → 1 | 126,850 | capacity *reduction*; inherits the bad capacity prior |
-| **v061** | head `GELU` → `ReLU` | 238,914 | cleanest of the set — identical params, FLOPs and latency, only the nonlinearity differs |
+| run | change | `full_valid_wp` | Δ | σ | *subset Δ* | *subset σ* |
+|---|---|---:|---:|---:|---:|---:|
+| **v059** | `lr` 0.002 → 0.001 | **0.688676** | +0.000524 | **+3.3** | −0.000968 | −6.1 |
+| **v055** | `state_reset` 10000 | **0.688667** | +0.000516 | **+3.2** | +0.000062 | +0.4 |
+| v057 | `grad_clip` → 5.0 | 0.688293 | +0.000141 | +0.9 | −0.000944 | −5.9 |
+| v058 | `weight_decay` → 1e-4 | 0.688032 | −0.000119 | −0.7 | −0.000439 | −2.8 |
+| v056 | regularisation | 0.687772 | −0.000379 | −2.4 | −0.000540 | −3.4 |
+| v061 | head GELU → ReLU | 0.687064 | −0.001088 | −6.8 | −0.000065 | −0.4 |
+| v060 | `layers` 2 → 1 | 0.686824 | −0.001328 | **−8.3** | +0.000974 | **+6.1** |
 
-**v061 branches from v056, not v054** — v054's head is a plain `Linear` with no activation, so
-there is nothing to swap. v056 is the only model with a real GELU head.
+**Read the last two columns. The subset and the official metric disagree about the entire
+ranking, and not gently:**
 
-**Also running:** v055 (`state_reset` 10000, full length) and v056 (regularisation: dropout +
-BatchNorm head).
+- **v060 was the subset's clear winner** (+6.1σ, monotonically strengthening across four
+  measurement rounds) and is the **worst model in the sweep** officially (−8.3σ).
+- **v059 was the subset's worst** (−6.1σ, and I twice recommended killing it on that basis)
+  and is the **best** officially (+3.3σ).
 
-Honest expectation, recorded before any result arrives: **all five are hygiene, not a
-breakthrough.** v038's weight-decay change moved −0.0005 local / −0.0004 public. We are chasing
-a **0.0111** gap, and the whole set together is unlikely to move more than ~0.001. They are
-worth running because the surface has never been touched, not because they are likely to win.
+**v060 would have shipped as the worst model we produced.** This is the fifth independent
+measurement of subset/full divergence here and by far the largest. Had the 200-sequence subset
+been the selector — as it was for the entire sweep — the sweep would have concluded that
+removing a recurrent layer was the biggest win of the project.
+
+Also settled: **the optimiser surface is dead.** Four of five untouched knobs came back null or
+negative, and three got *worse* as data accumulated. `lr`, `weight_decay`, `grad_clip` and
+`schedule` sat frozen for 57 versions, and that turned out to be the right call by accident.
+
+**Packaged:** v059 and v055, both `STATUS: PASS`, p50 **39.92 / 39.96 µs/row on an idle
+machine** (all seven runs had finished). They differ by 0.000009 — indistinguishable — so the
+choice between them gets made on the public board, which is the only place that difference is
+visible at all.
 
 ## Extreme cases and how they change how you read this table
 
