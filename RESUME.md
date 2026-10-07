@@ -41,23 +41,23 @@ reference metric in `tools/metric_ref.py`.
 | 10 | **v050** | v042's EXACT recipe at seed 1338 instead of... | 0.688599 | Submitted | 0.6596 | 45m57s (77%) | 628 MB |
 | 11 | **v047** | v042 with training.state_reset 2000 ->... | 0.688458 | Submitted | 0.6600 | 50m32s (84%) | 628 MB |
 | 12 | **v037** | v031's exact recipe at 8 epochs instead of 3 | 0.688370 | Submitted | 0.6592 | 48m06s (80%) | 628 MB |
-| 13 | **v057** | v054 EXACTLY with ONE change:... | 0.688293 | Yet to package | -- | -- | -- |
+| 13 | **v057** | v054 EXACTLY with ONE change:... | 0.688293 | Ready to Submit | -- | 42m12s (70%) | -- |
 | 14 | **v042** | v039 with a THREE-member teacher: dozken... | 0.688268 | Submitted | 0.6600 | 44m31s (74%) | 628 MB |
 | 15 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Submitted | 0.6594 | 47m42s (80%) | 628 MB |
 | 16 | **v054** | v042 recipe EXACTLY, on the patched... | 0.688151 | Submitted | 0.6597 | 45m27s (76%) | 628 MB |
-| 17 | **v058** | v054 EXACTLY with ONE change:... | 0.688032 | Yet to package | -- | -- | -- |
+| 17 | **v058** | v054 EXACTLY with ONE change:... | 0.688032 | Ready to Submit | -- | 42m00s (70%) | -- |
 | 18 | **v043** | v039 with ONLY dozken reset4k as teacher,... | 0.687944 | Submitted | 0.6569 | 45m52s (76%) | 628 MB |
-| 19 | **v056** | v054's recipe with the REGULARISATION/HEAD... | 0.687772 | Yet to package | -- | -- | -- |
+| 19 | **v056** | v054's recipe with the REGULARISATION/HEAD... | 0.687772 | Ready to Submit | -- | 44m30s (74%) | -- |
 | 20 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Submitted | 0.6588 | 48m06s (80%) | 628 MB |
 | 21 | **v036** | v031's exact recipe with ONE change:... | 0.687535 | Submitted | 0.6586 | 48m06s (80%) | 629 MB |
 | 22 | **v031** | v028's exact recipe and architecture with... | 0.687376 | Submitted | 0.6587 | 45m41s (76%) | 628 MB |
 | 23 | **v032** | v028's exact recipe -- same architecture,... | 0.687219 | Submitted | 0.6587 | 45m32s (76%) | 628 MB |
 | 24 | **v035** | v031's exact recipe with ONE change: hidden... | 0.687177 | Submitted | 0.6586 | 44m52s (75%) | 626 MB |
-| 25 | **v061** | v056 EXACTLY with ONE change:... | 0.687064 | Yet to package | -- | -- | -- |
+| 25 | **v061** | v056 EXACTLY with ONE change:... | 0.687064 | Ready to Submit | -- | 44m12s (74%) | -- |
 | 26 | **v052** | PROOF RUN | 0.687051 | Submitted | 0.6588 | 44m51s (75%) | 628 MB |
 | 27 | **v030** | v028's exact recipe and architecture with... | 0.686919 | Submitted | 0.6585 | 47m11s (79%) | 629 MB |
 | 28 | **v053** | v042 recipe on the PATCHED trainer with... | 0.686871 | Submitted | 0.6592 | 47m02s (78%) | 628 MB |
-| 29 | **v060** | v054 EXACTLY with ONE change: model.layers... | 0.686824 | Yet to package | -- | -- | -- |
+| 29 | **v060** | v054 EXACTLY with ONE change: model.layers... | 0.686824 | Ready to Submit | -- | 33m06s (55%) | -- |
 | 30 | **v051** | PROOF RUN | 0.686628 | Submitted | 0.6595 | 46m47s (78%) | 628 MB |
 | 31 | **v028** | v023's exact recipe and architecture with... | 0.686510 | Submitted | 0.6585 | 46m52s (78%) | 628 MB |
 | 32 | **v034** | v028's exact recipe with the ONE axis that... | 0.686000 | Submitted | 0.6579 | 47m17s (79%) | 629 MB |
