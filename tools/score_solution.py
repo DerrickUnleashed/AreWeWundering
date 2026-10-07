@@ -136,12 +136,22 @@ def offline_predict(offline_script, offline_config, offline_checkpoint, parquet_
     # Read it from the CHECKPOINT's own config first so it tracks whatever the run
     # actually trained, falling back to the yaml only if the checkpoint predates it.
     _ck_cfg = st.get('config') or {}
-    _head = ((_ck_cfg.get('model') or {}).get('head_hidden')
-             or cfg['model'].get('head_hidden') or 192)
-    model = mod.GRUModel(st['feature_dim'], hidden=cfg['model']['hidden'],
-                         layers=cfg['model']['layers'],
-                         input_proj=cfg['model'].get('input_proj') or 0,
-                         head_hidden=_head)
+    # Prefer the trainer's OWN construction path when it has one. Every knob that
+    # changes the parameter set must come from that path or load_state_dict fails,
+    # and the failure is silent from the outside: the parity check simply produces no
+    # output and the bundle is written NOT-READY, which reads as "not verified" rather
+    # than "the verifier could not build the model". That has now bitten twice -- v034
+    # (head_hidden) and v056/v061 (head_batch_norm, head_dropout, head_layers,
+    # head_activation). Adding a model knob without teaching this about it is the bug.
+    _mcfg = dict(cfg['model'])
+    _mcfg.update(_ck_cfg.get('model') or {})
+    if hasattr(mod, 'build_model'):
+        model = mod.build_model(_mcfg, st['feature_dim'])
+    else:
+        model = mod.GRUModel(st['feature_dim'], hidden=_mcfg['hidden'],
+                             layers=_mcfg['layers'],
+                             input_proj=_mcfg.get('input_proj') or 0,
+                             head_hidden=_mcfg.get('head_hidden') or 192)
     model.load_state_dict(st['model'])
     model.eval()
     out = {}
