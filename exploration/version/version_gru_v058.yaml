@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v058
   parent: gru_v054
-  status: running
+  status: finished
 description: 'v054 EXACTLY with ONE change: optim.weight_decay 0.01 -> 1e-4 (100x
   lower). The optimiser has never been varied in this project -- across 57 versions
   lr, weight_decay, grad_clip and schedule were all fixed. This opens that surface.
@@ -194,15 +194,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.12580253245045128
-  best_val_t0: 0.016892752221108413
-  best_val_t1: -0.268497817122011
-  full_valid_wp: null
+  best_step: 38999
+  best_val_wp: 0.6966990042661909
+  best_val_t0: 0.6930939507236505
+  best_val_t1: 0.7003040578087314
+  full_valid_wp: 0.6880319813445743
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0096
-  finished_utc: '2026-10-06T11:21:42Z'
+  train_hours: 8.8244
+  finished_utc: '2026-10-06T20:12:57Z'
   note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
     matched to serving, full length. Compare against v042 at 0.688268 local / 0.6600
     public.'
