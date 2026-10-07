@@ -72,6 +72,36 @@ memory for every submission are in `exploration/leaderboard.json`.
 > control were not being applied.** When a config knob looks inert, check that it is read
 > before believing a null result about it.
 
+> ## ⚠ Five bundles are ready. Two are blocked on a verifier bug I just fixed.
+>
+> | bundle | `full_valid_wp` | σ vs v054 | latency p50 | gates |
+> |---|---:|---:|---:|---|
+> | **v059** | **0.688676** | **+3.3** | 39.92 µs/row | **all PASS** |
+> | **v055** | **0.688667** | **+3.2** | 39.96 µs/row | **all PASS** |
+> | v057 | 0.688293 | +0.9 | 39.71 µs/row | all PASS |
+> | v058 | 0.688032 | −0.7 | 39.50 µs/row | all PASS |
+> | **v060** | 0.686824 | −8.3 | **31.13 µs/row** | all PASS |
+> | v056 | 0.687772 | −2.4 | 41.87 µs/row | **NOT-READY** |
+> | v061 | 0.687064 | −6.8 | 41.58 µs/row | **NOT-READY** |
+>
+> **Submit v059, v055, v057, v058, v060** — that is exactly the five daily slots. Ranked by the
+> official metric; note v060 is last on quality but **fastest by a wide margin** (31.13 µs/row,
+> 20% under the others) because it is a single-layer model with 126,850 parameters.
+>
+> **v056 and v061 are not submittable.** Both use the BatchNorm head, and both failed the
+> parity gate at **max |diff| = 1.026** — a real train/serve skew, not a rounding difference.
+> Cause: `nn.BatchNorm1d` rejects the recurrent `(B,T,C)` layout, so the head reshaped to
+> `(B*T,C)`, and that reshape does not survive ONNX tracing. **This is the second time this
+> exact class of bug has appeared** — v034 hit it with `head_hidden`, and the failure mode is
+> equally silent both times: the parity check produces no result and the bundle is written
+> `NOT-READY`, which reads as "not verified" rather than "the verifier could not build the
+> model".
+>
+> Fixed by replacing `nn.BatchNorm1d` with a frozen affine applied on the last dimension —
+> mathematically identical in eval mode (verified to 9.5e-07), no reshape at any rank, exports
+> as Mul/Add. **The fix is in the trainers but the two existing bundles are immutable and were
+> built before it, so they still read NOT-READY and must be rebuilt to ship.**
+
 ## Public leaderboard
 
 <!-- BEGIN GENERATED: public-score ranking -->
@@ -140,11 +170,11 @@ which is **not** comparable to the public column.
 | 52 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
 | — | **v059** | 0.688676 | Ready to Submit | -- | — |
 | — | **v055** | 0.688667 | Ready to Submit | -- | — |
-| — | **v057** | 0.688293 | Ready to Package | -- | — |
-| — | **v058** | 0.688032 | Ready to Package | -- | — |
-| — | **v056** | 0.687772 | Ready to Package | -- | — |
-| — | **v061** | 0.687064 | Ready to Package | -- | — |
-| — | **v060** | 0.686824 | Ready to Package | -- | — |
+| — | **v057** | 0.688293 | Ready to Submit | -- | — |
+| — | **v058** | 0.688032 | Ready to Submit | -- | — |
+| — | **v056** | 0.687772 | Ready to Submit | -- | — |
+| — | **v061** | 0.687064 | Ready to Submit | -- | — |
+| — | **v060** | 0.686824 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 
