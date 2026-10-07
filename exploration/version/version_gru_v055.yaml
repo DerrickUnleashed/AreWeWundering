@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v055
   parent: gru_v054
-  status: running
+  status: finished
 description: 'v054''s exact recipe with ONE change: training.state_reset 10000 instead
   of 4000. The one-epoch state_reset sweep put 10000 best on FULL validation (0.687051
   vs 0.686871 vs 0.686628) but that arm was never run at length. Same seed, same architecture,
@@ -194,19 +194,19 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.12581932136987412
-  best_val_t0: 0.016905511851951136
-  best_val_t1: -0.2685441545916994
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.0066
-  finished_utc: '2026-10-06T10:40:39Z'
+  best_step: 39776
+  best_val_wp: 0.6977995787148448
+  best_val_t0: 0.6945658532310589
+  best_val_t1: 0.7010333041986306
+  full_valid_wp: 0.6886673961450368
+  latency_us_p50: 39.96
+  latency_us_p99: 50.62
+  train_hours: 8.2898
+  finished_utc: '2026-10-06T18:58:07Z'
   note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
     matched to serving, full length. Compare against v042 at 0.688268 local / 0.6600
     public.'
 artifacts:
   log: exploration/logs/log_gru_v055.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v055
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v055
