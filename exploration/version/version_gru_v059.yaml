@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v059
   parent: gru_v054
-  status: running
+  status: finished
 description: 'v054 EXACTLY with ONE change: optim.lr 0.002 -> 0.001. The optimiser
   has never been varied in this project -- across 57 versions lr, weight_decay, grad_clip
   and schedule were all fixed. This opens that surface. Graded against wunderfund''s
@@ -194,19 +194,19 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.13601352855833346
-  best_val_t0: 0.004994745953603139
-  best_val_t1: -0.2770218030702701
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.01
-  finished_utc: '2026-10-06T11:22:21Z'
+  best_step: 39776
+  best_val_wp: 0.697524078823294
+  best_val_t0: 0.6941164157007896
+  best_val_t1: 0.7009317419457984
+  full_valid_wp: 0.6886756598066747
+  latency_us_p50: 39.92
+  latency_us_p99: 50.92
+  train_hours: 8.7692
+  finished_utc: '2026-10-06T20:09:41Z'
   note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
     matched to serving, full length. Compare against v042 at 0.688268 local / 0.6600
     public.'
 artifacts:
   log: exploration/logs/log_gru_v059.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v059
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v059
