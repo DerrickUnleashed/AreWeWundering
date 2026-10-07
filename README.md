@@ -10,6 +10,25 @@ memory for every submission are in `exploration/leaderboard.json`.
 
 > ## ⚠ Read this before trusting any number on this page
 >
+> ## ⚠ The metric you are reading is not the one that selects models
+>
+> The 200-sequence periodic-eval subset and the official `full_valid_wp` (all 1,873
+> sequences) **disagree about which model is best — and on the seven-run optimiser sweep they
+> disagreed by a perfect inversion.**
+>
+> | run | official `full_valid_wp` | σ | *subset* σ |
+> |---|---:|---:|---:|
+> | **v059** (`lr` 0.002 → 0.001) | **0.688676** | **+3.3** | −6.1 |
+> | **v060** (`layers` 2 → 1) | 0.686824 | **−8.3** | **+6.1** |
+>
+> **v060 is the worst model in the sweep officially and the best on the subset**, with a subset
+> lead that strengthened monotonically across four measurement rounds. **v059 is the exact
+> mirror.** We were about to package v060 as the winner.
+>
+> **So: only `full_valid_wp` over all 1,873 sequences is a selection signal. Never rank
+> candidates on the periodic-eval subset** — it is 1/9 of the scored rows and roughly 4× noisier.
+> Full detail in edge case 1.
+>
 > **On 2026-10-05 we found that the recurrent state never carried across chunks during
 > training.** The trainer rebuilt the hidden state as zeros every step and discarded the
 > state the GRU returned, so the model saw at most **1,000 steps** of history while serving
@@ -233,7 +252,35 @@ visible at all.
 
 ## Extreme cases and how they change how you read this table
 
-1. **A perfect rank inversion on the state_reset axis — local is not just weak here, it
+1. **The 200-sequence subset is not a preview of the official metric. On the seven-run
+   optimiser sweep it selected the exact inverse of the winner.** This is the most important
+   entry on this page, and it is worse than the public/local disagreement below because both
+   numbers are *local* — it breaks the check you would fall back on when the public board is
+   unavailable.
+
+   | run | change | `full_valid_wp` (official) | σ | *subset* | *σ* |
+   |---|---|---:|---:|---:|---:|
+   | **v059** | `lr` 0.002 → 0.001 | **0.688676** | +3.3 | 0.687708 | −6.1 |
+   | **v055** | `state_reset` 10000 | **0.688667** | +3.2 | 0.688213 | +0.4 |
+   | v057 | `grad_clip` → 5.0 | 0.688293 | +0.9 | 0.687247 | −5.9 |
+   | v058 | `weight_decay` → 1e-4 | 0.688032 | −0.7 | 0.687712 | −2.8 |
+   | v056 | regularisation | 0.687772 | −2.4 | 0.687611 | −3.4 |
+   | v061 | head GELU → ReLU | 0.687064 | −6.8 | 0.688086 | −0.4 |
+   | **v060** | `layers` 2 → 1 | 0.686824 | **−8.3** | **+6.1** | **+6.1** |
+
+   **v060 is the worst model in the sweep on the official metric and the best on the subset** —
+   and its subset lead strengthened monotonically across four measurement rounds (+3.6σ →
+   +4.2σ → +6.0σ → +6.1σ), which is exactly the shape of a real effect. **v059 is the mirror
+   image**, and was the subset's worst at every reading.
+
+   We were about to package v060 as the sweep's winner. Selecting on the subset would have
+   shipped the worst model this project produced.
+
+   *Rule: **only `full_valid_wp` over all 1,873 sequences is a selection signal.** The 200-seq
+   periodic-eval subset is for watching a run progress and nothing else — it is 1/9 of the
+   scored rows and its noise floor is ~4× looser. Never rank candidates on it.*
+
+2. **A perfect rank inversion on the state_reset axis — local is not just weak here, it
    points the wrong way.** Three models, one epoch each, identical seed and data, differing
    only in `training.state_reset`. All three are **post-patch**, so these are genuinely
    different models (three distinct weight hashes), not the v042/v047/v048 duplicates:
@@ -266,7 +313,7 @@ visible at all.
    thousandths, submit several and let the board choose — we have 5 submissions/day and no
    local method for telling them apart.*
 
-2. **Now that the state is actually carried, the axis is live — and train/serve parity is the
+3. **Now that the state is actually carried, the axis is live — and train/serve parity is the
    optimum.** v051 / v053 / v052 are the sweep that v042/v047/v048 were believed to be, on the
    patched trainer. Three **distinct** weight hashes where there was one model before:
 
@@ -287,7 +334,7 @@ visible at all.
    unresolved, and with a 2.7σ full-validation spread against a 0.0004 public seed noise,
    **none of it is yet strong enough to act on.**
 
-2. **This falsifies what we concluded from v041 and v043 alone.** After those two scored we
+4. **This falsifies what we concluded from v041 and v043 alone.** After those two scored we
    wrote that local *gains* never transfer while local *losses* arrive amplified, and
    treated it as a settled asymmetry. Four more submissions refuted it: v044's +10.3σ
    delivered +0.0005 publicly (a partial transfer, roughly a third of the local size), and
@@ -297,7 +344,7 @@ visible at all.
    *Rule: a conclusion drawn from two data points that four more data points contradict is
    a hypothesis, not a finding. This is the same mistake as the v039 teacher premise.*
 
-3. **Every latency `NOT-READY` verdict on a good model was wrong — including the one we
+5. **Every latency `NOT-READY` verdict on a good model was wrong — including the one we
    almost enforced.** Five times a bundle was rejected by the gate and five times it shipped
    fine. v028 was marked `NOT-READY` at a projected 120% and ran at **78%**. **v045** was
    called `Marginal (93% of budget)` and we discussed hard-blocking it; it ran in **55m37s
@@ -306,7 +353,7 @@ visible at all.
    runs were using the machine**. *Rule: never gate on a latency number taken under load,
    and never hard-block a model on a projection when the only evidence is local.*
 
-4. **Our own premises have been wrong in ways only measurement exposed — three times.**
+6. **Our own premises have been wrong in ways only measurement exposed — three times.**
    v039's teacher-vs-student claim compared our subset metric against another competitor's
    held-out set; measured properly the teacher was **+0.0057 better than our student**,
    inverting the assumption. Both hypotheses that followed died as nulls (capacity +0.5σ, a
@@ -315,7 +362,7 @@ visible at all.
    comparison is only evidence if both numbers come from the same rows and scale; and a null
    result refutes the hypothesis it tested, not the neighbouring one.*
 
-5. **The submission path is not the bottleneck, and the grader is not adversarial.** All 43
+7. **The submission path is not the bottleneck, and the grader is not adversarial.** All 43
    of our submissions that reached the grader produced a number except the two that timed
    out at 117% of budget; peak memory across the whole project is 634 MB against a 16 GB
    allowance. Every result in this table came from a bundle that passed contract,
