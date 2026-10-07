@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v061
   parent: v056
-  status: running
+  status: finished
 description: 'v056 EXACTLY with ONE change: model.head_activation gelu -> relu. v056
   is the reference because it is the only model in the project with a real multi-layer
   GELU head, so the activation is a genuine A/B rather than a comparison against a
@@ -199,15 +199,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.020808484666023544
-  best_val_t0: 0.03483240355491678
-  best_val_t1: -0.07644937288696387
-  full_valid_wp: null
+  best_step: 29999
+  best_val_wp: 0.697190588475306
+  best_val_t0: 0.6930041626436659
+  best_val_t1: 0.7013770143069461
+  full_valid_wp: 0.6870635755936626
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0099
-  finished_utc: '2026-10-06T11:23:21Z'
+  train_hours: 9.0644
+  finished_utc: '2026-10-06T20:27:28Z'
   note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
     matched to serving, full length. Compare against v042 at 0.688268 local / 0.6600
     public.'
