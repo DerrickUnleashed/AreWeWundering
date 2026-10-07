@@ -523,7 +523,7 @@ class GRUModel(nn.Module):
             # stays causal (no window statistics) and exports as a plain
             # BatchNormalization node.
             if head_batch_norm:
-                blocks.append(nn.BatchNorm1d(head_hidden))
+                blocks.append(FrozenBatchNorm1d(head_hidden))
             blocks.append(act())
             if head_dropout:
                 blocks.append(nn.Dropout(head_dropout))
@@ -547,12 +547,7 @@ class GRUModel(nn.Module):
         cat = torch.cat([y, z_proj], dim=-1)
         h = self.head_ln(cat)
         for blk in self.head_blocks:
-            # BatchNorm1d needs a 2-D (N, C) input; keep the trailing dims aside.
-            if isinstance(blk, nn.BatchNorm1d):
-                shp = h.shape
-                h = blk(h.reshape(-1, shp[-1])).view(shp)
-            else:
-                h = blk(h)
+            h = blk(h)
         return self.head_fc_out(h)
 
     def forward_chunk(self, x, h):
@@ -587,6 +582,35 @@ def build_model(mcfg, in_dim):
         head_dropout=float(mcfg.get('head_dropout', 0.0)),
         head_activation=str(mcfg.get('head_activation') or 'gelu'),
     )
+
+
+class FrozenBatchNorm1d(nn.Module):
+    """BatchNorm1d frozen to its learned affine and applied on the LAST dimension.
+
+    WHY THIS EXISTS INSTEAD OF nn.BatchNorm1d. BatchNorm1d rejects the recurrent
+    (B, T, C) layout, so the obvious workaround is reshaping to (B*T, C) and back. That
+    reshape does not survive ONNX tracing: the traced `h.shape` fed to `.view(shp)`
+    produces a graph whose row-by-row serving path disagrees with the chunked offline path.
+    It showed up as a parity failure of max |diff| = 1.026 on v056 and v061 -- a silent
+    train/serve skew that no shape check would have caught.
+
+    In eval mode BatchNorm IS exactly an affine map, so apply that affine directly. No
+    reshape at any rank, exports as Mul/Add, and is bit-identical between chunked training
+    evaluation and row-by-row serving. The running statistics stay causal: they are frozen
+    constants learned at training time, never computed from the data being served.
+    """
+
+    def __init__(self, c, eps=1e-5):
+        super().__init__()
+        self.eps = eps
+        self.register_buffer('weight', torch.ones(c))
+        self.register_buffer('bias', torch.zeros(c))
+        self.register_buffer('running_mean', torch.zeros(c))
+        self.register_buffer('running_var', torch.ones(c))
+
+    def forward(self, x):
+        scale = self.weight / torch.sqrt(self.running_var + self.eps)
+        return x * scale + (self.bias - self.running_mean * scale)
 
 
 class StepGraph(nn.Module):
