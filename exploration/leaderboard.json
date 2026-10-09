@@ -462,5 +462,68 @@
     "uploaded_filename": "submission_gru_v054.zip",
     "outcome": "SCORED",
     "note": "The state-carry FIX, priced publicly. v042's exact recipe on the patched trainer, with training context matched to serving at 4000. Local full_valid_wp 0.688151 vs v042's 0.688268, i.e. -0.000117 (-0.7 sigma) -- a NULL. Public 0.6597 vs 0.6600, i.e. -0.0003 against a 0.0004 seed noise -- ALSO a null. This is the ONLY axis in the project where the local metric and the public board agreed, and they agreed that nothing happened. Distinct weights from v042 (unlike v047/v048 which were byte-identical duplicates), so this is a clean measurement of a genuinely different model. Duration 45m27s = 76% of budget, against v042's 44m31s = 74%, consistent with the identical 225,922 params."
+  },
+  "v059": {
+    "public_score": 0.66,
+    "grader_seconds": 2671,
+    "memory_mb": 633,
+    "submitted_utc": "2026-10-07T00:04Z",
+    "uploaded_filename": "submission_v059.zip",
+    "outcome": "SCORED",
+    "note": "lr halved. TIES OUR BEST PUBLIC SCORE. full_valid_wp 0.688676, +3.3 sigma vs v054 -- the best official-metric result of the sweep. Was the WORST of the seven on the 200-seq subset, so selecting on the subset would have discarded it."
+  },
+  "v055": {
+    "public_score": 0.6598,
+    "grader_seconds": 2657,
+    "memory_mb": 629,
+    "submitted_utc": "2026-10-07T00:04Z",
+    "uploaded_filename": "submission_v055.zip",
+    "outcome": "SCORED",
+    "note": "state_reset 10000. Second on the official metric (0.688667) and second on public (0.6598) -- the two metrics agreed on the ordering here, unlike the subset."
+  },
+  "v057": {
+    "public_score": 0.6597,
+    "grader_seconds": 2646,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-07T00:10Z",
+    "uploaded_filename": "submission_v057.zip",
+    "outcome": "SCORED",
+    "note": "grad_clip 5.0. Third officially and third publicly. The most consistent run of the sweep across both metrics."
+  },
+  "v058": {
+    "public_score": 0.6592,
+    "grader_seconds": 2802,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-07T00:10Z",
+    "uploaded_filename": "submission_v058.zip",
+    "outcome": "SCORED",
+    "note": "weight_decay 1e-4. Null officially (-0.7 sigma), fourth publicly."
+  },
+  "v056": {
+    "public_score": 0.6591,
+    "grader_seconds": 3037,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-07T00:09Z",
+    "uploaded_filename": "submission_v056.zip",
+    "outcome": "SCORED",
+    "note": "REGULARISATION. Submitted despite gate parity FAIL (max |diff| 1.026, a real train/serve skew in the BatchNorm head). It still ran and scored, which is the finding: the NOT-READY gate does NOT block upload. Model served is not the model trained."
+  },
+  "v060": {
+    "public_score": 0.6591,
+    "grader_seconds": 2291,
+    "memory_mb": 626,
+    "submitted_utc": "2026-10-07T00:10Z",
+    "uploaded_filename": "submission_v060.zip",
+    "outcome": "SCORED",
+    "note": "layers 2 -> 1. WORST officially (-8.3 sigma) but sixth of seven publicly and TIED with v056 at 0.6591. Also the FASTEST submission at 38m11s = 64% of budget, 126,850 params."
+  },
+  "v061": {
+    "public_score": 0.6572,
+    "grader_seconds": 2976,
+    "memory_mb": 629,
+    "submitted_utc": "2026-10-07T00:10Z",
+    "uploaded_filename": "submission_v061.zip",
+    "outcome": "SCORED",
+    "note": "head GELU -> ReLU. Submitted despite the same parity FAIL as v056, and scored WORST of all seven (0.6572). The broken head cost about 0.0029 against v055, the nearest comparable."
   }
 }
