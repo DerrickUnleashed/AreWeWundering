@@ -525,5 +525,14 @@
     "uploaded_filename": "submission_v061.zip",
     "outcome": "SCORED",
     "note": "head GELU -> ReLU. Submitted despite the same parity FAIL as v056, and scored WORST of all seven (0.6572). The broken head cost about 0.0029 against v055, the nearest comparable."
+  },
+  "v062": {
+    "public_score": 0.6587,
+    "grader_seconds": 2737,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-10T15:20Z",
+    "uploaded_filename": "submission_gru_v062.zip",
+    "outcome": "SCORED",
+    "note": "THE STACKING FAILURE, submitted to confirm it. v054's recipe with all three sweep winners stacked: lr 0.002->0.001, grad_clip 1.0->5.0, training.state_reset 4000->10000. Local full_valid_wp 0.687990, i.e. -0.000161 (-1.0 sigma) vs v054 and -0.000686 vs v059, against a pre-registered additive prediction of 0.689332 (+7.4 sigma). Public 0.6587, LAST of the three, which is exactly where full_valid_wp ranked it. Confirms both the negative result and, again, that the official metric predicts the board. Duration 45m37s = 76%."
   }
 }
