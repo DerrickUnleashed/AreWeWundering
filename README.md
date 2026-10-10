@@ -179,8 +179,10 @@ which is **not** comparable to the public column.
 | 57 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
 | 58 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
 | 59 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| — | **v062** | 0.687990 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
+| — | **v063** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -247,42 +249,56 @@ first weight matrix** — mathematically redundant, not merely unhelpful.
 earned its place — v007 did not beat its base. It is defensible as genuine nonlinear feature
 engineering, not as a measured win. It was never re-validated at length.
 
-## The optimiser sweep is over — and the subset picked the exact inverse of the winner
+## After the sweep: stacking failed, and that is the useful part
 
-Seven runs, all finished. Graded on the **official** metric (`full_valid_wp`, all 1,873
-sequences, ±0.0003) against v054's 0.688151 — **not** on the 200-sequence subset:
+**v062 stacked the three sweep winners** — `lr` 1e-3, `state_reset` 10000, `grad_clip` 5.0 —
+on top of v054. The prediction was written into the yaml **before** the run:
 
-| run | change | `full_valid_wp` | Δ | σ | *subset Δ* | *subset σ* |
-|---|---|---:|---:|---:|---:|---:|
-| **v059** | `lr` 0.002 → 0.001 | **0.688676** | +0.000524 | **+3.3** | −0.000968 | −6.1 |
-| **v055** | `state_reset` 10000 | **0.688667** | +0.000516 | **+3.2** | +0.000062 | +0.4 |
-| v057 | `grad_clip` → 5.0 | 0.688293 | +0.000141 | +0.9 | −0.000944 | −5.9 |
-| v058 | `weight_decay` → 1e-4 | 0.688032 | −0.000119 | −0.7 | −0.000439 | −2.8 |
-| v056 | regularisation | 0.687772 | −0.000379 | −2.4 | −0.000540 | −3.4 |
-| v061 | head GELU → ReLU | 0.687064 | −0.001088 | −6.8 | −0.000065 | −0.4 |
-| v060 | `layers` 2 → 1 | 0.686824 | −0.001328 | **−8.3** | +0.000974 | **+6.1** |
+| | `full_valid_wp` |
+|---|---:|
+| predicted, if additive | **0.689332** (+7.4σ) |
+| best single component (v059) | 0.688676 (+3.3σ) |
+| baseline v054 | 0.688151 |
+| **v062 actual** | **0.687990 (−1.0σ)** |
 
-**Read the last two columns. The subset and the official metric disagree about the entire
-ranking, and not gently:**
+Stacking did not merely fail to help. It landed **below the baseline** and **0.000686 below v059
+alone**. Three levers that each help on their own:
 
-- **v060 was the subset's clear winner** (+6.1σ, monotonically strengthening across four
-  measurement rounds) and is the **worst model in the sweep** officially (−8.3σ).
-- **v059 was the subset's worst** (−6.1σ, and I twice recommended killing it on that basis)
-  and is the **best** officially (+3.3σ).
+```
+v059  lr 1e-3             +0.000524
+v055  state_reset 10000   +0.000516
+v057  grad_clip 5.0       +0.000141
+                        ─────────
+sum                      +0.001181      actual  −0.000161
+```
 
-**v060 would have shipped as the worst model we produced.** This is the fifth independent
-measurement of subset/full divergence here and by far the largest. Had the 200-sequence subset
-been the selector — as it was for the entire sweep — the sweep would have concluded that
-removing a recurrent layer was the biggest win of the project.
+**Why:** all three act on the **optimiser's effective step size**. Halving the learning rate,
+unclipping gradients and lengthening the training horizon are three ways of damping the same
+quantity, so the individual gains are largely *the same gain counted three times*.
 
-Also settled: **the optimiser surface is dead.** Four of five untouched knobs came back null or
-negative, and three got *worse* as data accumulated. `lr`, `weight_decay`, `grad_clip` and
-`schedule` sat frozen for 57 versions, and that turned out to be the right call by accident.
+**Rule this produced: no more stacking. Single-variable search only** — against a selector that
+works. The one lever that earned its place is **`lr` 1e-3** alone.
 
-**Packaged:** v059 and v055, both `STATUS: PASS`, p50 **39.92 / 39.96 µs/row on an idle
-machine** (all seven runs had finished). They differ by 0.000009 — indistinguishable — so the
-choice between them gets made on the public board, which is the only place that difference is
-visible at all.
+v062 is packaged (`STATUS: PASS`, 39.67 µs/row) but **not worth submitting**: below both v054
+and v059. Its value is the negative result, not a submission slot.
+
+## In flight — v063
+
+**v063 = v059 + `layers` 2 → 1**, a single-key change against our *strongest* model rather than
+the baseline.
+
+| | params | `full_valid_wp` | public | latency |
+|---|---:|---:|---:|---:|
+| v059 (lr 1e-3, 2 layers) | 225,922 | **0.688676** | **0.6600** | 39.92 µs/row |
+| v060 (lr 0.002, 1 layer) | 126,850 | 0.686824 | 0.6591 | **31.13 µs/row** |
+| **v063 (both)** | **126,850** | running | — | ~31 µs/row expected |
+
+**Why this is worth running after v062 failed:** v062 stacked three *step-size* levers and they
+overlapped. v060's result is a **capacity** change — a different axis — so this is the first
+stacking attempt here with a mechanistic reason to expect the gains to add.
+
+Falsifiable both ways: **~0.6887** means the axes are independent and v059's accuracy arrives at
+64% of the runtime budget; a fall toward v060's 0.6868 means capacity is not carrying its weight.
 
 ## Extreme cases and how they change how you read this table
 
