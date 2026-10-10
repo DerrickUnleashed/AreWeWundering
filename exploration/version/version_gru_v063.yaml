@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v063
   parent: gru_v059
-  status: running
+  status: finished
 description: 'v059 (lr 1e-3 -- the single best lever in the project, full_valid_wp
   0.688676, public 0.6600) with ONE change: model.layers 2 -> 1. Branched from v059
   rather than from v060 so the capacity change is measured against our strongest model,
@@ -197,15 +197,15 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: 0.13726651682381072
-  best_val_t0: 0.10593136562846249
-  best_val_t1: 0.16860166801915896
-  full_valid_wp: null
+  best_step: 38999
+  best_val_wp: 0.6977204706418231
+  best_val_t0: 0.6946995730142298
+  best_val_t1: 0.7007413682694164
+  full_valid_wp: 0.6880897299398298
   latency_us_p50: null
   latency_us_p99: null
-  train_hours: 0.0035
-  finished_utc: '2026-10-10T09:46:02Z'
+  train_hours: 2.0136
+  finished_utc: '2026-10-10T11:46:56Z'
   note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
     matched to serving, full length. Compare against v042 at 0.688268 local / 0.6600
     public.'
