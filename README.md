@@ -180,9 +180,10 @@ which is **not** comparable to the public column.
 | 58 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
 | 59 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
 | 60 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| — | **v063** | 0.688090 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
-| — | **v063** | -- | Training | -- | — |
+| — | **v064** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -298,23 +299,61 @@ project's history. The three latest runs say it plainly:
 more than twenty — was the **200-sequence subset's** fault, not local-versus-public. Select on
 `full_valid_wp` and the board follows.
 
-## In flight — v063
+## The layers × learning-rate grid — and why "independent axes" was wrong
 
-**v063 = v059 + `layers` 2 → 1**, a single-key change against our *strongest* model rather than
-the baseline.
+**v063** was v059 plus one recurrent layer instead of two. The prediction, written down first,
+was **~0.6887** on the argument that capacity and step size are different axes so the gains
+should add. **It was wrong. Actual: 0.688090.**
 
-| | params | `full_valid_wp` | public | latency |
+The 2×2 grid says exactly what happened:
+
+| | lr 0.002 | lr 1e-3 | cost of removing a layer |
+|---|---:|---:|---:|
+| 2 layers | 0.688151 | **0.688676** | |
+| 1 layer | 0.686824 | 0.688090 | −0.001328 at lr 0.002, **−0.000586** at lr 1e-3 |
+
+**The capacity hit is 56% smaller at the lower learning rate.** There is a real interaction, and
+it runs the opposite way to the one I assumed: the halved LR partly compensates for the missing
+layer. Reasoning that two knobs "should" act on different axes is not the same as measuring
+that they do, and the measurement won.
+
+v063 is therefore an **efficiency win, not an accuracy win** — statistically **tied with the
+baseline** (−0.4σ) at **44% of the parameters** and 33.13 µs/row against ~40, the fastest bundle
+we have.
+
+## In flight — v064
+
+**v064 = v059 + `training.epochs` 3 → 8.** One key. 106,072 steps, ~16 h.
+
+| | epochs | lr | `full_valid_wp` | public |
 |---|---:|---:|---:|---:|
-| v059 (lr 1e-3, 2 layers) | 225,922 | **0.688676** | **0.6600** | 39.92 µs/row |
-| v060 (lr 0.002, 1 layer) | 126,850 | 0.686824 | 0.6591 | **31.13 µs/row** |
-| **v063 (both)** | **126,850** | running | — | ~31 µs/row expected |
+| v059 | 3 | 1e-3 | **0.688676** | **0.6600** |
+| v064 | **8** | 1e-3 | running | — |
 
-**Why this is worth running after v062 failed:** v062 stacked three *step-size* levers and they
-overlapped. v060's result is a **capacity** change — a different axis — so this is the first
-stacking attempt here with a mechanistic reason to expect the gains to add.
+**Why this axis, and why it might behave like the last one.** Four 8-epoch runs exist
+(v037/v040/v044/v046) but **every one used lr 0.002**. This is the first at lr 1e-3.
 
-Falsifiable both ways: **~0.6887** means the axes are independent and v059's accuracy arrives at
-64% of the runtime budget; a fall toward v060's 0.6868 means capacity is not carrying its weight.
+Halving the learning rate halves the distance travelled per step, so the 3-epoch budget may be
+**too short** at this rate — meaning those runs were LR-limited rather than converged. If so,
+epochs and LR are the *same* axis, which is precisely the kind of interaction the grid above just
+demonstrated in another direction.
+
+Falsifiable: **~0.6887** means the axes are independent and the recipe is exhausted;
+materially higher means epochs and LR are one axis and the 3-epoch runs were LR-limited.
+
+## Where every axis stands
+
+| axis | result |
+|---|---|
+| `lr` 1e-3 | **+3.3σ — the only lever that earned its place** |
+| `layers` 1 | −3.7σ vs v059, tied with baseline — capacity is not free |
+| stacking three levers | −1.0σ — they all damp the same quantity |
+| `grad_clip` 5.0 | +0.9σ, inside noise |
+| `weight_decay` 1e-4 | −0.7σ, null |
+| preprocessing | never worked; all apparent gains were seed noise |
+| `epochs` 8 @ lr 1e-3 | **v064, in flight** |
+
+**Nothing has beaten 0.6600.** Every run since the sweep is v059 plus a failed variation.
 
 ## Extreme cases and how they change how you read this table
 
