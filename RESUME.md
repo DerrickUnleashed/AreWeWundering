@@ -46,7 +46,7 @@ reference metric in `tools/metric_ref.py`.
 | 15 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Submitted | 0.6594 | 47m42s (80%) | 628 MB |
 | 16 | **v054** | v042 recipe EXACTLY, on the patched... | 0.688151 | Submitted | 0.6597 | 45m27s (76%) | 628 MB |
 | 17 | **v058** | v054 EXACTLY with ONE change:... | 0.688032 | Submitted | 0.6592 | 46m42s (78%) | 628 MB |
-| 18 | **v062** | v054 with the THREE sweep winners stacked:... | 0.687990 | Ready to Submit | -- | 42m12s (70%) | -- |
+| 18 | **v062** | v054 with the THREE sweep winners stacked:... | 0.687990 | Submitted | 0.6587 | 45m37s (76%) | 628 MB |
 | 19 | **v043** | v039 with ONLY dozken reset4k as teacher,... | 0.687944 | Submitted | 0.6569 | 45m52s (76%) | 628 MB |
 | 20 | **v056** | v054's recipe with the REGULARISATION/HEAD... | 0.687772 | Submitted | 0.6591 | 50m37s (84%) | 628 MB |
 | 21 | **v038** | v031's exact recipe with ONE change: AdamW... | 0.687577 | Submitted | 0.6588 | 48m06s (80%) | 628 MB |
