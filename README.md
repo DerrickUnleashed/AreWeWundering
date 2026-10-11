@@ -1,3 +1,9 @@
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:667EEA,100:764BA2&height=300&section=header&text=Alfa%20Connectome&fontSize=70&animation=fadeIn&fontAlignY=38&desc=Wunder%20Fund%20competition%20-%20stateful%20sequence%20models%20for%20t0%2Ft1%20forecasting&descAlignY=55&descAlign=50" width="100%" alt="Alfa Connectome" />
+
+</div>
+
 # Alfa Connectome — public results
 
 **One table, ranked by public score.** This is the only number that decides the prize, so it
