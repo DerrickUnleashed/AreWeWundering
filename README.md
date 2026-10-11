@@ -180,10 +180,10 @@ which is **not** comparable to the public column.
 | 58 | **v010** | 0.670696 | **0.6427** | -0.0173 | 34m37s (58%) |
 | 59 | **v001** | 0.674315 | **0.6416** | -0.0184 | 34m02s (57%) |
 | 60 | **v033** | 0.660415 | **0.6274** | -0.0326 | 47m22s (79%) |
+| — | **v064** | 0.689476 | Ready to Submit | -- | — |
 | — | **v063** | 0.688090 | Ready to Submit | -- | — |
 | — | **v026** | 0.684335 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
 | — | **v027** | 0.683058 | **killed at 69m57s (117%)** | -- | 69m57s (117%) |
-| — | **v064** | -- | Training | -- | — |
 
 **The rows marked `killed at ...` are the clearest evidence for the
 capacity result.** **v026**, **v027** are the two largest models this project ever built. Locally they were
@@ -321,25 +321,39 @@ v063 is therefore an **efficiency win, not an accuracy win** — statistically *
 baseline** (−0.4σ) at **44% of the parameters** and 33.13 µs/row against ~40, the fastest bundle
 we have.
 
-## In flight — v064
+## v064 — the first real win: 0.689476
 
-**v064 = v059 + `training.epochs` 3 → 8.** One key. 106,072 steps, ~16 h.
+**v059 + `training.epochs` 3 → 8.** One key. 106,072 steps, 15.87 h.
 
-| | epochs | lr | `full_valid_wp` | public |
-|---|---:|---:|---:|---:|
-| v059 | 3 | 1e-3 | **0.688676** | **0.6600** |
-| v064 | **8** | 1e-3 | running | — |
+| vs | `full_valid_wp` | Δ | σ |
+|---|---:|---:|---:|
+| **v059** (3 epochs, same lr) | 0.688676 | **+0.000801** | **+5.0** |
+| v054 baseline | 0.688151 | +0.001325 | +8.3 |
+| v062 (failed stack) | 0.687990 | +0.001486 | +9.3 |
+| v063 (1 layer) | 0.688090 | +0.001387 | +8.7 |
 
-**Why this axis, and why it might behave like the last one.** Four 8-epoch runs exist
-(v037/v040/v044/v046) but **every one used lr 0.002**. This is the first at lr 1e-3.
+**0.689476 — the best `full_valid_wp` in the project.** Every run since the seven-run sweep was
+v059 plus a failed variation. This beats all of them.
 
-Halving the learning rate halves the distance travelled per step, so the 3-epoch budget may be
-**too short** at this rate — meaning those runs were LR-limited rather than converged. If so,
-epochs and LR are the *same* axis, which is precisely the kind of interaction the grid above just
-demonstrated in another direction.
+### The pre-registered prediction failed, and the truth is more useful
 
-Falsifiable: **~0.6887** means the axes are independent and the recipe is exhausted;
-materially higher means epochs and LR are one axis and the 3-epoch runs were LR-limited.
+It predicted **~0.6887**, on the argument that epochs and LR are independent axes. Actual
+**0.689476** — **0.000800 higher**.
+
+So they are *not* independent, but in the **opposite** direction to v063's interaction. The
+**3-epoch budget was LR-limited, not converged**, and giving it room at the halved rate pays
+better than anything else we have tried.
+
+### This inverts v062's conclusion, usefully
+
+v062 stacked three step-size levers and collapsed to 0.687990, *below every one of them*.
+v064 is a **single axis pushed 8×** and beats all three combined.
+
+**The way past a failed stack is not to stack less — it is to find the axis that actually had
+headroom.**
+
+Packaged: `STATUS: PASS`, parity 2.146e-06, **39.58 µs/row idle**, 2.42 MB. On the +0.947
+calibration this should land near **0.6608** — the first run to genuinely beat 0.6600.
 
 ## Where every axis stands
 
