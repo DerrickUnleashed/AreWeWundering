@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v064
   parent: gru_v059
-  status: running
+  status: finished
 description: 'v059 with ONE change: training.epochs 3 -> 8. v059 is the project''s
   strongest single-lever result (full_valid_wp 0.688676, public 0.6600) at lr 1e-3.
   The 8-epoch arm has been tried before but NEVER at this learning rate -- v037/v040/v044/v046
@@ -198,19 +198,19 @@ inference:
   target_us_per_row: 68.5
   state_reset: 4000
 results:
-  best_step: 59
-  best_val_wp: -0.13601352855833346
-  best_val_t0: 0.004994745953603139
-  best_val_t1: -0.2770218030702701
-  full_valid_wp: null
-  latency_us_p50: null
-  latency_us_p99: null
-  train_hours: 0.0064
-  finished_utc: '2026-10-10T12:25:08Z'
+  best_step: 100499
+  best_val_wp: 0.6988095972415358
+  best_val_t0: 0.6953533803196823
+  best_val_t1: 0.7022658141633893
+  full_valid_wp: 0.6894763719264951
+  latency_us_p50: 39.58
+  latency_us_p99: 60.17
+  train_hours: 15.8699
+  finished_utc: '2026-10-11T04:17:25Z'
   note: 'THE run that prices the state-carry fix: v042 recipe, patched, training horizon
     matched to serving, full length. Compare against v042 at 0.688268 local / 0.6600
     public.'
 artifacts:
   log: exploration/logs/log_gru_v064.log
   checkpoint_dir: exploration/checkpoints/checkpoint_gru_v064
-  submission_dir: null
+  submission_dir: submissions/submission_gru_v064
