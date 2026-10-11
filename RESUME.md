@@ -46,7 +46,7 @@ reference metric in `tools/metric_ref.py`.
 | 15 | **v042** | v039 with a THREE-member teacher: dozken... | 0.688268 | Submitted | 0.6600 | 44m31s (74%) | 628 MB |
 | 16 | **v039** | v031's exact recipe with a BETTER TEACHER | 0.688212 | Submitted | 0.6594 | 47m42s (80%) | 628 MB |
 | 17 | **v054** | v042 recipe EXACTLY, on the patched... | 0.688151 | Submitted | 0.6597 | 45m27s (76%) | 628 MB |
-| 18 | **v063** | v059 (lr 1e-3 -- the single best lever in... | 0.688090 | Ready to Submit | -- | 35m12s (59%) | -- |
+| 18 | **v063** | v059 (lr 1e-3 -- the single best lever in... | 0.688090 | Submitted | 0.6599 | 39m11s (65%) | 626 MB |
 | 19 | **v058** | v054 EXACTLY with ONE change:... | 0.688032 | Submitted | 0.6592 | 46m42s (78%) | 628 MB |
 | 20 | **v062** | v054 with the THREE sweep winners stacked:... | 0.687990 | Submitted | 0.6587 | 45m37s (76%) | 628 MB |
 | 21 | **v043** | v039 with ONLY dozken reset4k as teacher,... | 0.687944 | Submitted | 0.6569 | 45m52s (76%) | 628 MB |
