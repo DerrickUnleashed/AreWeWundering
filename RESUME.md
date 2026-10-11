@@ -30,7 +30,7 @@ reference metric in `tools/metric_ref.py`.
 | Rank | Ver | What it changed | full_valid_wp | Status | Public score | Duration | Memory |
 |---:|---|---|---:|---|---|---:|---|
 | 1 | **v044** | v039 with epochs 3 -> 8 AND distill_weight... | 0.689846 | Submitted | 0.6599 | 47m41s (79%) | 628 MB |
-| 2 | **v064** | v059 with ONE change: training.epochs 3 -> 8 | 0.689476 | Ready to Submit | -- | 42m06s (70%) | -- |
+| 2 | **v064** | v059 with ONE change: training.epochs 3 -> 8 | 0.689476 | Submitted | 0.6604 | 44m47s (75%) | 628 MB |
 | 3 | **v040** | v039 (our best at 0.6594) trained for 8... | 0.689146 | Submitted | 0.6596 | 44m57s (75%) | 628 MB |
 | 4 | **v045** | v041 with hidden 128 -> 192, i.e | 0.689116 | Submitted | 0.6595 | 55m37s (93%) | 634 MB |
 | 5 | **v041** | v039 with distill_weight 2.0 -> 3.0, i.e | 0.689036 | Submitted | 0.6593 | 46m51s (78%) | 628 MB |
