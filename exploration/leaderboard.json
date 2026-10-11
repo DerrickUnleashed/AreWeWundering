@@ -543,5 +543,14 @@
     "uploaded_filename": "submission_gru_v063.zip",
     "outcome": "SCORED",
     "note": "THE EFFICIENCY MODEL. v059's lever (lr 1e-3) with ONE recurrent layer instead of two: 126,850 params against 225,922. full_valid_wp 0.688090, i.e. -0.000061 vs v054 baseline = -0.4 sigma, statistically TIED. Public 0.6599, also tied with v054's 0.6597 to within 0.0002. So the official metric correctly predicted 'no difference from baseline' and the board agreed to within 0.0002 -- the selector working as designed. The value here is RUNTIME, not score: 39m11s = 65% of budget against v042's 44m31s = 74%, and the lowest memory of any submission (626MB). Same score for 12% less of the time budget."
+  },
+  "v064": {
+    "public_score": 0.6604,
+    "grader_seconds": 2687,
+    "memory_mb": 628,
+    "submitted_utc": "2026-10-11T10:03Z",
+    "uploaded_filename": "submission_gru_v064.zip",
+    "outcome": "SCORED",
+    "note": "OUR BEST. v059's recipe with ONE change: training.epochs 3 -> 8 (106,072 steps, 15.87 h). Local full_valid_wp 0.689476 vs v059's 0.688676, i.e. +0.000801 (+5.0 sigma on the AGENTS.md 11.4a threshold) -- the strongest single-variable result in the project. That local gain transferred as +0.0004 public, so about HALF of it survived the trip. The pre-registered prediction was ~0.6887 assuming independence of epochs and lr; the actual 0.689476 falsified it in the helpful direction -- the 3-epoch budget was LR-limited rather than converged. Beats v042/v047/v048/v059, all of which sat at 0.6600, by +0.0004. RAN 44m47s = 75% of budget. FIRST SUBMISSION TO EXCEED 0.6600."
   }
 }
