@@ -534,5 +534,14 @@
     "uploaded_filename": "submission_gru_v062.zip",
     "outcome": "SCORED",
     "note": "THE STACKING FAILURE, submitted to confirm it. v054's recipe with all three sweep winners stacked: lr 0.002->0.001, grad_clip 1.0->5.0, training.state_reset 4000->10000. Local full_valid_wp 0.687990, i.e. -0.000161 (-1.0 sigma) vs v054 and -0.000686 vs v059, against a pre-registered additive prediction of 0.689332 (+7.4 sigma). Public 0.6587, LAST of the three, which is exactly where full_valid_wp ranked it. Confirms both the negative result and, again, that the official metric predicts the board. Duration 45m37s = 76%."
+  },
+  "v063": {
+    "public_score": 0.6599,
+    "grader_seconds": 2351,
+    "memory_mb": 626,
+    "submitted_utc": "2026-10-10T18:15Z",
+    "uploaded_filename": "submission_gru_v063.zip",
+    "outcome": "SCORED",
+    "note": "THE EFFICIENCY MODEL. v059's lever (lr 1e-3) with ONE recurrent layer instead of two: 126,850 params against 225,922. full_valid_wp 0.688090, i.e. -0.000061 vs v054 baseline = -0.4 sigma, statistically TIED. Public 0.6599, also tied with v054's 0.6597 to within 0.0002. So the official metric correctly predicted 'no difference from baseline' and the board agreed to within 0.0002 -- the selector working as designed. The value here is RUNTIME, not score: 39m11s = 65% of budget against v042's 44m31s = 74%, and the lowest memory of any submission (626MB). Same score for 12% less of the time budget."
   }
 }
