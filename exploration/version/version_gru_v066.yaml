@@ -3,7 +3,7 @@ identity:
   model: gru
   version: v066
   parent: gru_v064
-  status: finished
+  status: running
 description: 'v064''s EXACT recipe at seed 1338 instead of 1337. Not a candidate --
   a CONTROL. It exists to answer one question: is v064''s 0.6604 a real gain or seed
   luck?'
